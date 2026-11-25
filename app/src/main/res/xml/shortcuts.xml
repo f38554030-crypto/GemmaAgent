@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_chat"
+        android:shortcutId="new_chat"
+        android:shortcutShortLabel="@string/shortcut_new_chat">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.gemmaagent.app.MainActivity"
+            android:targetPackage="com.gemmaagent.app">
+            <extra android:name="shortcut" android:value="new_chat" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_online"
+        android:shortcutId="online"
+        android:shortcutShortLabel="@string/shortcut_online">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.gemmaagent.app.MainActivity"
+            android:targetPackage="com.gemmaagent.app">
+            <extra android:name="shortcut" android:value="online" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_scan"
+        android:shortcutId="scan_image"
+        android:shortcutShortLabel="@string/shortcut_scan">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.gemmaagent.app.MainActivity"
+            android:targetPackage="com.gemmaagent.app">
+            <extra android:name="shortcut" android:value="scan_image" />
+        </intent>
+    </shortcut>
+</shortcuts>

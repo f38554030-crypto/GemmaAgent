@@ -2,6 +2,9 @@ name: Build APK
 
 on:
   push:
+    # Semua branch (termasuk main) dan semua tag rilis.
+    branches: ["**"]
+    tags: ["*"]
   workflow_dispatch:
 
 permissions:
@@ -20,7 +23,7 @@ jobs:
       - name: Ambil kode
         uses: actions/checkout@v5
 
-      - name: Pasang Java 17
+      - name: Pasang JDK 17
         uses: actions/setup-java@v5
         with:
           distribution: temurin
@@ -42,22 +45,22 @@ jobs:
           path: ~/.android/debug.keystore
           key: gemma-agent-debug-keystore-v1
 
-      - name: Build APK
+      - name: Build APK (assembleDebug)
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleRelease --stacktrace --no-daemon
+          ./gradlew assembleDebug --stacktrace --no-daemon
 
       - name: Siapkan file APK
         run: |
           mkdir -p out
-          cp app/build/outputs/apk/release/app-release.apk out/GemmaAgent.apk
+          cp app/build/outputs/apk/debug/app-debug.apk out/GemmaChatHybrid.apk
           ls -lh out
 
       - name: Unggah APK (Artifact)
         uses: actions/upload-artifact@v4
         with:
-          name: GemmaAgent-APK
-          path: out/GemmaAgent.apk
+          name: GemmaChatHybrid-APK
+          path: out/GemmaChatHybrid.apk
           if-no-files-found: error
 
       - name: Terbitkan ke halaman Releases (tag apk-terbaru)
@@ -65,9 +68,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete apk-terbaru --cleanup-tag --yes --repo "$GITHUB_REPOSITORY" || true
-          gh release create apk-terbaru out/GemmaAgent.apk \
+          gh release create apk-terbaru out/GemmaChatHybrid.apk \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --prerelease \
-            --title "Gemma Agent APK (build terbaru)" \
-            --notes "APK otomatis dari commit $GITHUB_SHA (branch ${GITHUB_REF_NAME}). Unduh GemmaAgent.apk di bawah, lalu instal di HP."
+            --title "GemmaChat Hybrid APK (build terbaru)" \
+            --notes "APK otomatis dari commit $GITHUB_SHA (${GITHUB_REF_NAME}). Unduh GemmaChatHybrid.apk di bawah lalu instal di HP."

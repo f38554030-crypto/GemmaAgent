@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Gemma Agent</string>
-    <string name="accessibility_label">Gemma Agent (Kontrol Layar AI)</string>
-    <string name="accessibility_description">Mengizinkan agen AI lokal Gemma membaca teks di layar dan menjalankan perintah ketuk, ketik, geser, buka aplikasi, kembali, dan beranda atas permintaan Anda. Semua proses berjalan offline di HP ini.</string>
+    <string name="app_name">GemmaChat Hybrid</string>
+    <string name="shortcut_new_chat">Chat Baru</string>
+    <string name="shortcut_online">Pencarian Online</string>
+    <string name="shortcut_scan">Pindai Gambar</string>
 </resources>

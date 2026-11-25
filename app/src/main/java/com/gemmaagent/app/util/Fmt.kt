@@ -12,4 +12,8 @@ object Fmt {
     fun gb(bytes: Long): String = String.format(ID, "%.2f", bytes / (1024.0 * 1024 * 1024))
 
     fun gbFromMb(mb: Long): String = String.format(ID, "%.1f", mb / 1024.0)
+
+    fun seconds(ms: Long): String = String.format(ID, "%.1f", ms / 1000.0)
+
+    fun one(v: Double): String = String.format(ID, "%.1f", v)
 }

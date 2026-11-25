@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
-/** Status proses penyalinan model (cara cadangan lewat File Picker). */
+/** Status penyalinan model (cara cadangan lewat File Picker). */
 sealed interface CopyState {
     data object Idle : CopyState
     data class Copying(val percent: Int, val copiedBytes: Long, val totalBytes: Long) : CopyState
@@ -26,49 +26,46 @@ sealed interface CopyState {
     data class Error(val message: String) : CopyState
 }
 
-enum class ModelSource {
-    /** Dibaca langsung dari /storage/emulated/0/Download (tanpa salin). */
-    DOWNLOAD_DIRECT,
+enum class ModelSource { DOWNLOAD_DIRECT, INTERNAL_COPY }
 
-    /** Salinan di memori internal aplikasi (filesDir). */
-    INTERNAL_COPY,
-    NONE,
-}
-
-data class ModelInfo(
-    val source: ModelSource,
-    val path: String?,
-    val name: String,
-    val sizeBytes: Long,
-) {
-    val ready: Boolean get() = source != ModelSource.NONE && path != null
+data class ModelFile(val path: String, val name: String, val sizeBytes: Long, val source: ModelSource) {
+    /** Label pendek untuk Top App Bar, mis. "Gemma 4 E2B". */
+    val shortLabel: String
+        get() {
+            val n = name.removeSuffix(".litertlm")
+            val gemma = Regex("gemma[-_ ]?(\\d+n?)[-_ ]?([a-z0-9]+)?", RegexOption.IGNORE_CASE).find(n)
+            return if (gemma != null) {
+                val ver = gemma.groupValues[1]
+                val size = gemma.groupValues[2].uppercase().takeIf { it.isNotEmpty() && it != "IT" }
+                listOfNotNull("Gemma $ver", size).joinToString(" ")
+            } else n.take(18)
+        }
 }
 
 /**
- * Mengelola lokasi file model .litertlm.
- *
- * Cara utama: dengan izin "Akses Semua File" (MANAGE_EXTERNAL_STORAGE), aplikasi
- * mendeteksi otomatis gemma-4-E2B-it.litertlm di folder Download dan membacanya
- * LANGSUNG dari sana (tanpa menyalin 2,59 GB).
- *
- * Cara cadangan: pilih file lewat File Picker → disalin sekali ke filesDir.
+ * Manajer Multi-Model (.litertlm):
+ * - Pemuatan langsung (zero-copy) dari /storage/emulated/0/Download dengan izin "Akses Semua File".
+ * - Pemindai otomatis semua file .litertlm di folder Download (sampai 2 tingkat subfolder).
+ * - Cara cadangan: pilih file → disalin sekali ke memori internal.
  */
 class ModelRepository(
     private val context: Context,
     private val scope: CoroutineScope,
+    private val settings: SettingsRepository,
     private val beforeReplace: () -> Unit,
 ) {
     private val prefs = context.getSharedPreferences("model_prefs", Context.MODE_PRIVATE)
     private val modelDir = File(context.filesDir, "models")
-
-    /** Lokasi salinan internal (cara cadangan). */
     val internalFile: File = File(modelDir, "gemma-model.litertlm")
 
     private val _copyState = MutableStateFlow<CopyState>(CopyState.Idle)
     val copyState: StateFlow<CopyState> = _copyState.asStateFlow()
 
-    private val _info = MutableStateFlow(ModelInfo(ModelSource.NONE, null, "Belum ada model", 0))
-    val info: StateFlow<ModelInfo> = _info.asStateFlow()
+    private val _models = MutableStateFlow<List<ModelFile>>(emptyList())
+    val models: StateFlow<List<ModelFile>> = _models.asStateFlow()
+
+    private val _active = MutableStateFlow<ModelFile?>(null)
+    val active: StateFlow<ModelFile?> = _active.asStateFlow()
 
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
@@ -79,10 +76,8 @@ class ModelRepository(
         refresh()
     }
 
-    /** Path model yang dipakai mesin AI saat ini (null jika belum ada). */
-    fun currentModelPath(): String? = _info.value.path
+    fun currentModelPath(): String? = _active.value?.path
 
-    /** Apakah izin baca penyimpanan (Akses Semua File) sudah diberikan. */
     fun hasStorageAccess(): Boolean =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
@@ -91,69 +86,68 @@ class ModelRepository(
                 PackageManager.PERMISSION_GRANTED
         }
 
-    /** Pindai ulang folder Download dan salinan internal. Aman dipanggil kapan saja. */
     fun refresh() {
         scope.launch(Dispatchers.IO) {
             _scanning.value = true
             try {
-                _info.value = detect()
-            } catch (t: Throwable) {
-                _info.value = ModelInfo(ModelSource.NONE, null, "Gagal memindai: ${t.message ?: t.javaClass.simpleName}", 0)
+                val list = scan()
+                _models.value = list
+                val selected = settings.current.selectedModelPath
+                _active.value = list.firstOrNull { it.path == selected }
+                    ?: list.firstOrNull { it.name.equals(PREFERRED_NAME, true) }
+                    ?: list.firstOrNull()
+            } catch (_: Throwable) {
+                _models.value = emptyList()
+                _active.value = null
             } finally {
                 _scanning.value = false
             }
         }
     }
 
-    private fun detect(): ModelInfo {
-        // 1) Prioritas: baca langsung dari folder Download.
+    fun select(model: ModelFile) {
+        settings.update { it.copy(selectedModelPath = model.path) }
+        _active.value = model
+    }
+
+    private fun scan(): List<ModelFile> {
+        val result = mutableListOf<ModelFile>()
         if (hasStorageAccess()) {
-            findInDownload()?.let { f ->
-                return ModelInfo(ModelSource.DOWNLOAD_DIRECT, f.absolutePath, f.name, f.length())
+            val roots = listOf(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+                File("/storage/emulated/0/Download"),
+            ).distinctBy { runCatching { it.canonicalPath }.getOrDefault(it.absolutePath) }
+            val seen = HashSet<String>()
+            for (root in roots) {
+                if (!root.isDirectory) continue
+                root.walkTopDown().maxDepth(2).onFail { _, _ -> }
+                    .filter { it.isFile && it.name.endsWith(".litertlm", true) && it.length() > MIN_MODEL_BYTES && it.canRead() }
+                    .forEach { f ->
+                        val key = runCatching { f.canonicalPath }.getOrDefault(f.absolutePath)
+                        if (seen.add(key)) result += ModelFile(f.absolutePath, f.name, f.length(), ModelSource.DOWNLOAD_DIRECT)
+                    }
             }
         }
-        // 2) Cadangan: salinan internal yang lengkap.
         val expected = prefs.getLong(KEY_SIZE, -1L)
         if (internalFile.isFile && internalFile.length() > 0 && internalFile.length() == expected) {
-            return ModelInfo(
-                ModelSource.INTERNAL_COPY,
+            result += ModelFile(
                 internalFile.absolutePath,
                 prefs.getString(KEY_NAME, null) ?: internalFile.name,
                 internalFile.length(),
+                ModelSource.INTERNAL_COPY,
             )
         }
-        return ModelInfo(ModelSource.NONE, null, "Belum ada model", 0)
+        return result.sortedWith(
+            compareByDescending<ModelFile> { it.name.equals(PREFERRED_NAME, true) }
+                .thenBy { it.source.ordinal }
+                .thenBy { it.name.lowercase() }
+        )
     }
 
-    private fun findInDownload(): File? {
-        val roots = buildList {
-            add(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS))
-            add(File("/storage/emulated/0/Download"))
-        }.distinctBy { it.absolutePath }
-
-        for (root in roots) {
-            val exact = File(root, PREFERRED_NAME)
-            if (exact.isFile && exact.canRead() && exact.length() > MIN_MODEL_BYTES) return exact
-        }
-        val candidates = roots.flatMap { root ->
-            if (!root.isDirectory) emptyList()
-            else root.walkTopDown()
-                .maxDepth(2)
-                .onFail { _, _ -> }
-                .filter { it.isFile && it.name.endsWith(".litertlm", ignoreCase = true) && it.length() > MIN_MODEL_BYTES && it.canRead() }
-                .toList()
-        }
-        return candidates.sortedWith(
-            compareByDescending<File> { it.name.contains("gemma-4", true) && it.name.contains("e2b", true) }
-                .thenByDescending { it.length() }
-        ).firstOrNull()
-    }
-
-    /** Menghapus salinan internal (hemat ±2,6 GB) bila model sudah dibaca langsung dari Download. */
     fun deleteInternalCopy() {
         scope.launch(Dispatchers.IO) {
             try {
-                if (_info.value.source == ModelSource.INTERNAL_COPY) beforeReplace()
+                if (_active.value?.source == ModelSource.INTERNAL_COPY) runCatching { beforeReplace() }
                 internalFile.delete()
                 prefs.edit().remove(KEY_NAME).remove(KEY_SIZE).apply()
                 _copyState.value = CopyState.Done("Salinan internal dihapus.")
@@ -165,17 +159,15 @@ class ModelRepository(
         }
     }
 
-    // ------------------------------------------------------------------
-    // CARA CADANGAN: File Picker → salin ke filesDir
-    // ------------------------------------------------------------------
+    // ---------------- Cara cadangan: salin dari File Picker ----------------
 
     fun importModel(uri: Uri) {
         if (copyJob?.isActive == true) return
         copyJob = scope.launch(Dispatchers.IO) {
             try {
                 copyInternal(uri)
-            } catch (oom: OutOfMemoryError) {
-                _copyState.value = CopyState.Error("Memori RAM tidak cukup saat menyalin. Tutup aplikasi lain lalu coba lagi.")
+            } catch (_: OutOfMemoryError) {
+                _copyState.value = CopyState.Error("RAM tidak cukup saat menyalin. Tutup aplikasi lain lalu coba lagi.")
             } catch (t: Throwable) {
                 _copyState.value = CopyState.Error("Gagal menyalin: ${t.message ?: t.javaClass.simpleName}")
             } finally {
@@ -190,53 +182,42 @@ class ModelRepository(
         var name = "model.litertlm"
         var size = -1L
         runCatching {
-            resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)
-                ?.use { c ->
-                    if (c.moveToFirst()) {
-                        val ni = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                        val si = c.getColumnIndex(OpenableColumns.SIZE)
-                        if (ni >= 0 && !c.isNull(ni)) name = c.getString(ni)
-                        if (si >= 0 && !c.isNull(si)) size = c.getLong(si)
-                    }
+            resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)?.use { c ->
+                if (c.moveToFirst()) {
+                    val ni = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    val si = c.getColumnIndex(OpenableColumns.SIZE)
+                    if (ni >= 0 && !c.isNull(ni)) name = c.getString(ni)
+                    if (si >= 0 && !c.isNull(si)) size = c.getLong(si)
                 }
+            }
         }
-
         if (!name.lowercase().endsWith(".litertlm")) {
-            _copyState.value = CopyState.Error("File \"$name\" bukan model .litertlm. Pilih file Gemma 4 E2B IT berekstensi .litertlm.")
+            _copyState.value = CopyState.Error("File \"$name\" bukan model .litertlm.")
             return
         }
-
-        // Cukup satu kali: kalau file yang sama sudah tersalin, lewati.
-        if (internalFile.isFile && prefs.getString(KEY_NAME, null) == name &&
-            size > 0 && prefs.getLong(KEY_SIZE, -1L) == size && internalFile.length() == size
-        ) {
-            _copyState.value = CopyState.Done("Model \"$name\" sudah tersalin sebelumnya. Tidak perlu menyalin ulang.")
+        if (internalFile.isFile && prefs.getString(KEY_NAME, null) == name && size > 0 && internalFile.length() == size) {
+            _copyState.value = CopyState.Done("Model \"$name\" sudah tersalin sebelumnya.")
             return
         }
-
         modelDir.mkdirs()
         if (size > 0) {
             val needed = size + 200L * 1024 * 1024
             val available = modelDir.usableSpace + (if (internalFile.exists()) internalFile.length() else 0L)
             if (available < needed) {
-                _copyState.value = CopyState.Error(
-                    "Memori internal tidak cukup. Butuh sekitar ${Fmt.gb(needed)} GB ruang kosong, tersedia ${Fmt.gb(available)} GB."
-                )
+                _copyState.value = CopyState.Error("Memori internal tidak cukup. Butuh ${Fmt.gb(needed)} GB, tersedia ${Fmt.gb(available)} GB.")
                 return
             }
         }
-
         val temp = File(modelDir, "${internalFile.name}.part")
         temp.delete()
         _copyState.value = CopyState.Copying(0, 0, size)
-
         val input = resolver.openInputStream(uri) ?: run {
             _copyState.value = CopyState.Error("File tidak bisa dibuka.")
             return
         }
         var copied = 0L
         var lastPercent = -1
-        var lastEmitBytes = 0L
+        var lastEmit = 0L
         input.use { ins ->
             temp.outputStream().use { out ->
                 val buffer = ByteArray(1024 * 1024)
@@ -246,13 +227,13 @@ class ModelRepository(
                     out.write(buffer, 0, read)
                     copied += read
                     if (size > 0) {
-                        val percent = ((copied * 100) / size).toInt().coerceIn(0, 100)
-                        if (percent != lastPercent) {
-                            lastPercent = percent
-                            _copyState.value = CopyState.Copying(percent, copied, size)
+                        val p = ((copied * 100) / size).toInt().coerceIn(0, 100)
+                        if (p != lastPercent) {
+                            lastPercent = p
+                            _copyState.value = CopyState.Copying(p, copied, size)
                         }
-                    } else if (copied - lastEmitBytes >= 50L * 1024 * 1024) {
-                        lastEmitBytes = copied
+                    } else if (copied - lastEmit >= 50L * 1024 * 1024) {
+                        lastEmit = copied
                         _copyState.value = CopyState.Copying(0, copied, size)
                     }
                 }
@@ -260,22 +241,20 @@ class ModelRepository(
                 runCatching { out.fd.sync() }
             }
         }
-
         if (size > 0 && copied != size) {
             temp.delete()
-            _copyState.value = CopyState.Error("Penyalinan tidak lengkap (${Fmt.gb(copied)} dari ${Fmt.gb(size)} GB). Coba lagi.")
+            _copyState.value = CopyState.Error("Penyalinan tidak lengkap. Coba lagi.")
             return
         }
-
-        // Lepaskan model lama dari RAM sebelum file-nya diganti.
         runCatching { beforeReplace() }
         internalFile.delete()
         if (!temp.renameTo(internalFile)) {
             temp.delete()
-            _copyState.value = CopyState.Error("Gagal menyimpan model ke memori internal.")
+            _copyState.value = CopyState.Error("Gagal menyimpan model.")
             return
         }
         prefs.edit().putString(KEY_NAME, name).putLong(KEY_SIZE, internalFile.length()).apply()
+        settings.update { it.copy(selectedModelPath = internalFile.absolutePath) }
         _copyState.value = CopyState.Done("Model \"$name\" berhasil disalin (${Fmt.gb(copied)} GB).")
     }
 
