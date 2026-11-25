@@ -1,0 +1,63 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-apk-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Ambil kode
+        uses: actions/checkout@v4
+
+      - name: Pasang Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Pasang Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Pasang Gradle (dengan cache)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build APK
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease --stacktrace --no-daemon
+
+      - name: Siapkan file APK
+        run: |
+          mkdir -p out
+          cp app/build/outputs/apk/release/app-release.apk out/GemmaAgent.apk
+          ls -lh out
+
+      - name: Unggah APK (Artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: GemmaAgent-APK
+          path: out/GemmaAgent.apk
+          if-no-files-found: error
+
+      - name: Terbitkan ke halaman Releases (tag apk-terbaru)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete apk-terbaru --cleanup-tag --yes --repo "$GITHUB_REPOSITORY" || true
+          gh release create apk-terbaru out/GemmaAgent.apk \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --prerelease \
+            --title "Gemma Agent APK (build terbaru)" \
+            --notes "APK otomatis dari commit $GITHUB_SHA (branch ${GITHUB_REF_NAME}). Unduh GemmaAgent.apk di bawah, lalu instal di HP."
