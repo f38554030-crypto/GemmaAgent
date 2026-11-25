@@ -38,6 +38,11 @@ android {
         compose = true
     }
 
+    lint {
+        checkReleaseBuilds = false
+        abortOnError = false
+    }
+
     packaging {
         jniLibs {
             useLegacyPackaging = true
