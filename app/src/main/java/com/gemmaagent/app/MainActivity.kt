@@ -110,7 +110,6 @@ class MainActivity : FragmentActivity() {
                 }
             }
         }
-        if (!unlocked) authenticate()
     }
 
     private var backgroundAt = 0L
@@ -120,6 +119,8 @@ class MainActivity : FragmentActivity() {
         backgroundAt = System.currentTimeMillis()
     }
 
+    private var prompting = false
+
     override fun onStart() {
         super.onStart()
         // Kunci lagi bila aplikasi ditinggal lebih dari 60 detik.
@@ -127,8 +128,12 @@ class MainActivity : FragmentActivity() {
             System.currentTimeMillis() - backgroundAt > 60_000L
         ) {
             unlocked = false
-            authenticate()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (GemmaChatApp.instance.settings.current.biometricLock && !unlocked && !prompting) authenticate()
     }
 
     override fun onNewIntent(intent: Intent) {
@@ -152,7 +157,13 @@ class MainActivity : FragmentActivity() {
         }
         val prompt = BiometricPrompt(this, ContextCompat.getMainExecutor(this), object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                prompting = false
                 unlocked = true
+            }
+
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                // Tetap terkunci; pengguna bisa menekan "Buka kunci" untuk mencoba lagi.
+                prompting = false
             }
         })
         val info = BiometricPrompt.PromptInfo.Builder()
@@ -160,7 +171,8 @@ class MainActivity : FragmentActivity() {
             .setSubtitle("Lindungi riwayat obrolan & memori pribadi")
             .setAllowedAuthenticators(authenticators)
             .build()
-        runCatching { prompt.authenticate(info) }.onFailure { unlocked = true }
+        prompting = true
+        runCatching { prompt.authenticate(info) }.onFailure { prompting = false }
     }
 
     companion object {

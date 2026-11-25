@@ -193,7 +193,7 @@ fun AssistantBubble(
                     .animateContentSize()
             ) {
                 if (live) {
-                    LiveContent(stream!!)
+                    LiveContent(stream)
                 } else {
                     if (msg.thought.isNotBlank() && msg.kind != Kinds.COMPARE) ThoughtSection(msg.thought)
                     when (msg.kind) {

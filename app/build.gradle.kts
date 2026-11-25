@@ -95,4 +95,6 @@ dependencies {
     implementation("org.jsoup:jsoup:1.18.3")
     // Ekstraksi teks PDF
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
+
+    testImplementation("junit:junit:4.13.2")
 }

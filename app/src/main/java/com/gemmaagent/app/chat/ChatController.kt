@@ -108,6 +108,14 @@ class ChatController(
     private var job: Job? = null
     private var followJob: Job? = null
 
+    /** Hentikan pembuatan saran lanjutan (termasuk di mesin native) agar perintah baru tidak menunggu. */
+    private fun cancelFollowUps() {
+        if (followJob?.isActive == true) {
+            llm.stop()
+            followJob?.cancel()
+        }
+    }
+
     /** Setelah gambar pernah dikirim, mesin tetap dalam mode vision agar tidak bolak-balik memuat ulang. */
     @Volatile
     private var visionSticky = false
@@ -180,7 +188,7 @@ class ChatController(
             return
         }
         if (trimmed.isEmpty() && imageUri == null && document == null) return
-        followJob?.cancel()
+        cancelFollowUps()
 
         scope.launch {
             try {
@@ -232,6 +240,7 @@ class ChatController(
     /** Regenerasi jawaban (fitur 39). */
     fun regenerate(assistant: MessageEntity) {
         if (_generating.value) return
+        cancelFollowUps()
         scope.launch {
             val list = db.messages().list(assistant.sessionId)
             val user = list.lastOrNull { it.id < assistant.id && it.role == Roles.USER } ?: return@launch
@@ -243,6 +252,7 @@ class ChatController(
     /** Edit pesan & kirim ulang (fitur 38). */
     fun editAndResend(user: MessageEntity, newText: String) {
         if (_generating.value || newText.isBlank()) return
+        cancelFollowUps()
         scope.launch {
             db.messages().deleteFrom(user.sessionId, user.id)
             val edited = user.copy(id = 0, text = newText.trim(), createdAt = System.currentTimeMillis())
@@ -459,6 +469,7 @@ class ChatController(
     /** Generator Kuis / Flashcard (fitur 18). */
     fun makeStudy(source: MessageEntity, quiz: Boolean) {
         if (_generating.value) return
+        cancelFollowUps()
         job = scope.launch {
             _generating.value = true
             val aid = db.messages().insert(
@@ -532,6 +543,7 @@ class ChatController(
             return
         }
         val params = engineParams() ?: run { emit("Belum ada model."); return }
+        cancelFollowUps()
         _define.value = DefineState.Loading(word)
         scope.launch {
             _generating.value = true
