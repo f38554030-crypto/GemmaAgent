@@ -15,16 +15,20 @@ Build bisa dijalankan ulang manual: Actions → Build APK → **Run workflow**.
 
 ## Siapkan model
 
-Unduh file **Gemma 4 E2B IT** berformat `.litertlm` (±2,6 GB) dari Hugging Face
-(organisasi `litert-community`) ke folder **Download** di HP. Butuh ruang kosong ±3 GB lagi untuk salinan internal.
+Unduh **gemma-4-E2B-it.litertlm** (±2,6 GB) dari Hugging Face (organisasi `litert-community`)
+ke folder **Download** di HP.
 
 ## Langkah pertama di aplikasi (Beranda)
 
-1. **Pilih File Model** → pilih file `.litertlm` → tunggu progress bar 100% (disalin sekali saja).
+1. **Pilih File Model** → ketuk **Izinkan Akses Semua File** → aktifkan untuk Gemma Agent → kembali ke aplikasi.
+   Model otomatis terdeteksi dan dibaca **langsung dari Download (tanpa salin)**.
+   Cara cadangan (tanpa izin itu): "pilih file manual" → disalin sekali ke memori internal.
 2. **Izin Tampil di Atas Aplikasi Lain** → aktifkan untuk Gemma Agent.
-3. **Layanan Aksesibilitas** → aktifkan "Gemma Agent (Kontrol Layar AI)".
+3. **Layanan Aksesibilitas** → aktifkan "Gemma Agent (Kontrol Layar AI)", lalu ketuk **Tes Baca Layar** untuk memastikan berfungsi.
    - Kalau tombolnya abu-abu / muncul "Setelan terbatas" (Android 13+): Info Aplikasi → menu ⋮ → **Izinkan setelan terbatas**.
 4. Tombol **Mulai Chat Agen** aktif setelah ketiganya centang hijau.
+
+Jika aplikasi sempat error, Beranda menampilkan kartu **Laporan error terakhir** (bisa disalin/di-screenshot).
 
 Tips MIUI/HyperOS: set Penghemat baterai = **Tanpa batasan**, aktifkan **Mulai otomatis**, dan kunci aplikasi di menu Terbaru.
 
@@ -38,7 +42,7 @@ Tips MIUI/HyperOS: set Penghemat baterai = **Tanpa batasan**, aktifkan **Mulai o
 | Floating Pill | Kapsul transparan, titik berkedip saat berpikir, status 1 baris, tombol merah STOP; ketuk teks untuk mini-panel log; bisa digeser |
 | Log pemikiran real-time | Di layar chat & mini-panel melayang |
 | Anti-looping | Maks. 15 langkah/perintah, jeda 1,5 detik, berhenti jika aksi sama diulang 3x |
-| Safety Guard | Pop-up "Izinkan/Tolak" untuk tombol Transfer, Bayar, Kirim, Hapus, Beli (dll.) |
+| Safety Guard | Pop-up "Izinkan/Tolak" hanya untuk tombol Transfer, Bayar, Beli, Hapus, Checkout (+ padanan Inggris: pay, buy, purchase, delete) |
 | UI | Material 3, Jetpack Compose, dark mode AMOLED (hitam pekat + biru elektrik/ungu) |
 | Chat | Gelembung kanan/kiri, kartu ringkasan aksi, typing dots, quick action chips |
 | Top bar | Monitor RAM real-time + status model ("Gemma 4 E2B • Siap"), tombol Sesi Baru / Reset Memori |

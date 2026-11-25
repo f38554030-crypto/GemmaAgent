@@ -106,6 +106,7 @@ import com.gemmaagent.app.llm.LlmEngine
 import com.gemmaagent.app.llm.ModelStatus
 import com.gemmaagent.app.ui.theme.GA
 import com.gemmaagent.app.util.DeviceInfo
+import com.gemmaagent.app.util.Fmt
 import com.gemmaagent.app.util.SpeechInput
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
@@ -231,11 +232,16 @@ fun ChatScreen(onBack: () -> Unit) {
         )
 
         if (modelStatus == ModelStatus.ERROR && modelError != null) {
-            Text(
-                modelError ?: "",
-                color = GA.Red, fontSize = 12.sp,
-                modifier = Modifier.fillMaxWidth().background(GA.Red.copy(alpha = 0.1f)).padding(horizontal = 16.dp, vertical = 8.dp),
-            )
+            Row(
+                Modifier.fillMaxWidth().background(GA.Red.copy(alpha = 0.1f)).padding(start = 16.dp, end = 8.dp, top = 6.dp, bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(modelError ?: "", color = GA.Red, fontSize = 12.sp, modifier = Modifier.weight(1f))
+                TextButton(onClick = {
+                    app.feedback.clickHaptic()
+                    app.llm.loadAsync()
+                }) { Text("Coba Lagi") }
+            }
         }
 
         // ================= DAFTAR CHAT =================
@@ -380,7 +386,7 @@ private fun RamBadge(availMb: Long, totalMb: Long) {
     ) {
         Icon(Icons.Filled.Memory, contentDescription = null, tint = color, modifier = Modifier.size(11.dp))
         Spacer(Modifier.width(3.dp))
-        Text("RAM %.1f/%.1f GB".format(availMb / 1024f, totalMb / 1024f), fontSize = 10.sp, color = color, maxLines = 1)
+        Text("RAM " + Fmt.gbFromMb(availMb) + "/" + Fmt.gbFromMb(totalMb) + " GB", fontSize = 10.sp, color = color, maxLines = 1)
     }
 }
 

@@ -36,6 +36,12 @@ jobs:
       - name: Pasang Gradle (dengan cache)
         uses: gradle/actions/setup-gradle@v4
 
+      - name: Kunci tanda tangan APK tetap (agar update bisa menimpa versi lama)
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: gemma-agent-debug-keystore-v1
+
       - name: Build APK
         run: |
           chmod +x ./gradlew

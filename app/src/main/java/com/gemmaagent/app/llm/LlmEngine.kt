@@ -19,6 +19,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import com.gemmaagent.app.util.CrashLogger
+import com.gemmaagent.app.util.DeviceInfo
+import com.gemmaagent.app.util.Fmt
+import kotlinx.coroutines.CoroutineExceptionHandler
+import java.io.File
 import java.util.concurrent.Executors
 
 enum class ModelStatus(val label: String) {
@@ -41,7 +46,7 @@ class LlmEngine(private val context: Context) {
     private val dispatcher = Executors.newSingleThreadExecutor { r ->
         Thread(r, "gemma-llm").apply { priority = Thread.NORM_PRIORITY }
     }.asCoroutineDispatcher()
-    private val scope = CoroutineScope(SupervisorJob() + dispatcher)
+    private val scope = CoroutineScope(SupervisorJob() + dispatcher + CoroutineExceptionHandler { _, _ -> })
     private val mutex = Mutex()
 
     private var engine: Engine? = null
@@ -52,37 +57,79 @@ class LlmEngine(private val context: Context) {
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
-    /** Memuat model di background (dipanggil oleh Foreground Service). */
+    /** Memuat model di background (dipanggil oleh Foreground Service). Tidak pernah melempar error. */
     fun loadAsync() {
-        scope.launch { mutex.withLock { ensureLoaded() } }
+        scope.launch {
+            mutex.withLock {
+                try {
+                    ensureLoaded()
+                } catch (_: Throwable) {
+                    // Pesan error sudah disimpan di [error] dan tampil di layar.
+                }
+            }
+        }
     }
 
+    private var loadedPath: String? = null
+
+    /** Memuat model jika belum. Error dikonversi menjadi pesan yang mudah dipahami. */
     private fun ensureLoaded() {
-        if (engine != null) return
-        val file = GemmaAgentApp.instance.modelRepository.modelFile
-        if (!file.exists()) {
+        val path = GemmaAgentApp.instance.modelRepository.currentModelPath()
+        if (engine != null && loadedPath == path) return
+        if (engine != null) {
+            // File model berubah (mis. pindah dari salinan internal ke folder Download).
+            runCatching { engine?.close() }
+            engine = null
+            loadedPath = null
+        }
+        if (path == null || !File(path).canRead()) {
             _status.value = ModelStatus.ERROR
-            _error.value = "File model belum disalin. Pilih file model di Beranda."
-            throw IllegalStateException(_error.value)
+            val msg = "File model tidak ditemukan / tidak bisa dibaca. Buka Beranda lalu cek Langkah 1."
+            _error.value = msg
+            throw IllegalStateException(msg)
         }
         _status.value = ModelStatus.LOADING
         _error.value = null
+
+        val (availMb, _) = runCatching { DeviceInfo.availableRamMb(context) }.getOrDefault(0L to 0L)
         try {
             val config = EngineConfig(
-                modelPath = file.absolutePath,
+                modelPath = path,
                 backend = Backend.CPU(),
                 maxNumTokens = MAX_TOKENS,
                 cacheDir = context.cacheDir.absolutePath,
             )
             val e = Engine(config)
-            e.initialize()
+            try {
+                e.initialize()
+            } catch (t: Throwable) {
+                runCatching { e.close() }
+                throw t
+            }
             engine = e
+            loadedPath = path
             _status.value = ModelStatus.READY
         } catch (t: Throwable) {
             engine = null
+            loadedPath = null
             _status.value = ModelStatus.ERROR
-            _error.value = "Gagal memuat model: ${t.message ?: t.javaClass.simpleName}"
-            throw t
+            _error.value = friendlyError(t, availMb)
+            CrashLogger.record(context, "Gagal memuat model (aplikasi tidak ditutup)", t)
+            throw IllegalStateException(_error.value, t)
+        }
+    }
+
+    private fun friendlyError(t: Throwable, availMb: Long): String {
+        val raw = (t.message ?: t.javaClass.simpleName).take(200)
+        val lower = raw.lowercase()
+        return when {
+            t is OutOfMemoryError || "memory" in lower || "alloc" in lower || "oom" in lower ->
+                "RAM tidak cukup untuk memuat model (sisa ${Fmt.gbFromMb(availMb)} GB). Tutup aplikasi lain lalu ketuk Coba Lagi. Detail: $raw"
+            "permission" in lower || "denied" in lower || "eacces" in lower ->
+                "Tidak punya izin membaca file model. Aktifkan \"Akses Semua File\" di Beranda. Detail: $raw"
+            "not found" in lower || "no such file" in lower ->
+                "File model tidak ditemukan. Detail: $raw"
+            else -> "Gagal memuat model: $raw"
         }
     }
 
@@ -103,13 +150,17 @@ class LlmEngine(private val context: Context) {
             mutex.withLock {
                 ensureLoaded()
                 val eng = engine ?: throw IllegalStateException("Model belum dimuat")
-                _status.value = ModelStatus.BUSY
-                val conversation = eng.createConversation(
-                    ConversationConfig(
-                        systemInstruction = Contents.of(systemPrompt),
-                        samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
+                val conversation = try {
+                    eng.createConversation(
+                        ConversationConfig(
+                            systemInstruction = Contents.of(systemPrompt),
+                            samplerConfig = SamplerConfig(topK = 40, topP = 0.9, temperature = 0.2),
+                        )
                     )
-                )
+                } catch (t: Throwable) {
+                    throw IllegalStateException("Gagal memulai percakapan AI: ${t.message ?: t.javaClass.simpleName}", t)
+                }
+                _status.value = ModelStatus.BUSY
                 currentConversation = conversation
                 try {
                     val sb = StringBuilder()
@@ -146,6 +197,7 @@ class LlmEngine(private val context: Context) {
             mutex.withLock {
                 runCatching { engine?.close() }
                 engine = null
+                loadedPath = null
                 _status.value = ModelStatus.NOT_LOADED
             }
         }
@@ -157,6 +209,7 @@ class LlmEngine(private val context: Context) {
             mutex.withLock {
                 runCatching { engine?.close() }
                 engine = null
+                loadedPath = null
                 _status.value = ModelStatus.NOT_LOADED
             }
         }

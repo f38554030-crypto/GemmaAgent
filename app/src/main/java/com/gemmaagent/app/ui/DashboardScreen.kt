@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -43,6 +44,9 @@ import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
@@ -55,6 +59,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,6 +76,13 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LifecycleEventEffect
 import com.gemmaagent.app.GemmaAgentApp
 import com.gemmaagent.app.data.CopyState
+import com.gemmaagent.app.data.ModelRepository
+import com.gemmaagent.app.data.ModelSource
+import com.gemmaagent.app.util.CrashLogger
+import com.gemmaagent.app.util.Fmt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.gemmaagent.app.service.AgentAccessibilityService
 import com.gemmaagent.app.ui.theme.GA
 
@@ -78,8 +90,16 @@ import com.gemmaagent.app.ui.theme.GA
 fun DashboardScreen(onStartChat: () -> Unit) {
     val context = LocalContext.current
     val app = GemmaAgentApp.instance
-    val modelReady by app.modelRepository.modelReady.collectAsState()
+    val modelInfo by app.modelRepository.info.collectAsState()
+    val scanning by app.modelRepository.scanning.collectAsState()
     val copyState by app.modelRepository.copyState.collectAsState()
+    val modelReady = modelInfo.ready
+    val scope = rememberCoroutineScope()
+
+    var storageOk by remember { mutableStateOf(app.modelRepository.hasStorageAccess()) }
+    var crashText by remember { mutableStateOf(CrashLogger.read(context)) }
+    var testResult by remember { mutableStateOf<String?>(null) }
+    var testing by remember { mutableStateOf(false) }
 
     var overlayOk by remember { mutableStateOf(Settings.canDrawOverlays(context)) }
     var accessOk by remember { mutableStateOf(AgentAccessibilityService.isEnabled(context)) }
@@ -90,11 +110,20 @@ fun DashboardScreen(onStartChat: () -> Unit) {
         overlayOk = Settings.canDrawOverlays(context)
         accessOk = AgentAccessibilityService.isEnabled(context)
         notifOk = hasNotificationPermission(context)
+        storageOk = app.modelRepository.hasStorageAccess()
         app.modelRepository.refresh()
     }
 
     val pickModel = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
-        if (uri != null) app.modelRepository.importModel(uri)
+        try {
+            if (uri != null) app.modelRepository.importModel(uri)
+        } catch (t: Throwable) {
+            Toast.makeText(context, "Gagal membuka file: ${t.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+    val legacyStorageLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        storageOk = granted
+        app.modelRepository.refresh()
     }
     val notifLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
         notifOk = granted
@@ -131,7 +160,20 @@ fun DashboardScreen(onStartChat: () -> Unit) {
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        Spacer(Modifier.height(20.dp))
+
+        // ---- Laporan error terakhir (jika pernah crash) ----
+        crashText?.let { text ->
+            CrashCard(
+                text = text,
+                onCopy = { copyToClipboard(context, text) },
+                onDismiss = {
+                    CrashLogger.clear(context)
+                    crashText = null
+                },
+            )
+            Spacer(Modifier.height(16.dp))
+        }
 
         // ---- Progres izin ----
         val progress by animateFloatAsState(doneCount / 3f, label = "setupProgress")
@@ -152,17 +194,50 @@ fun DashboardScreen(onStartChat: () -> Unit) {
             number = "1",
             icon = Icons.Filled.FolderOpen,
             title = "Pilih File Model",
-            description = if (modelReady) "Terpasang: ${app.modelRepository.modelDisplayName}"
-            else "Pilih file Gemma 4 E2B IT (.litertlm) dari folder Download. File disalin sekali ke memori internal aplikasi.",
+            description = when {
+                modelInfo.source == ModelSource.DOWNLOAD_DIRECT ->
+                    "Dibaca langsung dari Download (tanpa salin):\n${modelInfo.path}\n${Fmt.gb(modelInfo.sizeBytes)} GB"
+                modelInfo.source == ModelSource.INTERNAL_COPY ->
+                    "Memakai salinan internal: ${modelInfo.name} (${Fmt.gb(modelInfo.sizeBytes)} GB)"
+                !storageOk ->
+                    "Izinkan \"Akses Semua File\" agar aplikasi otomatis membaca ${ModelRepository.PREFERRED_NAME} langsung dari folder Download, tanpa menyalin 2,59 GB."
+                scanning -> "Memindai folder Download…"
+                else ->
+                    "File .litertlm tidak ditemukan di /storage/emulated/0/Download. Pastikan unduhan sudah selesai, lalu ketuk Pindai Ulang."
+            },
             done = modelReady,
-            buttonLabel = if (modelReady) "Ganti Model" else "Pilih File Model",
-            buttonEnabled = !copying,
+            buttonLabel = when {
+                !storageOk -> "Izinkan Akses Semua File"
+                else -> "Pindai Ulang Folder Download"
+            },
+            buttonEnabled = !copying && !scanning,
             onClick = {
                 app.feedback.clickHaptic()
-                runCatching { pickModel.launch(arrayOf("*/*")) }
+                if (!storageOk) {
+                    requestStorageAccess(context) { legacyStorageLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE) }
+                } else {
+                    app.modelRepository.refresh()
+                }
             },
         ) {
             CopyProgress(copyState)
+            if (modelInfo.source != ModelSource.DOWNLOAD_DIRECT) {
+                TextButton(
+                    enabled = !copying,
+                    onClick = {
+                        app.feedback.clickHaptic()
+                        try {
+                            pickModel.launch(arrayOf("*/*"))
+                        } catch (t: Throwable) {
+                            Toast.makeText(context, "File Picker tidak bisa dibuka: ${t.message}", Toast.LENGTH_LONG).show()
+                        }
+                    },
+                ) { Text("Cara cadangan: pilih file manual (disalin ke aplikasi)", fontSize = 12.sp) }
+            } else if (app.modelRepository.internalFile.exists()) {
+                TextButton(onClick = { app.modelRepository.deleteInternalCopy() }) {
+                    Text("Hapus salinan internal lama (hemat ruang)", fontSize = 12.sp)
+                }
+            }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -199,6 +274,23 @@ fun DashboardScreen(onStartChat: () -> Unit) {
                 openSafely(context, Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
             },
         ) {
+            Spacer(Modifier.height(4.dp))
+            OutlinedButton(
+                onClick = {
+                    app.feedback.clickHaptic()
+                    testing = true
+                    scope.launch {
+                        testResult = runScreenReadTest(context)
+                        testing = false
+                    }
+                },
+                enabled = !testing,
+                shape = RoundedCornerShape(14.dp),
+            ) {
+                Icon(Icons.Filled.Visibility, contentDescription = null, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(6.dp))
+                Text(if (testing) "Membaca…" else "Tes Baca Layar", fontSize = 13.sp)
+            }
             if (!accessOk) {
                 Spacer(Modifier.height(8.dp))
                 Text(
@@ -274,6 +366,103 @@ fun DashboardScreen(onStartChat: () -> Unit) {
         }
         Spacer(Modifier.height(24.dp))
     }
+
+    testResult?.let { result ->
+        AlertDialog(
+            onDismissRequest = { testResult = null },
+            containerColor = GA.SurfaceHigh,
+            title = { Text("Hasil Tes Baca Layar", color = GA.TextPrimary) },
+            text = {
+                Text(
+                    result,
+                    color = GA.TextSecondary,
+                    fontSize = 13.sp,
+                    modifier = Modifier.heightIn(max = 380.dp).verticalScroll(rememberScrollState()),
+                )
+            },
+            confirmButton = { TextButton(onClick = { testResult = null }) { Text("Tutup") } },
+        )
+    }
+}
+
+/** Menguji Accessibility Service: membaca teks yang sedang tampil di layar (layar Beranda ini). */
+private suspend fun runScreenReadTest(context: Context): String {
+    if (!AgentAccessibilityService.isEnabled(context)) {
+        return "❌ Layanan Aksesibilitas BELUM aktif.\n\nKetuk \"Buka Pengaturan Aksesibilitas\" lalu aktifkan \"Gemma Agent (Kontrol Layar AI)\"."
+    }
+    val svc = AgentAccessibilityService.instance
+        ?: return "⚠️ Layanan sudah dicentang di Pengaturan, tetapi belum terhubung ke aplikasi.\n\nMatikan lalu nyalakan lagi \"Gemma Agent (Kontrol Layar AI)\" di Pengaturan Aksesibilitas, atau mulai ulang HP."
+    return try {
+        val snap = withContext(Dispatchers.Default) { svc.readScreen() }
+        if (snap.elements.isEmpty()) {
+            "⚠️ Layanan terhubung, tetapi tidak ada teks terbaca dari layar (aplikasi: ${snap.packageName}). Coba lagi beberapa detik kemudian."
+        } else {
+            val lines = snap.elements.take(25).joinToString("\n") { e ->
+                val tag = when {
+                    e.editable -> "[kolom-ketik] "
+                    e.clickable -> "[tombol] "
+                    else -> ""
+                }
+                "• $tag${e.text}"
+            }
+            "✅ Berhasil! Agen bisa membaca ${snap.elements.size} teks dari layar.\nAplikasi aktif: ${snap.packageName}\n\n$lines"
+        }
+    } catch (t: Throwable) {
+        "❌ Gagal membaca layar: ${t.message ?: t.javaClass.simpleName}"
+    }
+}
+
+@Composable
+private fun CrashCard(text: String, onCopy: () -> Unit, onDismiss: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(GA.Red.copy(alpha = 0.08f))
+            .border(1.dp, GA.Red.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
+            .padding(16.dp),
+    ) {
+        Text("Laporan error terakhir", color = GA.Red, fontWeight = FontWeight.SemiBold)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            "Screenshot atau salin teks ini untuk perbaikan:",
+            color = GA.TextSecondary, fontSize = 12.sp,
+        )
+        Spacer(Modifier.height(6.dp))
+        Text(
+            text.lines().take(8).joinToString("\n"),
+            color = GA.TextPrimary, fontSize = 11.sp,
+            modifier = Modifier.heightIn(max = 160.dp).verticalScroll(rememberScrollState()),
+        )
+        Row {
+            TextButton(onClick = onCopy) { Text("Salin") }
+            TextButton(onClick = onDismiss) { Text("Tutup") }
+        }
+    }
+}
+
+private fun copyToClipboard(context: Context, text: String) {
+    runCatching {
+        val cm = context.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        cm.setPrimaryClip(android.content.ClipData.newPlainText("Gemma Agent error", text))
+        Toast.makeText(context, "Laporan error disalin", Toast.LENGTH_SHORT).show()
+    }
+}
+
+/** Membuka halaman izin "Akses Semua File" (Android 11+) atau meminta izin baca penyimpanan (Android 10-). */
+private fun requestStorageAccess(context: Context, legacyRequest: () -> Unit) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        try {
+            context.startActivity(
+                Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${context.packageName}"))
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        } catch (_: Throwable) {
+            openSafely(context, Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION))
+        }
+    } else {
+        legacyRequest()
+    }
 }
 
 @Composable
@@ -335,13 +524,12 @@ private fun CopyProgress(state: CopyState) {
     when (state) {
         is CopyState.Copying -> {
             Spacer(Modifier.height(10.dp))
-            val gbDone = state.copiedBytes / (1024.0 * 1024 * 1024)
-            val gbTotal = state.totalBytes / (1024.0 * 1024 * 1024)
-            Text(
-                if (state.totalBytes > 0) "Menyalin model… ${state.percent}% (%.2f / %.2f GB)".format(gbDone, gbTotal)
-                else "Menyalin model… %.2f GB".format(gbDone),
-                color = GA.Blue, fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
-            )
+            val text = if (state.totalBytes > 0) {
+                "Menyalin model… " + state.percent + "% (" + Fmt.gb(state.copiedBytes) + " / " + Fmt.gb(state.totalBytes) + " GB)"
+            } else {
+                "Menyalin model… " + Fmt.gb(state.copiedBytes) + " GB"
+            }
+            Text(text, color = GA.Blue, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
             Spacer(Modifier.height(6.dp))
             LinearProgressIndicator(
                 progress = { state.percent / 100f },

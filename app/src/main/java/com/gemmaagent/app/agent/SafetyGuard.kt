@@ -5,9 +5,16 @@ package com.gemmaagent.app.agent
  * Agen WAJIB meminta persetujuan pengguna sebelum mengetuk tombol-tombol ini.
  */
 object SafetyGuard {
+    // Hanya kata berisiko TINGGI (uang / data hilang). "Kirim" sengaja TIDAK dimasukkan
+    // agar agen bisa mengirim chat WhatsApp tanpa terhenti terus.
+    // Padanan bahasa Inggris disertakan untuk aplikasi yang tampil dalam bahasa Inggris.
     private val riskyWords = listOf(
-        "transfer", "bayar", "pembayaran", "kirim", "hapus", "beli", "checkout",
-        "pay", "send", "delete", "buy", "purchase", "top up", "topup", "konfirmasi pembayaran",
+        "transfer",
+        "bayar", "pembayaran",
+        "beli",
+        "hapus",
+        "checkout",
+        "pay", "buy", "purchase", "delete",
     )
 
     /** Mengembalikan kata berisiko yang ditemukan, atau null jika aman. */
