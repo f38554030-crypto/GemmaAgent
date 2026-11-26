@@ -67,6 +67,7 @@ import com.gemmaagent.app.GemmaChatApp
 import com.gemmaagent.app.data.Accent
 import com.gemmaagent.app.data.CopyState
 import com.gemmaagent.app.data.FontScale
+import com.gemmaagent.app.data.ThemeMode
 import com.gemmaagent.app.data.ModelSource
 import com.gemmaagent.app.llm.Personas
 import com.gemmaagent.app.ui.theme.GA
@@ -77,7 +78,7 @@ import com.gemmaagent.app.util.Fmt
 import kotlinx.coroutines.launch
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: () -> Unit, onReplayOnboarding: () -> Unit) {
+fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: () -> Unit, onReplayOnboarding: () -> Unit, onOpenModelHub: () -> Unit, onOpenKnowledge: () -> Unit) {
     val context = LocalContext.current
     val app = GemmaChatApp.instance
     val s by app.settings.settings.collectAsState()
@@ -88,26 +89,13 @@ fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: ()
     val accent = LocalAccent.current
     val scope = rememberCoroutineScope()
 
-    var storageOk by remember { mutableStateOf(app.models.hasStorageAccess()) }
     var message by remember { mutableStateOf<String?>(null) }
     var crash by remember { mutableStateOf(CrashLogger.read(context)) }
     var confirmRestore by remember { mutableStateOf<Uri?>(null) }
+    var pendingBackup by remember { mutableStateOf<Uri?>(null) }
 
-    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
-        storageOk = app.models.hasStorageAccess()
-        app.models.refresh()
-    }
-
-    val legacyStorage = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) {
-        storageOk = it; app.models.refresh()
-    }
-    val pickModel = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-        runCatching { if (uri != null) app.models.importModel(uri) }
-    }
     val backupLauncher = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
-        if (uri != null) scope.launch {
-            message = runCatching { app.export.backup(uri); "✅ Backup tersimpan." }.getOrElse { "Gagal backup: ${it.message}" }
-        }
+        if (uri != null) pendingBackup = uri
     }
     val restoreLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) confirmRestore = uri }
 
@@ -133,79 +121,15 @@ fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: ()
                 }
             }
 
-            // ---------------- MODEL (fitur 26 + zero-copy) ----------------
-            Section("Model (.litertlm)") {
-                if (!storageOk) {
-                    Text("Izinkan \"Akses Semua File\" agar model di folder Download dimuat langsung tanpa salin (zero-copy).", color = GA.TextSecondary, fontSize = 13.sp)
-                    Spacer(Modifier.height(6.dp))
-                    Button(onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            runCatching {
-                                context.startActivity(Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${context.packageName}")).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-                            }.onFailure {
-                                runCatching { context.startActivity(Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
-                            }
-                        } else legacyStorage.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    }) { Text("Izinkan Akses Semua File") }
-                } else {
-                    Text(if (scanning) "Memindai folder Download…" else "Model terdeteksi: ${models.size}", color = GA.TextSecondary, fontSize = 12.sp)
-                }
-                Spacer(Modifier.height(6.dp))
-                models.forEach { m ->
-                    val selected = m.path == active?.path
-                    Row(
-                        Modifier.fillMaxWidth().padding(vertical = 3.dp).clip(RoundedCornerShape(12.dp))
-                            .background(if (selected) accent.deep.copy(alpha = 0.25f) else GA.SurfaceHigh)
-                            .clickable { app.models.select(m) }.padding(10.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Icon(if (selected) Icons.Filled.CheckCircle else Icons.Filled.RadioButtonUnchecked, null,
-                            tint = if (selected) accent.main else GA.TextSecondary, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Column {
-                            Text(m.name, color = GA.TextPrimary, fontSize = 13.sp)
-                            Text("${Fmt.gb(m.sizeBytes)} GB • " + if (m.source == ModelSource.DOWNLOAD_DIRECT) "langsung dari Download" else "salinan internal",
-                                color = GA.TextSecondary, fontSize = 11.sp)
-                        }
-                    }
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { app.models.refresh() }, enabled = !scanning) { Text("Pindai Ulang") }
-                    TextButton(onClick = { runCatching { pickModel.launch(arrayOf("*/*")) } }, enabled = copyState !is CopyState.Copying) { Text("Pilih manual (salin)") }
-                }
-                when (val c = copyState) {
-                    is CopyState.Copying -> {
-                        Text("Menyalin… " + c.percent + "% (" + Fmt.gb(c.copiedBytes) + " GB)", color = accent.main, fontSize = 12.sp)
-                        LinearProgressIndicator(progress = { c.percent / 100f }, modifier = Modifier.fillMaxWidth())
-                    }
-                    is CopyState.Done -> Text(c.message, color = GA.Green, fontSize = 12.sp)
-                    is CopyState.Error -> Text(c.message, color = GA.Red, fontSize = 12.sp)
-                    CopyState.Idle -> Unit
-                }
-                if (app.models.internalFile.exists() && models.any { it.source == ModelSource.DOWNLOAD_DIRECT }) {
-                    TextButton(onClick = { app.models.deleteInternalCopy() }) { Text("Hapus salinan internal (hemat ±2,6 GB)") }
-                }
-            }
-
-            // ---------------- MESIN (fitur 30, 31, 34 + spesifikasi) ----------------
-            Section("Mesin AI (CPU)") {
-                Label("Thread CPU: ${s.cpuThreads}", "4–6 thread. Lebih banyak belum tentu lebih cepat di Helio G96.")
-                ChipRow(listOf(4, 5, 6), s.cpuThreads, { "$it" }) { v -> app.settings.update { it.copy(cpuThreads = v) } }
-                Label("Batas konteks: ${s.contextTokens} token", "Total input + output. Lebih besar = ingat lebih banyak tapi butuh RAM lebih.")
-                ChipRow(listOf(512, 1536, 3072), s.contextTokens, { "$it" }) { v -> app.settings.update { it.copy(contextTokens = v) } }
-                Label("Panjang jawaban maks: ${s.maxOutputTokens} token", "Tetap dibatasi oleh batas konteks di atas.")
-                ChipRow(listOf(512, 1536, 3072), s.maxOutputTokens, { "$it" }) { v -> app.settings.update { it.copy(maxOutputTokens = v) } }
-                Label("Kreativitas (temperature): ${Fmt.one(s.temperature.toDouble())}", "0,1 = sangat faktual • 0,9 = kreatif")
-                Slider(value = s.temperature, onValueChange = { v -> app.settings.update { it.copy(temperature = (Math.round(v * 10) / 10f).coerceIn(0.1f, 0.9f)) } },
-                    valueRange = 0.1f..0.9f, steps = 7)
+            // ---------------- MODEL ----------------
+            Section("Model & Mesin") {
+                Text("Aktif: ${active?.name ?: "belum ada"}", color = GA.TextPrimary, fontSize = 13.sp)
+                Text("Atur model .gguf / .litertlm, parameter per model (template, temperature, repeat penalty, top-p, n_ctx, stop words), benchmark, dan unduhan Drive di Model Hub.",
+                    color = GA.TextSecondary, fontSize = 12.sp)
+                Button(onClick = onOpenModelHub) { Text("Buka Model Hub") }
                 Label("Jendela riwayat: ${s.historyTurns} giliran terakhir", "Pesan lebih lama dipangkas agar RAM aman.")
                 ChipRow(listOf(5, 6, 7, 8), s.historyTurns, { "$it" }) { v -> app.settings.update { it.copy(historyTurns = v) } }
-                Spacer(Modifier.height(6.dp))
-                OutlinedButton(onClick = {
-                    app.llm.clearCaches { app.chat.preload() }
-                    message = "🧹 Cache & memori mesin dibersihkan. Model dimuat ulang."
-                }) { Text("Bersihkan Cache & Memori") }
-                Text("Perubahan thread/konteks diterapkan otomatis pada pesan berikutnya (model dimuat ulang).", color = GA.TextSecondary, fontSize = 11.sp)
+                OutlinedButton(onClick = { app.llm.clearCache { message = "🧹 KV cache dilepas dari RAM." } }) { Text("Bersihkan Cache RAM") }
             }
 
             // ---------------- PERCAKAPAN (fitur 6, 12, 14, 15, 45) ----------------
@@ -213,6 +137,8 @@ fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: ()
                 SwitchRow("Mode Berpikir (Thinking)", "Default OFF agar respons instan", s.thinking) { v -> app.settings.update { it.copy(thinking = v) } }
                 SwitchRow("Saran pertanyaan lanjutan", "Menambah ±5–10 detik setelah jawaban", s.followUps) { v -> app.settings.update { it.copy(followUps = v) } }
                 SwitchRow("Gunakan Memori Jangka Panjang", "Fakta tentang Anda disisipkan ke konteks", s.useMemory) { v -> app.settings.update { it.copy(useMemory = v) } }
+                SwitchRow("Gunakan Basis Pengetahuan (RAG)", "Cari kutipan dokumen pribadi sebelum menjawab", s.useKnowledge) { v -> app.settings.update { it.copy(useKnowledge = v) } }
+                OutlinedButton(onClick = onOpenKnowledge) { Text("Kelola Basis Pengetahuan") }
                 Label("Persona", null)
                 ChipRow(Personas.all.map { it.id }, s.personaId, { id -> Personas.byId(id).let { "${it.emoji} ${it.name}" } }) { v -> app.settings.update { it.copy(personaId = v) } }
                 Label("System prompt kustom", "Aturan main tambahan untuk AI (opsional)")
@@ -225,6 +151,8 @@ fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: ()
 
             // ---------------- TAMPILAN (fitur 43, 46) ----------------
             Section("Tampilan") {
+                Label("Tema", "Gemini Dark (AMOLED) atau Clean Light")
+                ChipRow(ThemeMode.entries.toList(), s.themeMode, { it.label }) { v -> app.settings.update { it.copy(themeMode = v) } }
                 Label("Warna aksen", null)
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     Accent.entries.forEach { a ->
@@ -232,7 +160,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: ()
                         Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { app.settings.update { it.copy(accent = a) } }) {
                             androidx.compose.foundation.layout.Box(
                                 Modifier.size(36.dp).clip(CircleShape).background(c.main)
-                                    .border(if (s.accent == a) 3.dp else 0.dp, androidx.compose.ui.graphics.Color.White, CircleShape)
+                                    .border(if (s.accent == a) 3.dp else 0.dp, GA.Strong, CircleShape)
                             )
                             Text(a.label, color = GA.TextSecondary, fontSize = 10.sp)
                         }
@@ -252,7 +180,7 @@ fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: ()
             // ---------------- DATA (fitur 29, 35) ----------------
             Section("Data & Lainnya") {
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { backupLauncher.launch("gemmachat-backup.json") }) { Text("Backup JSON") }
+                    OutlinedButton(onClick = { backupLauncher.launch("gemmachat-backup.json") }) { Text("Backup JSON Terenkripsi") }
                     OutlinedButton(onClick = { restoreLauncher.launch(arrayOf("application/json", "*/*")) }) { Text("Restore") }
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -269,23 +197,20 @@ fun SettingsScreen(onBack: () -> Unit, onOpenMemory: () -> Unit, onOpenStats: ()
         AlertDialog(onDismissRequest = { message = null }, containerColor = GA.SurfaceHigh,
             text = { Text(m, color = GA.TextPrimary) }, confirmButton = { TextButton(onClick = { message = null }) { Text("OK") } })
     }
+    pendingBackup?.let { uri ->
+        PasswordDialog("Kata sandi backup", "Minimal 4 karakter. Simpan baik-baik — tanpa kata sandi ini backup tidak bisa dipulihkan.", onDismiss = { pendingBackup = null }) { pw ->
+            pendingBackup = null
+            scope.launch { message = runCatching { app.export.backup(uri, pw); "✅ Backup terenkripsi (AES-256) tersimpan." }.getOrElse { "Gagal backup: ${it.message}" } }
+        }
+    }
     confirmRestore?.let { uri ->
-        AlertDialog(
-            onDismissRequest = { confirmRestore = null },
-            containerColor = GA.SurfaceHigh,
-            title = { Text("Pulihkan dari backup?", color = GA.TextPrimary) },
-            text = { Text("Semua riwayat, memori, catatan, dan pengaturan saat ini akan DIGANTI isi file backup.", color = GA.TextSecondary) },
-            confirmButton = {
-                TextButton(onClick = {
-                    confirmRestore = null
-                    scope.launch {
-                        message = runCatching { app.export.restore(uri) }.getOrElse { "Gagal restore: ${it.message}" }
-                        app.chat.setSession(null)
-                    }
-                }) { Text("Pulihkan", color = GA.Red) }
-            },
-            dismissButton = { TextButton(onClick = { confirmRestore = null }) { Text("Batal") } },
-        )
+        PasswordDialog("Pulihkan dari backup?", "Semua riwayat, memori, catatan, dan pengaturan saat ini akan DIGANTI. Masukkan kata sandi backup.", onDismiss = { confirmRestore = null }) { pw ->
+            confirmRestore = null
+            scope.launch {
+                message = runCatching { app.export.restore(uri, pw) }.getOrElse { "Gagal restore: ${it.message}" }
+                app.chat.setSession(null)
+            }
+        }
     }
 }
 
@@ -333,4 +258,24 @@ private fun SwitchRow(title: String, hint: String, value: Boolean, onChange: (Bo
         }
         Switch(checked = value, onCheckedChange = onChange, colors = SwitchDefaults.colors(checkedTrackColor = LocalAccent.current.deep))
     }
+}
+
+
+@Composable
+private fun PasswordDialog(title: String, body: String, onDismiss: () -> Unit, onOk: (String) -> Unit) {
+    var pw by remember { mutableStateOf("") }
+    AlertDialog(
+        onDismissRequest = onDismiss, containerColor = GA.SurfaceHigh,
+        title = { Text(title, color = GA.TextPrimary) },
+        text = {
+            Column {
+                Text(body, color = GA.TextSecondary, fontSize = 13.sp)
+                Spacer(Modifier.height(8.dp))
+                OutlinedTextField(pw, { pw = it }, singleLine = true, label = { Text("Kata sandi") },
+                    visualTransformation = androidx.compose.ui.text.input.PasswordVisualTransformation())
+            }
+        },
+        confirmButton = { TextButton(enabled = pw.length >= 4, onClick = { onOk(pw) }) { Text("OK") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Batal") } },
+    )
 }

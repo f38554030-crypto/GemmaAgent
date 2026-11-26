@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -143,7 +144,7 @@ object MarkdownParser {
             when {
                 s.startsWith("**", i) && s.indexOf("**", i + 2) > i + 2 -> {
                     val end = s.indexOf("**", i + 2)
-                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = Color.White)) { append(s.substring(i + 2, end)) }
+                    withStyle(SpanStyle(fontWeight = FontWeight.Bold, color = GA.Strong)) { append(s.substring(i + 2, end)) }
                     i = end + 2
                 }
                 (s[i] == '*' || s[i] == '_') && i + 1 < s.length && s[i + 1] != ' ' &&
@@ -190,6 +191,7 @@ fun MarkdownText(
     color: Color = GA.TextPrimary,
     onWordLongPress: ((word: String, sentence: String) -> Unit)? = null,
     onCopyCode: (String) -> Unit = {},
+    onPreviewCode: ((lang: String, code: String) -> Unit)? = null,
 ) {
     val accent = LocalAccent.current.main
     val scale = LocalFontScale.current
@@ -200,7 +202,7 @@ fun MarkdownText(
             when (b) {
                 is MdBlock.Heading -> WordText(
                     MarkdownParser.inline(b.text, accent),
-                    color = Color.White,
+                    color = GA.Strong,
                     size = when (b.level) { 1 -> (21 * scale).sp; 2 -> (19 * scale).sp; else -> (17 * scale).sp },
                     weight = FontWeight.Bold,
                     onWordLongPress = onWordLongPress,
@@ -226,7 +228,7 @@ fun MarkdownText(
                     Spacer(Modifier.width(8.dp))
                     WordText(MarkdownParser.inline(b.text, accent), GA.TextSecondary, base, italic = true, onWordLongPress = onWordLongPress)
                 }
-                is MdBlock.Code -> CodeBlock(b.lang, b.code, scale, onCopyCode)
+                is MdBlock.Code -> CodeBlock(b.lang, b.code, scale, onCopyCode, onPreviewCode)
                 is MdBlock.Table -> TableBlock(b.rows, accent, scale)
                 MdBlock.Rule -> HorizontalDivider(color = GA.Outline)
             }
@@ -283,10 +285,10 @@ private fun WordText(
 }
 
 @Composable
-private fun CodeBlock(lang: String, code: String, scale: Float, onCopy: (String) -> Unit) {
+private fun CodeBlock(lang: String, code: String, scale: Float, onCopy: (String) -> Unit, onPreview: ((String, String) -> Unit)?) {
     val accent = LocalAccent.current.main
     Column(
-        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xFF0A0A0D))
+        Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(GA.CodeBg)
             .border(1.dp, GA.Outline, RoundedCornerShape(12.dp))
     ) {
         Row(
@@ -294,6 +296,16 @@ private fun CodeBlock(lang: String, code: String, scale: Float, onCopy: (String)
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(lang.ifBlank { "kode" }, color = GA.TextSecondary, fontSize = 11.sp, modifier = Modifier.weight(1f))
+            if (onPreview != null && CodePreview.supports(lang, code)) {
+                Row(
+                    Modifier.clip(RoundedCornerShape(8.dp)).clickable { onPreview(lang, code) }.padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Filled.PlayArrow, contentDescription = null, tint = GA.Green, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(3.dp))
+                    Text("Pratinjau", color = GA.Green, fontSize = 11.sp)
+                }
+            }
             Row(
                 Modifier.clip(RoundedCornerShape(8.dp)).clickable { onCopy(code) }.padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -308,7 +320,7 @@ private fun CodeBlock(lang: String, code: String, scale: Float, onCopy: (String)
                 SyntaxHighlighter.highlight(code, accent),
                 fontFamily = FontFamily.Monospace,
                 fontSize = (12.5f * scale).sp,
-                color = Color(0xFFD6D6E0),
+                color = GA.TextPrimary,
                 softWrap = false,
             )
         }
@@ -328,7 +340,7 @@ private fun TableBlock(rows: List<List<String>>, accent: Color, scale: Float) {
                     for (c in 0 until cols) {
                         Text(
                             MarkdownParser.inline(row.getOrElse(c) { "" }, accent),
-                            color = if (r == 0) Color.White else GA.TextPrimary,
+                            color = if (r == 0) GA.Strong else GA.TextPrimary,
                             fontWeight = if (r == 0) FontWeight.SemiBold else FontWeight.Normal,
                             fontSize = (13 * scale).sp,
                             modifier = Modifier.width(130.dp).padding(horizontal = 8.dp, vertical = 6.dp),
@@ -388,4 +400,24 @@ object SyntaxHighlighter {
             }
         }
     }
+}
+
+
+/** Bahasa yang bisa dipratinjau di Studio Kode (fitur 24). */
+object CodePreview {
+    fun kind(lang: String, code: String): String? {
+        val l = lang.lowercase().trim()
+        return when {
+            l in setOf("html", "htm", "xml") && code.contains("<") -> "html"
+            l == "svg" || (l.isEmpty() && code.trimStart().startsWith("<svg")) -> "html"
+            l == "css" -> "css"
+            l in setOf("js", "javascript") -> "js"
+            l == "json" -> "json"
+            l == "mermaid" -> "mermaid"
+            l.isEmpty() && code.trimStart().startsWith("<!DOCTYPE", true) -> "html"
+            else -> null
+        }
+    }
+
+    fun supports(lang: String, code: String) = kind(lang, code) != null
 }

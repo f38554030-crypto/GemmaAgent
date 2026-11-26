@@ -8,18 +8,32 @@ plugins {
 android {
     namespace = "com.gemmaagent.app"
     compileSdk = 36
+    ndkVersion = "28.2.13676358"
 
     defaultConfig {
         // ID paket dipertahankan agar APK baru bisa menimpa versi lama.
         applicationId = "com.gemmaagent.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3
-        versionName = "2.0.0"
+        versionCode = 4
+        versionName = "3.0.0"
 
         ndk {
             // POCO M4 Pro (MediaTek Helio G96) = 64-bit ARM
             abiFilters += listOf("arm64-v8a")
+        }
+        externalNativeBuild {
+            cmake {
+                arguments += listOf("-DCMAKE_BUILD_TYPE=Release", "-DANDROID_STL=c++_shared")
+                cppFlags += listOf("-O3", "-fexceptions", "-frtti")
+            }
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path = file("src/main/cpp/CMakeLists.txt")
+            version = "3.31.6"
         }
     }
 
@@ -93,8 +107,14 @@ dependencies {
 
     // Web search tanpa API key (scraping HTML ringan) & pembaca artikel
     implementation("org.jsoup:jsoup:1.18.3")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // Salin file model besar di latar belakang
+    implementation("androidx.work:work-runtime-ktx:2.11.2")
+    // OCR offline (model ikut di APK)
+    implementation("com.google.mlkit:text-recognition:16.0.1")
     // Ekstraksi teks PDF
     implementation("com.tom-roush:pdfbox-android:2.0.27.0")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
 }

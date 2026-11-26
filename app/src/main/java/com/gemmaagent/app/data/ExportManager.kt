@@ -103,7 +103,7 @@ class ExportManager(
         layout.draw(c)
         c.restore()
         val footer = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.rgb(154, 154, 173); textSize = 32f }
-        c.drawText("✦ GemmaChat Hybrid • Gemma 4 E2B (offline)", pad, height - pad + 10f, footer)
+        c.drawText("✦ GemmaChat Hybrid • Gemma 4 (offline)", pad, height - pad + 10f, footer)
 
         val dir = File(context.cacheDir, "share").apply { mkdirs() }
         val file = File(dir, "kartu-gemma-${System.currentTimeMillis()}.png")
@@ -122,7 +122,7 @@ class ExportManager(
 
     // ------------------------- Backup & Restore JSON -------------------------
 
-    suspend fun backup(uri: Uri) = withContext(Dispatchers.IO) {
+    suspend fun backup(uri: Uri, password: String) = withContext(Dispatchers.IO) {
         val root = JSONObject()
         root.put("app", "GemmaChatHybrid")
         root.put("version", 1)
@@ -157,14 +157,16 @@ class ExportManager(
                 put(k, JSONObject().put("t", type).put("v", v?.toString() ?: ""))
             }
         })
-        context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(root.toString(2).toByteArray()) }
+        val out = com.gemmaagent.app.util.BackupCrypto.encrypt(root.toString(), password)
+        context.contentResolver.openOutputStream(uri, "wt")?.use { it.write(out.toByteArray()) }
             ?: throw IllegalStateException("Tidak bisa menulis file backup")
     }
 
     /** Memulihkan data dari file backup. Data lama diganti seluruhnya. */
-    suspend fun restore(uri: Uri): String = withContext(Dispatchers.IO) {
-        val text = context.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
+    suspend fun restore(uri: Uri, password: String): String = withContext(Dispatchers.IO) {
+        val raw = context.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) }
             ?: throw IllegalStateException("File tidak bisa dibaca")
+        val text = if (com.gemmaagent.app.util.BackupCrypto.isEncrypted(raw)) com.gemmaagent.app.util.BackupCrypto.decrypt(raw, password) else raw
         val root = JSONObject(text)
         require(root.optString("app") == "GemmaChatHybrid") { "Ini bukan file backup GemmaChat Hybrid." }
 

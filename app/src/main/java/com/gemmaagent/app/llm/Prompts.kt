@@ -45,6 +45,38 @@ object PromptTemplates {
     )
 }
 
+/** Rantai Prompt (Prompt Chaining): langkah berurutan; {input} = teks awal, {prev} = hasil langkah sebelumnya. */
+data class PromptChain(val title: String, val emoji: String, val steps: List<Pair<String, String>>)
+
+object PromptChains {
+    val all = listOf(
+        PromptChain("Catatan → Aksi → Email", "📨", listOf(
+            "Ringkas" to "Ringkas teks berikut dalam 5 poin penting:\n\n{input}",
+            "Daftar tugas" to "Dari ringkasan ini, buat daftar tugas bernomor (siapa/apa/kapan bila ada):\n\n{prev}",
+            "Draf email" to "Tulis email singkat dan sopan untuk tim berisi daftar tugas berikut:\n\n{prev}",
+        )),
+        PromptChain("Riset → Kerangka → Artikel", "📰", listOf(
+            "Poin kunci" to "Sebutkan 6 poin kunci tentang topik: {input}",
+            "Kerangka" to "Susun kerangka artikel dari poin berikut:\n\n{prev}",
+            "Artikel" to "Tulis artikel ±300 kata berdasarkan kerangka ini:\n\n{prev}",
+        )),
+        PromptChain("Teks → Terjemah → Poles", "🌐", listOf(
+            "Terjemahkan" to "Terjemahkan ke bahasa Inggris:\n\n{input}",
+            "Poles" to "Perbaiki agar terdengar natural dan profesional:\n\n{prev}",
+        )),
+        PromptChain("Materi → Ringkas → Kuis", "🎓", listOf(
+            "Ringkas" to "Ringkas materi berikut untuk belajar:\n\n{input}",
+            "Pertanyaan latihan" to "Buat 5 pertanyaan latihan beserta jawabannya dari ringkasan ini:\n\n{prev}",
+        )),
+    )
+
+    /** Rantai kustom: langkah dipisah baris "---". */
+    fun custom(text: String): PromptChain = PromptChain(
+        "Rantai kustom", "🔗",
+        text.split(Regex("\\n-{3,}\\n")).map { it.trim() }.filter { it.isNotEmpty() }.mapIndexed { i, t -> "Langkah ${i + 1}" to t },
+    )
+}
+
 /** Gaya pemoles teks (fitur 17). */
 enum class PolishStyle(val label: String, val instruction: String) {
     FORMAL("Formal", "gaya formal dan profesional"),
@@ -79,18 +111,36 @@ object PromptBuilder {
         return sb.toString()
     }
 
-    fun withWebContext(question: String, results: List<com.gemmaagent.app.web.WebResult>, budgetChars: Int): String {
-        val sb = StringBuilder("HASIL PENCARIAN:\n")
+    fun withWebContext(question: String, results: List<com.gemmaagent.app.web.WebResult>, budgetChars: Int, fromCache: Boolean = false): String {
+        val sb = StringBuilder(if (fromCache) "HASIL PENCARIAN (arsip offline):\n" else "HASIL PENCARIAN WEB:\n")
         var used = 0
         results.forEachIndexed { i, r ->
-            val block = "[${i + 1}] ${r.title}\n${r.snippet}\n"
-            if (used + block.length > budgetChars) return@forEachIndexed
+            val body = r.content.ifBlank { r.snippet }
+            val room = (budgetChars - used - r.title.length - 20).coerceAtLeast(0)
+            if (room < 80) return@forEachIndexed
+            val block = "[${i + 1}] ${r.title}\n${body.take(room)}\n"
             sb.append(block)
             used += block.length
         }
         sb.append("\nPERTANYAAN: ").append(question)
         return sb.toString()
     }
+
+    fun withKnowledge(question: String, hits: List<com.gemmaagent.app.data.kb.KbHit>, budgetChars: Int): String {
+        val sb = StringBuilder("KUTIPAN BASIS PENGETAHUAN PRIBADI:\n")
+        var used = 0
+        hits.forEach { h ->
+            val block = "— (${h.docName}) ${h.text.trim()}\n"
+            if (used + block.length > budgetChars) return@forEach
+            sb.append(block)
+            used += block.length
+        }
+        sb.append("\nJawab berdasarkan kutipan di atas bila relevan.\nPERTANYAAN: ").append(question)
+        return sb.toString()
+    }
+
+    fun withOcr(question: String, ocrText: String): String =
+        "TEKS DARI GAMBAR (hasil OCR):\n${ocrText.take(3000)}\n\nPERMINTAAN: ${question.ifBlank { "Jelaskan isi teks pada gambar ini." }}"
 
     fun withDocument(question: String, docName: String, docText: String): String =
         "DOKUMEN \"$docName\":\n$docText\n\nPERMINTAAN: ${question.ifBlank { "Rangkum dokumen ini dalam poin-poin penting." }}"

@@ -5,7 +5,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-enum class Accent(val label: String) { BLUE("Biru Elektrik"), EMERALD("Zamrud"), PURPLE("Ungu"), MONO("Monokrom") }
+enum class Accent(val label: String) { GEMINI("Gemini"), BLUE("Biru Elektrik"), EMERALD("Zamrud"), PURPLE("Ungu"), MONO("Monokrom") }
+
+enum class ThemeMode(val label: String) { DARK("Gelap (AMOLED)"), LIGHT("Terang"), SYSTEM("Ikuti sistem") }
 
 enum class FontScale(val label: String, val factor: Float) { SMALL("Kecil", 0.88f), NORMAL("Normal", 1f), LARGE("Besar", 1.18f) }
 
@@ -27,8 +29,10 @@ data class AppSettings(
     val customSystemPrompt: String = "",
     val followUps: Boolean = true,
     val useMemory: Boolean = true,
+    val useKnowledge: Boolean = false,
     // Tampilan
-    val accent: Accent = Accent.BLUE,
+    val accent: Accent = Accent.GEMINI,
+    val themeMode: ThemeMode = ThemeMode.DARK,
     val fontScale: FontScale = FontScale.NORMAL,
     // Keamanan & lainnya
     val biometricLock: Boolean = false,
@@ -65,7 +69,9 @@ class SettingsRepository(context: Context) {
             customSystemPrompt = prefs.getString("customSystemPrompt", "") ?: "",
             followUps = prefs.getBoolean("followUps", d.followUps),
             useMemory = prefs.getBoolean("useMemory", d.useMemory),
+            useKnowledge = prefs.getBoolean("useKnowledge", d.useKnowledge),
             accent = enumOr(prefs.getString("accent", null), d.accent),
+            themeMode = enumOr(prefs.getString("themeMode", null), d.themeMode),
             fontScale = enumOr(prefs.getString("fontScale", null), d.fontScale),
             biometricLock = prefs.getBoolean("biometricLock", d.biometricLock),
             onboardingDone = prefs.getBoolean("onboardingDone", d.onboardingDone),
@@ -87,7 +93,9 @@ class SettingsRepository(context: Context) {
             .putString("customSystemPrompt", s.customSystemPrompt)
             .putBoolean("followUps", s.followUps)
             .putBoolean("useMemory", s.useMemory)
+            .putBoolean("useKnowledge", s.useKnowledge)
             .putString("accent", s.accent.name)
+            .putString("themeMode", s.themeMode.name)
             .putString("fontScale", s.fontScale.name)
             .putBoolean("biometricLock", s.biometricLock)
             .putBoolean("onboardingDone", s.onboardingDone)

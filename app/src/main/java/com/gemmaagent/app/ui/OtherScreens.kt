@@ -183,7 +183,7 @@ fun NotesScreen(onBack: () -> Unit, onOpenSession: (Long) -> Unit) {
                         Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(GA.Surface)
                             .border(1.dp, GA.Outline, RoundedCornerShape(16.dp)).padding(12.dp)
                     ) {
-                        Text(n.title, color = Color.White, fontWeight = FontWeight.SemiBold)
+                        Text(n.title, color = GA.Strong, fontWeight = FontWeight.SemiBold)
                         Text(dateFmt.format(Date(n.createdAt)), color = GA.TextSecondary, fontSize = 11.sp)
                         Spacer(Modifier.height(6.dp))
                         Box(Modifier.heightIn(max = 220.dp)) { MarkdownText(n.text.take(1500)) }
@@ -327,7 +327,7 @@ fun OnboardingScreen(onDone: () -> Unit, onOpenSettings: () -> Unit) {
             val pg = pages[p]
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
-                    Modifier.size(96.dp).clip(RoundedCornerShape(30.dp)).background(Brush.linearGradient(listOf(accent.main, GA.VioletDeep))),
+                    Modifier.size(96.dp).clip(RoundedCornerShape(30.dp)).background(GA.Sparkle),
                     contentAlignment = Alignment.Center,
                 ) { Icon(pg.icon, null, tint = Color.White, modifier = Modifier.size(48.dp)) }
                 Spacer(Modifier.height(24.dp))

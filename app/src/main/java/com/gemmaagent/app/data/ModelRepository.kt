@@ -1,52 +1,64 @@
 package com.gemmaagent.app.data
 
 import android.Manifest
+import android.app.DownloadManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import androidx.core.content.ContextCompat
-import com.gemmaagent.app.util.Fmt
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.gemmaagent.app.llm.EngineType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
 
-/** Status penyalinan model (cara cadangan lewat File Picker). */
+/** Status penyalinan / pengunduhan model. */
 sealed interface CopyState {
     data object Idle : CopyState
-    data class Copying(val percent: Int, val copiedBytes: Long, val totalBytes: Long) : CopyState
+    data class Copying(val percent: Int, val copiedBytes: Long, val totalBytes: Long, val label: String = "Menyalin") : CopyState
     data class Done(val message: String) : CopyState
     data class Error(val message: String) : CopyState
 }
 
-enum class ModelSource { DOWNLOAD_DIRECT, INTERNAL_COPY }
+enum class ModelSource(val label: String) {
+    DOWNLOAD_DIRECT("langsung dari penyimpanan (zero-copy)"),
+    APP_FOLDER("folder GemmaModels"),
+    INTERNAL_COPY("salinan internal lama"),
+}
 
 data class ModelFile(val path: String, val name: String, val sizeBytes: Long, val source: ModelSource) {
-    /** Label pendek untuk Top App Bar, mis. "Gemma 4 E2B". */
+    val type: EngineType get() = if (name.endsWith(".gguf", true)) EngineType.GGUF else EngineType.LITERT
+
     val shortLabel: String
         get() {
-            val n = name.removeSuffix(".litertlm")
-            val gemma = Regex("gemma[-_ ]?(\\d+n?)[-_ ]?([a-z0-9]+)?", RegexOption.IGNORE_CASE).find(n)
-            return if (gemma != null) {
-                val ver = gemma.groupValues[1]
-                val size = gemma.groupValues[2].uppercase().takeIf { it.isNotEmpty() && it != "IT" }
-                listOfNotNull("Gemma $ver", size).joinToString(" ")
-            } else n.take(18)
+            val n = name.substringBeforeLast('.')
+            val gemma = Regex("gemma[-_ ]?(\\d+n?)", RegexOption.IGNORE_CASE).find(n)
+            val quant = Regex("(I?Q\\d[_A-Z0-9]*|F16|BF16|Q8_0)", RegexOption.IGNORE_CASE).find(n)?.value?.uppercase()
+            val size = Regex("\\b(E\\d+B|\\d+B)\\b", RegexOption.IGNORE_CASE).find(n.replace('-', ' ').replace('_', ' '))?.value?.uppercase()
+            return if (gemma != null) listOfNotNull("Gemma ${gemma.groupValues[1]}", size, quant).joinToString(" ") else n.take(22)
         }
 }
 
 /**
- * Manajer Multi-Model (.litertlm):
- * - Pemuatan langsung (zero-copy) dari /storage/emulated/0/Download dengan izin "Akses Semua File".
- * - Pemindai otomatis semua file .litertlm di folder Download (sampai 2 tingkat subfolder).
- * - Cara cadangan: pilih file → disalin sekali ke memori internal.
+ * Model Hub ala PocketPal AI:
+ * - Pemindai otomatis .gguf / .litertlm / .task di folder Download (izin Akses Semua File).
+ * - Pemilih file universal (File Manager, ZArchiver, Google Drive): file lokal dibaca langsung (zero-copy),
+ *   file dari cloud disalin di latar oleh WorkManager (buffer 64 KB) ke Download/GemmaModels.
+ * - Pengunduh dari link Google Drive via DownloadManager.
  */
 class ModelRepository(
     private val context: Context,
@@ -55,8 +67,7 @@ class ModelRepository(
     private val beforeReplace: () -> Unit,
 ) {
     private val prefs = context.getSharedPreferences("model_prefs", Context.MODE_PRIVATE)
-    private val modelDir = File(context.filesDir, "models")
-    val internalFile: File = File(modelDir, "gemma-model.litertlm")
+    private val legacyInternal = File(File(context.filesDir, "models"), "gemma-model.litertlm")
 
     private val _copyState = MutableStateFlow<CopyState>(CopyState.Idle)
     val copyState: StateFlow<CopyState> = _copyState.asStateFlow()
@@ -70,21 +81,21 @@ class ModelRepository(
     private val _scanning = MutableStateFlow(false)
     val scanning: StateFlow<Boolean> = _scanning.asStateFlow()
 
-    private var copyJob: Job? = null
-
     init {
         refresh()
+        observeCopyWork()
     }
 
-    fun currentModelPath(): String? = _active.value?.path
-
     fun hasStorageAccess(): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            Environment.isExternalStorageManager()
-        } else {
-            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED
-        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager()
+        else ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+
+    /** Folder tujuan salinan/unduhan: Download/GemmaModels (atau folder aplikasi bila tanpa izin). */
+    fun modelsFolder(): File {
+        val pub = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "GemmaModels")
+        if (hasStorageAccess() && (pub.isDirectory || pub.mkdirs())) return pub
+        return File(context.getExternalFilesDir(null), "GemmaModels").apply { mkdirs() }
+    }
 
     fun refresh() {
         scope.launch(Dispatchers.IO) {
@@ -94,7 +105,8 @@ class ModelRepository(
                 _models.value = list
                 val selected = settings.current.selectedModelPath
                 _active.value = list.firstOrNull { it.path == selected }
-                    ?: list.firstOrNull { it.name.equals(PREFERRED_NAME, true) }
+                    ?: list.firstOrNull { it.name.contains("gemma4-latih", true) }
+                    ?: list.firstOrNull { it.name.equals(PREFERRED_LITERT, true) }
                     ?: list.firstOrNull()
             } catch (_: Throwable) {
                 _models.value = emptyList()
@@ -110,79 +122,127 @@ class ModelRepository(
         _active.value = model
     }
 
+    private fun isModelFile(f: File) = f.isFile && f.length() > MIN_MODEL_BYTES &&
+        (f.name.endsWith(".gguf", true) || f.name.endsWith(".litertlm", true) || f.name.endsWith(".task", true))
+
     private fun scan(): List<ModelFile> {
-        val result = mutableListOf<ModelFile>()
+        val out = LinkedHashMap<String, ModelFile>()
+        fun add(f: File, src: ModelSource) {
+            val key = runCatching { f.canonicalPath }.getOrDefault(f.absolutePath)
+            if (!out.containsKey(key) && f.canRead()) out[key] = ModelFile(f.absolutePath, f.name, f.length(), src)
+        }
         if (hasStorageAccess()) {
-            val roots = listOf(
+            listOf(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 File("/storage/emulated/0/Download"),
-            ).distinctBy { runCatching { it.canonicalPath }.getOrDefault(it.absolutePath) }
-            val seen = HashSet<String>()
-            for (root in roots) {
-                if (!root.isDirectory) continue
-                root.walkTopDown().maxDepth(2).onFail { _, _ -> }
-                    .filter { it.isFile && it.name.endsWith(".litertlm", true) && it.length() > MIN_MODEL_BYTES && it.canRead() }
-                    .forEach { f ->
-                        val key = runCatching { f.canonicalPath }.getOrDefault(f.absolutePath)
-                        if (seen.add(key)) result += ModelFile(f.absolutePath, f.name, f.length(), ModelSource.DOWNLOAD_DIRECT)
-                    }
+            ).filter { it.isDirectory }.forEach { root ->
+                root.walkTopDown().maxDepth(3).onFail { _, _ -> }.filter { isModelFile(it) }.forEach {
+                    add(it, if (it.parentFile?.name == "GemmaModels") ModelSource.APP_FOLDER else ModelSource.DOWNLOAD_DIRECT)
+                }
             }
         }
-        val expected = prefs.getLong(KEY_SIZE, -1L)
-        if (internalFile.isFile && internalFile.length() > 0 && internalFile.length() == expected) {
-            result += ModelFile(
-                internalFile.absolutePath,
-                prefs.getString(KEY_NAME, null) ?: internalFile.name,
-                internalFile.length(),
-                ModelSource.INTERNAL_COPY,
-            )
-        }
-        return result.sortedWith(
-            compareByDescending<ModelFile> { it.name.equals(PREFERRED_NAME, true) }
-                .thenBy { it.source.ordinal }
-                .thenBy { it.name.lowercase() }
-        )
+        context.getExternalFilesDir(null)?.let { File(it, "GemmaModels") }?.listFiles()?.filter { isModelFile(it) }
+            ?.forEach { add(it, ModelSource.APP_FOLDER) }
+        // Path tambahan yang dipilih lewat File Manager / ZArchiver (zero-copy).
+        prefs.getStringSet(KEY_EXTRA, emptySet())?.map { File(it) }?.filter { isModelFile(it) }
+            ?.forEach { add(it, ModelSource.DOWNLOAD_DIRECT) }
+        if (legacyInternal.isFile && legacyInternal.length() > MIN_MODEL_BYTES) add(legacyInternal, ModelSource.INTERNAL_COPY)
+        return out.values.sortedWith(compareBy<ModelFile> { it.type.ordinal }.thenBy { it.name.lowercase() })
     }
 
-    fun deleteInternalCopy() {
+    fun deleteLegacyCopy() {
+        scope.launch(Dispatchers.IO) {
+            if (_active.value?.source == ModelSource.INTERNAL_COPY) runCatching { beforeReplace() }
+            legacyInternal.delete()
+            refresh()
+        }
+    }
+
+    // ---------------------- Pemilih file universal ----------------------
+
+    /** Dipanggil setelah pengguna memilih file lewat OpenDocument (filter semua tipe file). */
+    fun importFromUri(uri: Uri) {
         scope.launch(Dispatchers.IO) {
             try {
-                if (_active.value?.source == ModelSource.INTERNAL_COPY) runCatching { beforeReplace() }
-                internalFile.delete()
-                prefs.edit().remove(KEY_NAME).remove(KEY_SIZE).apply()
-                _copyState.value = CopyState.Done("Salinan internal dihapus.")
+                val (name, size) = queryNameSize(uri)
+                if (!(name.endsWith(".gguf", true) || name.endsWith(".litertlm", true) || name.endsWith(".task", true))) {
+                    _copyState.value = CopyState.Error("\"$name\" bukan file model (.gguf / .litertlm / .task).")
+                    return@launch
+                }
+                val local = resolveLocalPath(uri, name, size)
+                if (local != null) {
+                    // Zero-copy: pakai file aslinya.
+                    val set = prefs.getStringSet(KEY_EXTRA, emptySet())!!.toMutableSet().apply { add(local.absolutePath) }
+                    prefs.edit().putStringSet(KEY_EXTRA, set).apply()
+                    settings.update { it.copy(selectedModelPath = local.absolutePath) }
+                    _copyState.value = CopyState.Done("✅ $name dibaca langsung dari ${local.parent} (tanpa salin).")
+                    refresh()
+                    return@launch
+                }
+                // Sumber cloud (mis. Google Drive): salin di latar dengan WorkManager.
+                runCatching {
+                    context.contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+                val target = File(modelsFolder(), name)
+                val free = target.parentFile?.usableSpace ?: 0L
+                if (size > 0 && free < size + 200L * 1024 * 1024) {
+                    _copyState.value = CopyState.Error("Ruang penyimpanan tidak cukup: butuh ${com.gemmaagent.app.util.Fmt.gb(size)} GB.")
+                    return@launch
+                }
+                val req = OneTimeWorkRequestBuilder<ModelCopyWorker>()
+                    .setInputData(workDataOf(
+                        ModelCopyWorker.KEY_URI to uri.toString(),
+                        ModelCopyWorker.KEY_TARGET to target.absolutePath,
+                        ModelCopyWorker.KEY_SIZE to size,
+                    ))
+                    .build()
+                WorkManager.getInstance(context).enqueueUniqueWork(COPY_WORK, ExistingWorkPolicy.KEEP, req)
+                _copyState.value = CopyState.Copying(0, 0, size, "Menyalin dari cloud")
             } catch (t: Throwable) {
-                _copyState.value = CopyState.Error("Gagal menghapus salinan: ${t.message}")
-            } finally {
-                refresh()
+                _copyState.value = CopyState.Error("Gagal membuka file: ${t.message ?: t.javaClass.simpleName}")
             }
         }
     }
 
-    // ---------------- Cara cadangan: salin dari File Picker ----------------
+    fun cancelCopy() {
+        WorkManager.getInstance(context).cancelUniqueWork(COPY_WORK)
+    }
 
-    fun importModel(uri: Uri) {
-        if (copyJob?.isActive == true) return
-        copyJob = scope.launch(Dispatchers.IO) {
-            try {
-                copyInternal(uri)
-            } catch (_: OutOfMemoryError) {
-                _copyState.value = CopyState.Error("RAM tidak cukup saat menyalin. Tutup aplikasi lain lalu coba lagi.")
-            } catch (t: Throwable) {
-                _copyState.value = CopyState.Error("Gagal menyalin: ${t.message ?: t.javaClass.simpleName}")
-            } finally {
-                runCatching { File(modelDir, "${internalFile.name}.part").delete() }
-                refresh()
+    private fun observeCopyWork() {
+        scope.launch {
+            WorkManager.getInstance(context).getWorkInfosForUniqueWorkFlow(COPY_WORK).collect { infos ->
+                val info = infos.firstOrNull() ?: return@collect
+                when (info.state) {
+                    WorkInfo.State.RUNNING, WorkInfo.State.ENQUEUED -> {
+                        val p = info.progress
+                        _copyState.value = CopyState.Copying(
+                            p.getInt(ModelCopyWorker.KEY_PERCENT, 0), p.getLong(ModelCopyWorker.KEY_COPIED, 0),
+                            p.getLong(ModelCopyWorker.KEY_TOTAL, 0), "Menyalin dari cloud",
+                        )
+                    }
+                    WorkInfo.State.SUCCEEDED -> {
+                        val path = info.outputData.getString(ModelCopyWorker.KEY_TARGET)
+                        if (path != null && _copyState.value is CopyState.Copying) {
+                            settings.update { it.copy(selectedModelPath = path) }
+                            _copyState.value = CopyState.Done("✅ Tersalin ke ${File(path).parent}")
+                            refresh()
+                        }
+                    }
+                    WorkInfo.State.FAILED -> if (_copyState.value is CopyState.Copying) {
+                        _copyState.value = CopyState.Error(info.outputData.getString(ModelCopyWorker.KEY_ERROR) ?: "Penyalinan gagal.")
+                    }
+                    WorkInfo.State.CANCELLED -> if (_copyState.value is CopyState.Copying) _copyState.value = CopyState.Error("Penyalinan dibatalkan.")
+                    else -> Unit
+                }
             }
         }
     }
 
-    private fun copyInternal(uri: Uri) {
-        val resolver = context.contentResolver
-        var name = "model.litertlm"
+    private fun queryNameSize(uri: Uri): Pair<String, Long> {
+        var name = uri.lastPathSegment?.substringAfterLast('/') ?: "model"
         var size = -1L
         runCatching {
-            resolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)?.use { c ->
+            context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE), null, null, null)?.use { c ->
                 if (c.moveToFirst()) {
                     val ni = c.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     val si = c.getColumnIndex(OpenableColumns.SIZE)
@@ -191,77 +251,124 @@ class ModelRepository(
                 }
             }
         }
-        if (!name.lowercase().endsWith(".litertlm")) {
-            _copyState.value = CopyState.Error("File \"$name\" bukan model .litertlm.")
-            return
-        }
-        if (internalFile.isFile && prefs.getString(KEY_NAME, null) == name && size > 0 && internalFile.length() == size) {
-            _copyState.value = CopyState.Done("Model \"$name\" sudah tersalin sebelumnya.")
-            return
-        }
-        modelDir.mkdirs()
-        if (size > 0) {
-            val needed = size + 200L * 1024 * 1024
-            val available = modelDir.usableSpace + (if (internalFile.exists()) internalFile.length() else 0L)
-            if (available < needed) {
-                _copyState.value = CopyState.Error("Memori internal tidak cukup. Butuh ${Fmt.gb(needed)} GB, tersedia ${Fmt.gb(available)} GB.")
-                return
-            }
-        }
-        val temp = File(modelDir, "${internalFile.name}.part")
-        temp.delete()
-        _copyState.value = CopyState.Copying(0, 0, size)
-        val input = resolver.openInputStream(uri) ?: run {
-            _copyState.value = CopyState.Error("File tidak bisa dibuka.")
-            return
-        }
-        var copied = 0L
-        var lastPercent = -1
-        var lastEmit = 0L
-        input.use { ins ->
-            temp.outputStream().use { out ->
-                val buffer = ByteArray(1024 * 1024)
-                while (true) {
-                    val read = ins.read(buffer)
-                    if (read < 0) break
-                    out.write(buffer, 0, read)
-                    copied += read
-                    if (size > 0) {
-                        val p = ((copied * 100) / size).toInt().coerceIn(0, 100)
-                        if (p != lastPercent) {
-                            lastPercent = p
-                            _copyState.value = CopyState.Copying(p, copied, size)
-                        }
-                    } else if (copied - lastEmit >= 50L * 1024 * 1024) {
-                        lastEmit = copied
-                        _copyState.value = CopyState.Copying(0, copied, size)
+        return name to size
+    }
+
+    /**
+     * Mencoba menemukan path file asli dari URI (File Manager bawaan, ZArchiver, folder Download).
+     * Mengembalikan null bila file berasal dari cloud (mis. Google Drive).
+     */
+    private fun resolveLocalPath(uri: Uri, name: String, size: Long): File? {
+        fun ok(f: File?) = f != null && f.isFile && f.canRead() && (size <= 0 || f.length() == size)
+        if (uri.scheme == "file") uri.path?.let { File(it) }?.takeIf { ok(it) }?.let { return it }
+        val authority = uri.authority.orEmpty()
+        if (authority.contains("google") && authority.contains("docs")) return null // Google Drive
+
+        runCatching {
+            if (DocumentsContract.isDocumentUri(context, uri)) {
+                val docId = DocumentsContract.getDocumentId(uri)
+                when (authority) {
+                    "com.android.externalstorage.documents" -> {
+                        val (vol, rel) = docId.split(":", limit = 2).let { it[0] to it.getOrElse(1) { "" } }
+                        val base = if (vol.equals("primary", true)) Environment.getExternalStorageDirectory().absolutePath else "/storage/$vol"
+                        File(base, rel).takeIf { ok(it) }?.let { return it }
+                    }
+                    "com.android.providers.downloads.documents" -> {
+                        if (docId.startsWith("raw:")) File(docId.removePrefix("raw:")).takeIf { ok(it) }?.let { return it }
                     }
                 }
-                out.flush()
-                runCatching { out.fd.sync() }
             }
         }
-        if (size > 0 && copied != size) {
-            temp.delete()
-            _copyState.value = CopyState.Error("Penyalinan tidak lengkap. Coba lagi.")
+        // ZArchiver / file manager lain sering menyertakan path asli di URI.
+        val decoded = Uri.decode(uri.toString())
+        val idx = decoded.indexOf("/storage/")
+        if (idx >= 0) File(decoded.substring(idx)).takeIf { ok(it) }?.let { return it }
+        uri.path?.let { p -> p.indexOf("/storage/").takeIf { it >= 0 }?.let { File(p.substring(it)) } }?.takeIf { ok(it) }?.let { return it }
+
+        // Terakhir: cari file bernama & berukuran sama di folder Download (butuh izin Akses Semua File).
+        if (hasStorageAccess()) {
+            val dl = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            dl.walkTopDown().maxDepth(3).onFail { _, _ -> }.firstOrNull { it.isFile && it.name == name && (size <= 0 || it.length() == size) }
+                ?.let { return it }
+        }
+        return null
+    }
+
+    // ---------------------- Unduh dari Google Drive ----------------------
+
+    /** Mengubah link berbagi Drive menjadi link unduhan langsung lalu mengunduh lewat DownloadManager. */
+    fun downloadFromDrive(linkOrId: String, fileName: String) {
+        val id = extractDriveId(linkOrId)
+        if (id == null) {
+            _copyState.value = CopyState.Error("Link Drive tidak dikenali. Gunakan link file (…/file/d/ID/view), bukan link folder.")
             return
         }
-        runCatching { beforeReplace() }
-        internalFile.delete()
-        if (!temp.renameTo(internalFile)) {
-            temp.delete()
-            _copyState.value = CopyState.Error("Gagal menyimpan model.")
-            return
+        val name = fileName.trim().ifBlank { "model-$id.gguf" }
+        val url = "https://drive.usercontent.google.com/download?id=$id&export=download&confirm=t"
+        try {
+            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+            val req = DownloadManager.Request(Uri.parse(url))
+                .setTitle(name)
+                .setDescription("GemmaChat Hybrid — mengunduh model")
+                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GemmaModels/$name")
+                .setAllowedOverMetered(true)
+            val downloadId = dm.enqueue(req)
+            _copyState.value = CopyState.Copying(0, 0, 0, "Mengunduh dari Drive")
+            trackDownload(dm, downloadId, name)
+        } catch (t: Throwable) {
+            _copyState.value = CopyState.Error("Gagal memulai unduhan: ${t.message}")
         }
-        prefs.edit().putString(KEY_NAME, name).putLong(KEY_SIZE, internalFile.length()).apply()
-        settings.update { it.copy(selectedModelPath = internalFile.absolutePath) }
-        _copyState.value = CopyState.Done("Model \"$name\" berhasil disalin (${Fmt.gb(copied)} GB).")
+    }
+
+    private fun trackDownload(dm: DownloadManager, id: Long, name: String) {
+        scope.launch(Dispatchers.IO) {
+            while (true) {
+                val q = DownloadManager.Query().setFilterById(id)
+                val done = dm.query(q)?.use { c ->
+                    if (!c.moveToFirst()) return@use true
+                    val status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+                    val got = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
+                    val total = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
+                    when (status) {
+                        DownloadManager.STATUS_SUCCESSFUL -> {
+                            _copyState.value = CopyState.Done("✅ $name selesai diunduh ke Download/GemmaModels.")
+                            refresh()
+                            true
+                        }
+                        DownloadManager.STATUS_FAILED -> {
+                            _copyState.value = CopyState.Error("Unduhan gagal. Pastikan file Drive dibagikan \"Siapa saja yang memiliki link\".")
+                            true
+                        }
+                        else -> {
+                            val pct = if (total > 0) ((got * 100) / total).toInt() else 0
+                            _copyState.value = CopyState.Copying(pct, got, total, "Mengunduh dari Drive")
+                            false
+                        }
+                    }
+                } ?: true
+                if (done) break
+                delay(1000)
+            }
+        }
     }
 
     companion object {
-        const val PREFERRED_NAME = "gemma-4-E2B-it.litertlm"
-        private const val MIN_MODEL_BYTES = 100L * 1024 * 1024
-        private const val KEY_NAME = "model_name"
-        private const val KEY_SIZE = "model_size"
+        const val PREFERRED_LITERT = "gemma-4-E2B-it.litertlm"
+        const val USER_DRIVE_FOLDER = "https://drive.google.com/drive/folders/1rv8D1k-5xcaXvYZ8QbrMyV7eGLqs6NxL"
+        /** File GGUF hasil latih ulang pengguna di folder Drive di atas (model_hp/gguf). */
+        const val USER_DRIVE_GGUF_ID = "1vKHZZIx9yrU4QQ4WdvLXV4vgyYkKLNEY"
+        const val USER_DRIVE_GGUF_NAME = "gemma4-latih-Q4_K_M.gguf"
+        private const val COPY_WORK = "model_copy"
+        private const val KEY_EXTRA = "extra_paths"
+        private const val MIN_MODEL_BYTES = 50L * 1024 * 1024
+
+        fun extractDriveId(s: String): String? {
+            val t = s.trim()
+            Regex("/file/d/([A-Za-z0-9_-]{20,})").find(t)?.let { return it.groupValues[1] }
+            Regex("[?&]id=([A-Za-z0-9_-]{20,})").find(t)?.let { return it.groupValues[1] }
+            if (t.contains("/folders/")) return null
+            return t.takeIf { Regex("^[A-Za-z0-9_-]{20,}$").matches(it) }
+        }
     }
 }

@@ -43,6 +43,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CleaningServices
+import androidx.compose.material.icons.filled.Difference
+import androidx.compose.material.icons.filled.LibraryAdd
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.LinearProgressIndicator
+import com.gemmaagent.app.llm.PromptChains
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bookmarks
@@ -107,6 +114,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -149,8 +167,13 @@ fun ChatScreen(
     onOpenNotes: () -> Unit,
     onOpenMemory: () -> Unit,
     onOpenStats: () -> Unit,
+    onOpenModelHub: () -> Unit,
+    onOpenArchive: () -> Unit,
+    onOpenKnowledge: () -> Unit,
     shortcut: String?,
     onShortcutConsumed: () -> Unit,
+    sharedText: String?,
+    onSharedConsumed: () -> Unit,
 ) {
     val context = LocalContext.current
     val app = GemmaChatApp.instance
@@ -191,6 +214,16 @@ fun ChatScreen(
     var showCalc by remember { mutableStateOf(false) }
     var editing by remember { mutableStateOf<MessageEntity?>(null) }
     var renaming by remember { mutableStateOf<SessionEntity?>(null) }
+    var preview by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var diffPair by remember { mutableStateOf<Pair<String, String>?>(null) }
+    var showDiffTool by remember { mutableStateOf(false) }
+    var showChain by remember { mutableStateOf(false) }
+    var shared by remember { mutableStateOf<String?>(null) }
+    val incognito by chat.incognito.collectAsState()
+    val loadProgress by app.llm.progress.collectAsState()
+    LaunchedEffect(sharedText) {
+        if (sharedText != null) { shared = sharedText; onSharedConsumed() }
+    }
 
     val snackbar = remember { SnackbarHostState() }
     LaunchedEffect(Unit) { chat.events.collect { snackbar.showSnackbar(it) } }
@@ -236,6 +269,13 @@ fun ChatScreen(
                         if (d.truncated) toast("Dokumen panjang: hanya bagian awal yang dibaca.")
                     }
                 }
+                .onFailure { toast("Gagal membaca dokumen: ${it.message}") }
+        }
+    }
+    val kbPicker = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+        if (uri != null) scope.launch {
+            runCatching { DocumentReader.read(context, uri) }
+                .onSuccess { d -> if (d.text.isBlank()) toast("Teks dokumen tidak bisa diekstrak.") else chat.addToKnowledge(d) }
                 .onFailure { toast("Gagal membaca dokumen: ${it.message}") }
         }
     }
@@ -312,6 +352,9 @@ fun ChatScreen(
             onToggleChecklist = { m, i -> chat.toggleChecklist(m, i) },
             onFollowUp = { q -> send(q) },
             onWord = { w, sentence -> chat.defineWord(w, sentence) },
+            onPreviewCode = { l, c -> preview = l to c },
+            onSelectVersion = { m, i -> chat.selectVersion(m, i) },
+            onCompareVersions = { a, b -> diffPair = a to b },
         )
     }
 
@@ -333,6 +376,10 @@ fun ChatScreen(
                 onMemory = { scope.launch { drawerState.close() }; onOpenMemory() },
                 onStats = { scope.launch { drawerState.close() }; onOpenStats() },
                 onSettings = { scope.launch { drawerState.close() }; onOpenSettings() },
+                onModelHub = { scope.launch { drawerState.close() }; onOpenModelHub() },
+                onArchive = { scope.launch { drawerState.close() }; onOpenArchive() },
+                onKnowledge = { scope.launch { drawerState.close() }; onOpenKnowledge() },
+                onIncognito = { chat.startIncognito(); scope.launch { drawerState.close() } },
             )
         },
     ) {
@@ -346,13 +393,17 @@ fun ChatScreen(
                     ) {
                         IconButton(onClick = { scope.launch { drawerState.open() } }) { Icon(Icons.Filled.Menu, "Riwayat percakapan", tint = GA.TextPrimary) }
                         Column(Modifier.weight(1f)) {
-                            Text(currentTitle, color = GA.TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+                            Text(if (incognito) "🕶️ Sesi Incognito" else currentTitle, color = GA.TextPrimary, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Row(
+                                Modifier.clip(RoundedCornerShape(6.dp)).clickable { onOpenModelHub() },
+                                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(5.dp),
+                            ) {
                                 BlinkingDot(
                                     active = status == ModelStatus.LOADING || status == ModelStatus.BUSY,
                                     color = accent.main, size = 6.dp,
                                     idleColor = if (status == ModelStatus.READY) GA.Green else if (status == ModelStatus.ERROR) GA.Red else GA.TextSecondary,
                                 )
+                                activeModel?.let { InfoBadge(it.type.badge, accent.main) }
                                 Text("${activeModel?.shortLabel ?: "Tanpa model"} • ${status.label}", color = GA.TextSecondary, fontSize = 10.sp, maxLines = 1)
                             }
                             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.padding(top = 2.dp)) {
@@ -388,6 +439,11 @@ fun ChatScreen(
                             IconButton(onClick = { overflowMenu = true }) { Icon(Icons.Filled.MoreVert, "Menu lainnya", tint = GA.TextPrimary) }
                             DropdownMenu(expanded = overflowMenu, onDismissRequest = { overflowMenu = false }) {
                                 DropdownMenuItem(text = { Text("Chat baru") }, leadingIcon = { Icon(Icons.Filled.Add, null) }, onClick = { overflowMenu = false; chat.newSession() })
+                                DropdownMenuItem(text = { Text(if (incognito) "Keluar Incognito" else "Sesi Incognito") }, leadingIcon = { Icon(Icons.Filled.VisibilityOff, null) },
+                                    onClick = { overflowMenu = false; if (incognito) chat.newSession() else { chat.startIncognito(); toast("🕶️ Incognito: obrolan tidak disimpan") } })
+                                DropdownMenuItem(text = { Text("Model Hub") }, leadingIcon = { Icon(Icons.Filled.Memory, null) }, onClick = { overflowMenu = false; onOpenModelHub() })
+                                DropdownMenuItem(text = { Text("Bersihkan Cache RAM") }, leadingIcon = { Icon(Icons.Filled.CleaningServices, null) },
+                                    onClick = { overflowMenu = false; app.llm.clearCache { toast("🧹 KV cache dilepas") } })
                                 DropdownMenuItem(text = { Text("Mode Fokus (Zen)") }, leadingIcon = { Icon(Icons.Filled.Fullscreen, null) }, onClick = { overflowMenu = false; zen = true })
                                 DropdownMenuItem(text = { Text("Ekspor .md") }, leadingIcon = { Icon(Icons.Filled.Description, null) }, enabled = sessionId != null, onClick = {
                                     overflowMenu = false
@@ -405,7 +461,7 @@ fun ChatScreen(
 
                 // ===================== BANNER =====================
                 if (activeModel == null && status != ModelStatus.LOADING) {
-                    Banner("Belum ada model. Buka Pengaturan → Model, izinkan Akses Semua File agar ${"gemma-4-E2B-it.litertlm"} di Download terdeteksi.", GA.Amber, "Buka") { onOpenSettings() }
+                    Banner("Belum ada model. Buka Model Hub → izinkan Akses Semua File agar file .gguf / .litertlm di Download terdeteksi.", GA.Amber, "Model Hub") { onOpenModelHub() }
                 } else if (status == ModelStatus.ERROR && llmError != null) {
                     Banner(llmError ?: "", GA.Red, "Coba Lagi") { chat.preload() }
                 }
@@ -417,11 +473,43 @@ fun ChatScreen(
                     }
                 }
 
+                loadProgress?.let { p ->
+                    Column(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp)) {
+                        Text("Memuat ${activeModel?.name ?: "model"}… ${(p * 100).toInt()}%", color = GA.TextSecondary, fontSize = 11.sp)
+                        LinearProgressIndicator(progress = { p }, modifier = Modifier.fillMaxWidth().height(4.dp).clip(RoundedCornerShape(50)), color = accent.main, trackColor = GA.SurfaceHigher, drawStopIndicator = {})
+                    }
+                }
+                if (incognito) {
+                    Banner("🕶️ Incognito: pesan hanya di RAM, tidak masuk riwayat & memori, hilang saat keluar.", GA.Violet, "Keluar") { chat.newSession() }
+                }
+
                 // ===================== DAFTAR PESAN =====================
+                // ---------- Smart Scroll Lock (fitur 27) ----------
                 val listState = rememberLazyListState()
+                var follow by remember { mutableStateOf(true) }
+                val atBottom by remember { derivedStateOf { !listState.canScrollForward } }
+                val lockConnection = remember {
+                    object : NestedScrollConnection {
+                        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                            // Jari menggeser ke bawah = pengguna membaca ke atas → kunci gulir otomatis.
+                            if (source == NestedScrollSource.UserInput && available.y > 0f) follow = false
+                            return Offset.Zero
+                        }
+                    }
+                }
+                LaunchedEffect(atBottom) { if (atBottom) follow = true }
+                suspend fun jumpToEnd() {
+                    if (messages.isEmpty()) return
+                    val last = messages.size - 1
+                    if ((listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1) < last) listState.scrollToItem(last)
+                    listState.scrollBy(100_000f)
+                }
+                LaunchedEffect(messages.size) {
+                    if (messages.isNotEmpty()) { follow = true; jumpToEnd() }
+                }
                 val lastPayload = messages.lastOrNull()?.payload
-                LaunchedEffect(messages.size, stream?.text?.length, lastPayload) {
-                    if (messages.isNotEmpty()) listState.animateScrollToItem(messages.size - 1)
+                LaunchedEffect(stream?.text?.length, stream?.steps?.size, lastPayload) {
+                    if (follow) jumpToEnd()
                 }
                 Box(Modifier.weight(1f)) {
                     if (messages.isEmpty()) {
@@ -431,7 +519,7 @@ fun ChatScreen(
                             state = listState,
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().nestedScroll(lockConnection),
                         ) {
                             items(messages, key = { it.id }) { m ->
                                 Box(Modifier.animateItem()) {
@@ -442,6 +530,22 @@ fun ChatScreen(
                                     )
                                 }
                             }
+                        }
+                    }
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = messages.isNotEmpty() && !atBottom && (!follow || !generating),
+                        modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 10.dp),
+                        enter = fadeIn() + slideInVertically { it / 2 },
+                        exit = fadeOut() + slideOutVertically { it / 2 },
+                    ) {
+                        Row(
+                            Modifier.shadow(6.dp, RoundedCornerShape(50)).clip(RoundedCornerShape(50)).background(GA.SurfaceHigher)
+                                .border(1.dp, GA.Outline, RoundedCornerShape(50))
+                                .clickable { follow = true; scope.launch { jumpToEnd() } }
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text("↓ Ke bawah", color = GA.TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
                         }
                     }
                     if (zen) {
@@ -477,14 +581,17 @@ fun ChatScreen(
 
                 // ===================== KOLOM INPUT =====================
                 Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 6.dp, vertical = 6.dp),
+                    Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp)
+                        .shadow(10.dp, RoundedCornerShape(30.dp))
+                        .clip(RoundedCornerShape(30.dp)).background(GA.SurfaceHigh)
+                        .border(1.dp, GA.Outline, RoundedCornerShape(30.dp)).padding(5.dp),
                     verticalAlignment = Alignment.Bottom,
                 ) {
                     Box {
-                        RoundIcon(Icons.Filled.Add, "Lampiran & alat", GA.SurfaceHigh, accent.main) { attachMenu = true }
+                        RoundIcon(Icons.Filled.Add, "Lampiran & alat", Color.Transparent, accent.main) { attachMenu = true }
                         DropdownMenu(expanded = attachMenu, onDismissRequest = { attachMenu = false }) {
-                            MenuItem("Kamera", Icons.Filled.CameraAlt) { attachMenu = false; launchCamera() }
-                            MenuItem("Galeri", Icons.Filled.Image) {
+                            MenuItem("Kamera (OCR offline)", Icons.Filled.CameraAlt) { attachMenu = false; launchCamera() }
+                            MenuItem("Galeri (OCR offline)", Icons.Filled.Image) {
                                 attachMenu = false
                                 gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                             }
@@ -505,6 +612,12 @@ fun ChatScreen(
                             MenuItem("Template Prompt", Icons.Filled.LibraryBooks) { attachMenu = false; showTemplates = true }
                             MenuItem("Poles Gaya Bahasa", Icons.Filled.Spellcheck) { attachMenu = false; showPolish = true }
                             MenuItem("Kalkulator & Konverter", Icons.Filled.Calculate) { attachMenu = false; showCalc = true }
+                            MenuItem("Rantai Prompt", Icons.Filled.Link) { attachMenu = false; showChain = true }
+                            MenuItem("Diff Viewer (bandingkan teks)", Icons.Filled.Difference) { attachMenu = false; showDiffTool = true }
+                            MenuItem("Tambah ke Basis Pengetahuan", Icons.Filled.LibraryAdd) {
+                                attachMenu = false
+                                kbPicker.launch(arrayOf("application/pdf", "text/plain", "text/markdown"))
+                            }
                             MenuItem(if (compareNext) "Mode Banding: AKTIF" else "Mode Banding (Cepat vs Mendalam)", Icons.Filled.CompareArrows) {
                                 attachMenu = false; compareNext = !compareNext
                             }
@@ -515,7 +628,7 @@ fun ChatScreen(
                     RoundIcon(
                         if (s.online) Icons.Filled.Public else Icons.Filled.PublicOff,
                         if (s.online) "Mode Online aktif" else "Mode Offline",
-                        if (s.online) accent.deep else GA.SurfaceHigh,
+                        if (s.online) accent.deep else Color.Transparent,
                         if (s.online) Color.White else GA.TextSecondary,
                     ) {
                         app.settings.update { it.copy(online = !it.online) }
@@ -529,7 +642,7 @@ fun ChatScreen(
                         modifier = Modifier.weight(1f).heightIn(min = 48.dp, max = 150.dp),
                         shape = RoundedCornerShape(24.dp),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = GA.SurfaceHigh, unfocusedContainerColor = GA.SurfaceHigh,
+                            focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
                             focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
                             focusedTextColor = GA.TextPrimary, unfocusedTextColor = GA.TextPrimary, cursorColor = accent.main,
                         ),
@@ -539,7 +652,7 @@ fun ChatScreen(
                     )
                     Spacer(Modifier.width(4.dp))
                     RoundIcon(if (listening) Icons.Filled.Mic else Icons.Filled.MicNone, "Input suara",
-                        if (listening) GA.Red.copy(alpha = 0.25f) else GA.SurfaceHigh, if (listening) GA.Red else GA.Violet) {
+                        if (listening) GA.Red.copy(alpha = 0.25f) else Color.Transparent, if (listening) GA.Red else GA.Violet) {
                         if (listening) speech.stop()
                         else if (ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) speech.start()
                         else micPermission.launch(Manifest.permission.RECORD_AUDIO)
@@ -551,7 +664,7 @@ fun ChatScreen(
                         val canSend = input.isNotBlank() || pendingImage != null || pendingDoc != null
                         Box(
                             Modifier.size(46.dp).clip(CircleShape)
-                                .background(if (canSend) Brush.linearGradient(listOf(accent.main, GA.VioletDeep)) else Brush.linearGradient(listOf(GA.SurfaceHigher, GA.SurfaceHigher)))
+                                .background(if (canSend) GA.Sparkle else Brush.linearGradient(listOf(GA.SurfaceHigher, GA.SurfaceHigher)))
                                 .clickable(enabled = canSend) { send() },
                             contentAlignment = Alignment.Center,
                         ) { Icon(Icons.AutoMirrored.Filled.Send, "Kirim", tint = Color.White) }
@@ -664,6 +777,65 @@ fun ChatScreen(
         )
     }
 
+    preview?.let { (l, c) -> CodePreviewDialog(l, c) { preview = null } }
+    diffPair?.let { (a, b) -> DiffDialog(a, b, editable = false) { diffPair = null } }
+    if (showDiffTool) DiffDialog("", "", editable = true) { showDiffTool = false }
+
+    if (showChain) {
+        var chainInput by remember { mutableStateOf(input) }
+        var custom by remember { mutableStateOf("") }
+        AlertDialog(
+            onDismissRequest = { showChain = false },
+            containerColor = GA.SurfaceHigh,
+            title = { Text("🔗 Rantai Prompt", color = GA.TextPrimary) },
+            text = {
+                Column(Modifier.verticalScroll(rememberScrollState())) {
+                    OutlinedTextField(chainInput, { chainInput = it }, label = { Text("Teks / topik awal ({input})") }, modifier = Modifier.fillMaxWidth().heightIn(min = 90.dp, max = 180.dp))
+                    Spacer(Modifier.height(8.dp))
+                    PromptChains.all.forEach { ch ->
+                        Row(
+                            Modifier.fillMaxWidth().padding(vertical = 2.dp).clip(RoundedCornerShape(12.dp)).background(GA.Surface)
+                                .clickable(enabled = chainInput.isNotBlank() && !generating) { showChain = false; chat.runChain(ch, chainInput) }.padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Text(ch.emoji, fontSize = 18.sp)
+                            Spacer(Modifier.width(8.dp))
+                            Column {
+                                Text(ch.title, color = GA.TextPrimary, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                                Text(ch.steps.joinToString(" → ") { it.first }, color = GA.TextSecondary, fontSize = 11.sp)
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Text("Rantai kustom (pisahkan langkah dengan baris ---; pakai {input} dan {prev}):", color = GA.TextSecondary, fontSize = 11.sp)
+                    OutlinedTextField(custom, { custom = it }, placeholder = { Text("Ringkas: {input}\n---\nBuat 3 judul dari: {prev}") }, modifier = Modifier.fillMaxWidth().heightIn(min = 90.dp))
+                }
+            },
+            confirmButton = {
+                TextButton(enabled = custom.isNotBlank() && chainInput.isNotBlank() && !generating, onClick = {
+                    showChain = false; chat.runChain(PromptChains.custom(custom), chainInput)
+                }) { Text("Jalankan kustom") }
+            },
+            dismissButton = { TextButton(onClick = { showChain = false }) { Text("Tutup") } },
+        )
+    }
+
+    shared?.let { text ->
+        AlertDialog(
+            onDismissRequest = { shared = null },
+            containerColor = GA.SurfaceHigh,
+            title = { Text("Teks dari aplikasi lain", color = GA.TextPrimary) },
+            text = { Text(text.take(600) + if (text.length > 600) "…" else "", color = GA.TextSecondary, fontSize = 13.sp, modifier = Modifier.heightIn(max = 300.dp).verticalScroll(rememberScrollState())) },
+            confirmButton = {
+                Row {
+                    TextButton(onClick = { shared = null; send(PromptBuilder.clipboard("summary", text.take(6000))) }) { Text("Ringkas") }
+                    TextButton(onClick = { shared = null; send(PromptBuilder.clipboard("translate", text.take(6000))) }) { Text("Terjemahkan") }
+                }
+            },
+            dismissButton = { TextButton(onClick = { shared = null; input = text.take(4000) }) { Text("Tanya") } },
+        )
+    }
+
     if (showCalc) {
         var expr by remember { mutableStateOf("") }
         val result = remember(expr) {
@@ -739,7 +911,7 @@ private fun EmptyState(onTemplate: (String) -> Unit) {
         verticalArrangement = Arrangement.Center,
     ) {
         Box(
-            Modifier.size(68.dp).clip(RoundedCornerShape(22.dp)).background(Brush.linearGradient(listOf(accent.main, GA.VioletDeep))),
+            Modifier.size(68.dp).clip(RoundedCornerShape(22.dp)).background(GA.Sparkle),
             contentAlignment = Alignment.Center,
         ) { Icon(Icons.Filled.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(34.dp)) }
         Spacer(Modifier.height(14.dp))
@@ -776,6 +948,10 @@ private fun SessionsDrawer(
     onMemory: () -> Unit,
     onStats: () -> Unit,
     onSettings: () -> Unit,
+    onModelHub: () -> Unit,
+    onArchive: () -> Unit,
+    onKnowledge: () -> Unit,
+    onIncognito: () -> Unit,
 ) {
     val app = GemmaChatApp.instance
     val accent = LocalAccent.current
@@ -791,7 +967,7 @@ private fun SessionsDrawer(
             Text("Riwayat Percakapan", color = GA.TextPrimary, fontSize = 18.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(10.dp))
             Row(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(Brush.linearGradient(listOf(accent.deep, GA.VioletDeep)))
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(GA.Sparkle)
                     .clickable(onClick = onNew).padding(12.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -832,6 +1008,10 @@ private fun SessionsDrawer(
             HorizontalDivider(color = GA.Outline)
             DrawerLink("Catatan & Favorit", Icons.Filled.Bookmarks, onNotes)
             DrawerLink("Memori AI", Icons.Filled.Psychology, onMemory)
+            DrawerLink("Model Hub", Icons.Filled.Memory, onModelHub)
+            DrawerLink("Sesi Incognito", Icons.Filled.VisibilityOff, onIncognito)
+            DrawerLink("Arsip Web Offline", Icons.Filled.Public, onArchive)
+            DrawerLink("Basis Pengetahuan", Icons.Filled.LibraryBooks, onKnowledge)
             DrawerLink("Statistik", Icons.Filled.BarChart, onStats)
             DrawerLink("Pengaturan", Icons.Filled.Settings, onSettings)
         }

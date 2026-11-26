@@ -101,6 +101,9 @@ class MessageActions(
     val onToggleChecklist: (MessageEntity, Int) -> Unit,
     val onFollowUp: (String) -> Unit,
     val onWord: (String, String) -> Unit,
+    val onPreviewCode: (String, String) -> Unit = { _, _ -> },
+    val onSelectVersion: (MessageEntity, Int) -> Unit = { _, _ -> },
+    val onCompareVersions: (String, String) -> Unit = { _, _ -> },
 )
 
 private val timeFmt = SimpleDateFormat("HH:mm", Locale("id", "ID"))
@@ -120,11 +123,11 @@ fun UserBubble(msg: MessageEntity, actions: MessageActions, enabled: Boolean) {
             Box(
                 Modifier
                     .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 6.dp))
-                    .background(Brush.linearGradient(listOf(accent.deep, GA.VioletDeep)))
+                    .background(GA.UserBubble)
                     .clickable { menu = true }
                     .padding(horizontal = 14.dp, vertical = 10.dp)
             ) {
-                Text(msg.text, color = Color.White, fontSize = (15 * scale).sp, lineHeight = (21 * scale).sp)
+                Text(msg.text, color = GA.OnUserBubble, fontSize = (15 * scale).sp, lineHeight = (21 * scale).sp)
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
                     DropdownMenuItem(text = { Text("Salin") }, leadingIcon = { Icon(Icons.Filled.ContentCopy, null) },
                         onClick = { menu = false; actions.onCopy(msg.text) })
@@ -178,7 +181,7 @@ fun AssistantBubble(
 
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
         Box(
-            Modifier.size(28.dp).clip(CircleShape).background(Brush.linearGradient(listOf(accent.main, GA.VioletDeep))),
+            Modifier.size(28.dp).clip(CircleShape).background(GA.Sparkle),
             contentAlignment = Alignment.Center,
         ) { Icon(Icons.Filled.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(15.dp)) }
         Spacer(Modifier.width(8.dp))
@@ -193,19 +196,26 @@ fun AssistantBubble(
                     .animateContentSize()
             ) {
                 if (live) {
+                    if (stream.steps.isNotEmpty()) SearchSteps(stream.steps, null, liveOpen = true)
                     LiveContent(stream)
                 } else {
+                    payload?.optJSONObject("search")?.let { sj ->
+                        val arr = sj.optJSONArray("steps")
+                        val steps = if (arr == null) emptyList() else List(arr.length()) { arr.optString(it) }
+                        if (steps.isNotEmpty()) SearchSteps(steps, sj.optString("query").takeIf { it.isNotBlank() }, liveOpen = false)
+                    }
                     if (msg.thought.isNotBlank() && msg.kind != Kinds.COMPARE) ThoughtSection(msg.thought)
                     when (msg.kind) {
                         Kinds.QUIZ -> { Text(msg.text, color = GA.TextPrimary, fontSize = 14.sp); Spacer(Modifier.height(8.dp)); QuizView(payload) }
                         Kinds.FLASHCARDS -> { Text(msg.text, color = GA.TextPrimary, fontSize = 14.sp); Spacer(Modifier.height(8.dp)); FlashcardsView(payload) }
                         Kinds.CHECKLIST -> ChecklistView(msg, payload, actions)
                         Kinds.COMPARE -> CompareView(payload, actions)
-                        else -> MarkdownText(msg.text, onWordLongPress = actions.onWord, onCopyCode = actions.onCopyCode)
+                        else -> MarkdownText(msg.text, onWordLongPress = actions.onWord, onCopyCode = actions.onCopyCode, onPreviewCode = actions.onPreviewCode)
                     }
                 }
             }
             if (!live) {
+                Versions(msg, payload, actions)
                 Citations(payload)
                 MetaRow(msg)
                 ActionRow(msg, isLast, generating, speaking, actions)
@@ -373,7 +383,7 @@ private fun QuizView(payload: JSONObject?) {
                 Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(GA.Black)
                     .border(1.dp, GA.Outline, RoundedCornerShape(14.dp)).padding(10.dp)
             ) {
-                Text("${qi + 1}. ${q.optString("q")}", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+                Text("${qi + 1}. ${q.optString("q")}", color = GA.Strong, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
                 Spacer(Modifier.height(6.dp))
                 for (oi in 0 until options.length()) {
                     val picked = chosen[qi]
@@ -423,14 +433,14 @@ private fun FlashcardsView(payload: JSONObject?) {
             Modifier.fillMaxWidth().heightIn(min = 140.dp)
                 .graphicsLayer { rotationY = rotation; cameraDistance = 12 * density }
                 .clip(RoundedCornerShape(18.dp))
-                .background(if (rotation <= 90f) Brush.linearGradient(listOf(accent.deep, GA.VioletDeep)) else Brush.linearGradient(listOf(GA.SurfaceHigher, GA.Surface)))
+                .background(if (rotation <= 90f) GA.Sparkle else Brush.linearGradient(listOf(GA.SurfaceHigher, GA.Surface)))
                 .clickable { flipped = !flipped }
                 .padding(16.dp),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 if (rotation <= 90f) card?.optString("front").orEmpty() else card?.optString("back").orEmpty(),
-                color = Color.White, fontSize = 16.sp, textAlign = TextAlign.Center,
+                color = if (rotation <= 90f) Color.White else GA.Strong, fontSize = 16.sp, textAlign = TextAlign.Center,
                 modifier = Modifier.graphicsLayer { rotationY = if (rotation > 90f) 180f else 0f },
             )
         }
@@ -503,3 +513,50 @@ private fun CompareColumn(title: String, o: JSONObject?, actions: MessageActions
     }
 }
 
+
+
+/** Indikator langkah pencarian web yang bisa diketuk (fitur 14). */
+@Composable
+private fun SearchSteps(steps: List<String>, query: String?, liveOpen: Boolean) {
+    var open by remember { mutableStateOf(liveOpen) }
+    val accent = LocalAccent.current.main
+    Column(Modifier.padding(bottom = 6.dp).clip(RoundedCornerShape(12.dp)).background(GA.Surface).border(1.dp, GA.Outline, RoundedCornerShape(12.dp))) {
+        Row(
+            Modifier.fillMaxWidth().clickable { open = !open }.padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Filled.Public, null, tint = accent, modifier = Modifier.size(14.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(
+                if (query != null) "Mencari di web: \"${query.take(40)}\"" else steps.last(),
+                color = GA.TextSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.weight(1f),
+            )
+            Text(if (open) "▴" else "▾", color = GA.TextSecondary, fontSize = 12.sp)
+        }
+        AnimatedVisibility(open) {
+            Column(Modifier.padding(start = 30.dp, end = 10.dp, bottom = 8.dp)) {
+                steps.forEach { Text("• $it", color = GA.TextSecondary, fontSize = 11.sp) }
+            }
+        }
+    }
+}
+
+/** Percakapan bercabang: versi jawaban hasil regenerasi (fitur 29). */
+@Composable
+private fun Versions(msg: MessageEntity, payload: JSONObject?, actions: MessageActions) {
+    val arr = payload?.optJSONArray("versions") ?: return
+    val n = arr.length()
+    if (n < 2) return
+    val active = payload.optInt("active", n - 1).coerceIn(0, n - 1)
+    val accent = LocalAccent.current.main
+    Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text("‹", color = if (active > 0) accent else GA.TextSecondary, fontSize = 18.sp,
+            modifier = Modifier.clip(CircleShape).clickable(enabled = active > 0) { actions.onSelectVersion(msg, active - 1) }.padding(horizontal = 10.dp))
+        Text("Versi ${active + 1}/$n", color = GA.TextSecondary, fontSize = 12.sp)
+        Text("›", color = if (active < n - 1) accent else GA.TextSecondary, fontSize = 18.sp,
+            modifier = Modifier.clip(CircleShape).clickable(enabled = active < n - 1) { actions.onSelectVersion(msg, active + 1) }.padding(horizontal = 10.dp))
+        val prev = arr.optJSONObject(if (active > 0) active - 1 else 1)?.optString("text").orEmpty()
+        Text("Bandingkan", color = accent, fontSize = 12.sp,
+            modifier = Modifier.clip(RoundedCornerShape(50)).clickable { actions.onCompareVersions(prev, msg.text) }.padding(horizontal = 8.dp, vertical = 4.dp))
+    }
+}
