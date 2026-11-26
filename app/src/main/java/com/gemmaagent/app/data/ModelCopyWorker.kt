@@ -29,7 +29,7 @@ class ModelCopyWorker(appContext: Context, params: WorkerParameters) : Coroutine
         val total = inputData.getLong(KEY_SIZE, -1L)
         runCatching { setForeground(foregroundInfo(0, target.name)) }
 
-        val part = File(target.parentFile, target.name + ".part")
+        val part = File(target.parentFile, target.name + ".tmp")
         try {
             target.parentFile?.mkdirs()
             val input = applicationContext.contentResolver.openInputStream(uri) ?: return@withContext fail("File tidak bisa dibuka")

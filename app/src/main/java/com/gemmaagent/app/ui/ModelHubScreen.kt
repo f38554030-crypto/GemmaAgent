@@ -336,7 +336,7 @@ private fun CopyProgressView(state: CopyState, onCancel: () -> Unit) {
             Text("${state.label}… ${state.percent}%" + if (state.totalBytes > 0) " (${Fmt.gb(state.copiedBytes)} / ${Fmt.gb(state.totalBytes)} GB)" else "",
                 color = LocalAccent.current.main, fontSize = 12.sp)
             LinearProgressIndicator(progress = { state.percent / 100f }, modifier = Modifier.fillMaxWidth(), trackColor = GA.SurfaceHigher, drawStopIndicator = {})
-            if (state.label.contains("cloud")) TextButton(onClick = onCancel) { Text("Batalkan") }
+            TextButton(onClick = onCancel) { Text("Batalkan") }
         }
         is CopyState.Done -> Text(state.message, color = GA.Green, fontSize = 12.sp)
         is CopyState.Error -> Text(state.message, color = GA.Red, fontSize = 12.sp)

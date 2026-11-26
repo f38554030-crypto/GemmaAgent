@@ -1,7 +1,6 @@
 package com.gemmaagent.app.util
 
-import android.content.Context
-import android.net.Uri
+import android.graphics.Bitmap
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -10,15 +9,15 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 /**
- * OCR offline (fitur 17) memakai ML Kit Text Recognition versi bundled (model ikut di APK, tanpa internet).
- * Dimuat hanya saat dipakai (lazy).
+ * OCR offline (ML Kit, model ikut di APK). Menerima bitmap yang SUDAH diperkecil (maks 1024×1024)
+ * oleh [BitmapUtil], sehingga tidak ada lonjakan memori dari foto kamera beresolusi penuh.
  */
 object Ocr {
-    suspend fun read(context: Context, uri: Uri): String = suspendCancellableCoroutine { cont ->
+    suspend fun read(bitmap: Bitmap): String = suspendCancellableCoroutine { cont ->
         val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+        cont.invokeOnCancellation { runCatching { recognizer.close() } }
         try {
-            val image = InputImage.fromFilePath(context, uri)
-            recognizer.process(image)
+            recognizer.process(InputImage.fromBitmap(bitmap, 0))
                 .addOnSuccessListener { result ->
                     recognizer.close()
                     if (cont.isActive) cont.resume(result.text.trim())

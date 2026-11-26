@@ -8,6 +8,8 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +29,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,7 +56,8 @@ import com.gemmaagent.app.ui.theme.GA
 import com.gemmaagent.app.ui.theme.LocalAccent
 import com.gemmaagent.app.ui.theme.LocalFontScale
 
-/** Blok-blok Markdown yang didukung (fitur 44). */
+/** Blok-blok Markdown yang didukung. @Immutable → Compose membandingkan isi, bukan instance (lewati render ulang). */
+@Immutable
 sealed interface MdBlock {
     data class Heading(val level: Int, val text: String) : MdBlock
     data class Paragraph(val text: String) : MdBlock
@@ -193,46 +197,66 @@ fun MarkdownText(
     onCopyCode: (String) -> Unit = {},
     onPreviewCode: ((lang: String, code: String) -> Unit)? = null,
 ) {
+    val blocks = remember(markdown) { MarkdownParser.parse(markdown) }
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        for (b in blocks) MarkdownBlock(b, color, onWordLongPress, onCopyCode, onPreviewCode)
+    }
+}
+
+/**
+ * Merender SATU blok Markdown. Dipakai daftar chat yang dipecah per blok (LazyColumn),
+ * sehingga saat streaming hanya blok paling bawah yang dirender ulang.
+ */
+@Composable
+fun MarkdownBlock(
+    b: MdBlock,
+    color: Color = GA.TextPrimary,
+    onWordLongPress: ((word: String, sentence: String) -> Unit)? = null,
+    onCopyCode: (String) -> Unit = {},
+    onPreviewCode: ((lang: String, code: String) -> Unit)? = null,
+) {
     val accent = LocalAccent.current.main
     val scale = LocalFontScale.current
-    val blocks = remember(markdown) { MarkdownParser.parse(markdown) }
-    val base = (15 * scale).sp
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        for (b in blocks) {
-            when (b) {
-                is MdBlock.Heading -> WordText(
-                    MarkdownParser.inline(b.text, accent),
-                    color = GA.Strong,
-                    size = when (b.level) { 1 -> (21 * scale).sp; 2 -> (19 * scale).sp; else -> (17 * scale).sp },
-                    weight = FontWeight.Bold,
-                    onWordLongPress = onWordLongPress,
-                )
-                is MdBlock.Paragraph -> WordText(MarkdownParser.inline(b.text, accent), color, base, onWordLongPress = onWordLongPress)
-                is MdBlock.ListItem -> Row(Modifier.padding(start = (b.indent * 14).dp)) {
-                    Text(b.marker, color = accent, fontSize = base, modifier = Modifier.widthIn(min = 18.dp))
-                    Spacer(Modifier.width(4.dp))
-                    WordText(MarkdownParser.inline(b.text, accent), color, base, onWordLongPress = onWordLongPress)
-                }
-                is MdBlock.Task -> Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        if (b.done) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
-                        contentDescription = null, tint = if (b.done) GA.Green else GA.TextSecondary, modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    WordText(MarkdownParser.inline(b.text, accent), color, base, onWordLongPress = onWordLongPress)
-                }
-                is MdBlock.Quote -> Row(
-                    Modifier.clip(RoundedCornerShape(8.dp)).background(GA.SurfaceHigher.copy(alpha = 0.6f)).padding(end = 8.dp)
-                ) {
-                    Box(Modifier.width(3.dp).height(22.dp).background(accent))
-                    Spacer(Modifier.width(8.dp))
-                    WordText(MarkdownParser.inline(b.text, accent), GA.TextSecondary, base, italic = true, onWordLongPress = onWordLongPress)
-                }
-                is MdBlock.Code -> CodeBlock(b.lang, b.code, scale, onCopyCode, onPreviewCode)
-                is MdBlock.Table -> TableBlock(b.rows, accent, scale)
-                MdBlock.Rule -> HorizontalDivider(color = GA.Outline)
-            }
+    val base = (15.5f * scale).sp
+    when (b) {
+        is MdBlock.Heading -> {
+            val t = remember(b.text, accent) { MarkdownParser.inline(b.text, accent) }
+            WordText(
+                t, color = GA.Strong,
+                size = when (b.level) { 1 -> (21 * scale).sp; 2 -> (19 * scale).sp; else -> (17 * scale).sp },
+                weight = FontWeight.SemiBold, onWordLongPress = onWordLongPress,
+            )
         }
+        is MdBlock.Paragraph -> {
+            val t = remember(b.text, accent) { MarkdownParser.inline(b.text, accent) }
+            WordText(t, color, base, onWordLongPress = onWordLongPress)
+        }
+        is MdBlock.ListItem -> Row(Modifier.padding(start = (b.indent * 14).dp)) {
+            val t = remember(b.text, accent) { MarkdownParser.inline(b.text, accent) }
+            Text(b.marker, color = accent, fontSize = base, modifier = Modifier.widthIn(min = 18.dp))
+            Spacer(Modifier.width(4.dp))
+            WordText(t, color, base, onWordLongPress = onWordLongPress)
+        }
+        is MdBlock.Task -> Row(verticalAlignment = Alignment.CenterVertically) {
+            val t = remember(b.text, accent) { MarkdownParser.inline(b.text, accent) }
+            Icon(
+                if (b.done) Icons.Filled.CheckBox else Icons.Filled.CheckBoxOutlineBlank,
+                contentDescription = null, tint = if (b.done) GA.Green else GA.TextSecondary, modifier = Modifier.size(18.dp),
+            )
+            Spacer(Modifier.width(6.dp))
+            WordText(t, color, base, onWordLongPress = onWordLongPress)
+        }
+        is MdBlock.Quote -> Row(
+            Modifier.height(IntrinsicSize.Min).clip(RoundedCornerShape(8.dp)).background(GA.SurfaceHigher.copy(alpha = 0.6f)).padding(end = 8.dp)
+        ) {
+            val t = remember(b.text, accent) { MarkdownParser.inline(b.text, accent) }
+            Box(Modifier.width(3.dp).fillMaxHeight().background(accent))
+            Spacer(Modifier.width(8.dp))
+            WordText(t, GA.TextSecondary, base, italic = true, onWordLongPress = onWordLongPress)
+        }
+        is MdBlock.Code -> CodeBlock(b.lang, b.code, scale, onCopyCode, onPreviewCode)
+        is MdBlock.Table -> TableBlock(b.rows, accent, scale)
+        MdBlock.Rule -> HorizontalDivider(color = GA.Outline)
     }
 }
 
@@ -316,8 +340,9 @@ private fun CodeBlock(lang: String, code: String, scale: Float, onCopy: (String)
             }
         }
         Box(Modifier.horizontalScroll(rememberScrollState()).padding(10.dp)) {
+            val highlighted = remember(code, accent) { SyntaxHighlighter.highlight(code, accent) }
             Text(
-                SyntaxHighlighter.highlight(code, accent),
+                highlighted,
                 fontFamily = FontFamily.Monospace,
                 fontSize = (12.5f * scale).sp,
                 color = GA.TextPrimary,

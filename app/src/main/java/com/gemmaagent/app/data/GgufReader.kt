@@ -19,6 +19,11 @@ data class ModelMetadata(
     val ggufVersion: Int?,
     val tensorCount: Long?,
     val extra: Map<String, String> = emptyMap(),
+    val headCount: Long? = null,
+    val headCountKv: Long? = null,
+    val keyLength: Long? = null,
+    val valueLength: Long? = null,
+    val slidingWindow: Long? = null,
 )
 
 /**
@@ -101,6 +106,11 @@ object GgufReader {
                 chatTemplate = kv["tokenizer.chat_template"] as? String,
                 ggufVersion = version,
                 tensorCount = tensorCount,
+                headCount = arch?.let { num("$it.attention.head_count") },
+                headCountKv = arch?.let { num("$it.attention.head_count_kv") },
+                keyLength = arch?.let { num("$it.attention.key_length") },
+                valueLength = arch?.let { num("$it.attention.value_length") },
+                slidingWindow = arch?.let { num("$it.attention.sliding_window") },
                 extra = listOfNotNull(
                     (kv["general.basename"] as? String)?.let { "basename" to it },
                     (kv["general.size_label"] as? String)?.let { "size_label" to it },

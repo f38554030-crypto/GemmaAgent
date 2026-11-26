@@ -2,9 +2,16 @@ package com.gemmaagent.app.ui
 
 import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +20,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +30,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,22 +39,21 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.CheckBox
 import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Image
-import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Public
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarBorder
 import androidx.compose.material.icons.filled.StopCircle
+import androidx.compose.material.icons.filled.WarningAmber
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -54,13 +63,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -71,17 +83,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gemmaagent.app.chat.StreamState
 import com.gemmaagent.app.data.db.Kinds
 import com.gemmaagent.app.data.db.MessageEntity
 import com.gemmaagent.app.ui.theme.GA
 import com.gemmaagent.app.ui.theme.LocalAccent
 import com.gemmaagent.app.ui.theme.LocalFontScale
 import com.gemmaagent.app.util.Fmt
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 
 /** Aksi yang bisa dilakukan pada sebuah pesan. */
@@ -106,151 +116,8 @@ class MessageActions(
     val onCompareVersions: (String, String) -> Unit = { _, _ -> },
 )
 
-private val timeFmt = SimpleDateFormat("HH:mm", Locale("id", "ID"))
-
 @Composable
-fun UserBubble(msg: MessageEntity, actions: MessageActions, enabled: Boolean) {
-    val accent = LocalAccent.current
-    val scale = LocalFontScale.current
-    var menu by remember { mutableStateOf(false) }
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        Column(horizontalAlignment = Alignment.End, modifier = Modifier.widthIn(max = 310.dp)) {
-            msg.imagePath?.let { ImageThumb(it) }
-            if (msg.attachmentName != null && msg.imagePath == null) {
-                AttachmentChip(msg.attachmentName)
-                Spacer(Modifier.height(4.dp))
-            }
-            Box(
-                Modifier
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 6.dp))
-                    .background(GA.UserBubble)
-                    .clickable { menu = true }
-                    .padding(horizontal = 14.dp, vertical = 10.dp)
-            ) {
-                Text(msg.text, color = GA.OnUserBubble, fontSize = (15 * scale).sp, lineHeight = (21 * scale).sp)
-                DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
-                    DropdownMenuItem(text = { Text("Salin") }, leadingIcon = { Icon(Icons.Filled.ContentCopy, null) },
-                        onClick = { menu = false; actions.onCopy(msg.text) })
-                    DropdownMenuItem(text = { Text("Edit & kirim ulang") }, leadingIcon = { Icon(Icons.Filled.Edit, null) },
-                        enabled = enabled, onClick = { menu = false; actions.onEdit(msg) })
-                    DropdownMenuItem(text = { Text("Simpan ke Memori AI") }, leadingIcon = { Icon(Icons.Filled.Psychology, null) },
-                        onClick = { menu = false; actions.onRemember(msg) })
-                }
-            }
-            Text(timeFmt.format(Date(msg.createdAt)), color = GA.TextSecondary, fontSize = 10.sp, modifier = Modifier.padding(top = 2.dp, end = 4.dp))
-        }
-    }
-}
-
-@Composable
-private fun ImageThumb(path: String) {
-    val bmp = remember(path) { runCatching { BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = 2 }) }.getOrNull() }
-    if (bmp != null) {
-        Image(
-            bmp.asImageBitmap(), contentDescription = "Gambar terlampir",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.padding(bottom = 4.dp).size(180.dp).clip(RoundedCornerShape(16.dp)),
-        )
-    } else AttachmentChip("Gambar", Icons.Filled.Image)
-}
-
-@Composable
-fun AttachmentChip(name: String, icon: ImageVector = Icons.Filled.AttachFile) {
-    Row(
-        Modifier.clip(RoundedCornerShape(50)).background(GA.SurfaceHigher).padding(horizontal = 10.dp, vertical = 5.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Icon(icon, null, tint = LocalAccent.current.main, modifier = Modifier.size(14.dp))
-        Spacer(Modifier.width(4.dp))
-        Text(name, color = GA.TextPrimary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-}
-
-@Composable
-fun AssistantBubble(
-    msg: MessageEntity,
-    stream: StreamState?,
-    isLast: Boolean,
-    generating: Boolean,
-    speaking: Boolean,
-    actions: MessageActions,
-) {
-    val accent = LocalAccent.current
-    val live = stream != null && stream.messageId == msg.id
-    val payload = remember(msg.payload) { runCatching { JSONObject(msg.payload) }.getOrNull() }
-
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        Box(
-            Modifier.size(28.dp).clip(CircleShape).background(GA.Sparkle),
-            contentAlignment = Alignment.Center,
-        ) { Icon(Icons.Filled.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(15.dp)) }
-        Spacer(Modifier.width(8.dp))
-        Column(Modifier.weight(1f)) {
-            Column(
-                Modifier
-                    .clip(RoundedCornerShape(topStart = 6.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 20.dp))
-                    .background(if (msg.kind == Kinds.ERROR) GA.Red.copy(alpha = 0.1f) else GA.SurfaceHigh)
-                    .border(1.dp, if (msg.kind == Kinds.ERROR) GA.Red.copy(alpha = 0.4f) else GA.Outline,
-                        RoundedCornerShape(topStart = 6.dp, topEnd = 20.dp, bottomStart = 20.dp, bottomEnd = 20.dp))
-                    .padding(horizontal = 14.dp, vertical = 10.dp)
-                    .animateContentSize()
-            ) {
-                if (live) {
-                    if (stream.steps.isNotEmpty()) SearchSteps(stream.steps, null, liveOpen = true)
-                    LiveContent(stream)
-                } else {
-                    payload?.optJSONObject("search")?.let { sj ->
-                        val arr = sj.optJSONArray("steps")
-                        val steps = if (arr == null) emptyList() else List(arr.length()) { arr.optString(it) }
-                        if (steps.isNotEmpty()) SearchSteps(steps, sj.optString("query").takeIf { it.isNotBlank() }, liveOpen = false)
-                    }
-                    if (msg.thought.isNotBlank() && msg.kind != Kinds.COMPARE) ThoughtSection(msg.thought)
-                    when (msg.kind) {
-                        Kinds.QUIZ -> { Text(msg.text, color = GA.TextPrimary, fontSize = 14.sp); Spacer(Modifier.height(8.dp)); QuizView(payload) }
-                        Kinds.FLASHCARDS -> { Text(msg.text, color = GA.TextPrimary, fontSize = 14.sp); Spacer(Modifier.height(8.dp)); FlashcardsView(payload) }
-                        Kinds.CHECKLIST -> ChecklistView(msg, payload, actions)
-                        Kinds.COMPARE -> CompareView(payload, actions)
-                        else -> MarkdownText(msg.text, onWordLongPress = actions.onWord, onCopyCode = actions.onCopyCode, onPreviewCode = actions.onPreviewCode)
-                    }
-                }
-            }
-            if (!live) {
-                Versions(msg, payload, actions)
-                Citations(payload)
-                MetaRow(msg)
-                ActionRow(msg, isLast, generating, speaking, actions)
-                FollowUps(payload, enabled = !generating && isLast, onClick = actions.onFollowUp)
-            }
-        }
-    }
-}
-
-@Composable
-private fun LiveContent(stream: StreamState) {
-    val accent = LocalAccent.current.main
-    stream.compareFast?.let {
-        Text("⚡ Mode Cepat (selesai)", color = GA.TextSecondary, fontSize = 11.sp)
-        Text(it.take(240) + if (it.length > 240) "…" else "", color = GA.TextSecondary, fontSize = 12.sp)
-        Spacer(Modifier.height(8.dp))
-    }
-    if (stream.thought.isNotBlank()) {
-        Text("🧠 Proses berpikir…", color = GA.Violet, fontSize = 11.sp)
-        Text(stream.thought.takeLast(300), color = GA.Violet.copy(alpha = 0.75f), fontSize = 12.sp, maxLines = 4, overflow = TextOverflow.Ellipsis)
-        Spacer(Modifier.height(6.dp))
-    }
-    if (stream.text.isNotBlank()) {
-        MarkdownText(stream.text)
-        Spacer(Modifier.height(6.dp))
-    }
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        TypingDots(accent)
-        Spacer(Modifier.width(10.dp))
-        Text(stream.phase, color = GA.TextSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-}
-
-@Composable
-private fun ThoughtSection(thought: String) {
+internal fun ThoughtSection(thought: String) {
     var open by remember { mutableStateOf(false) }
     Column(Modifier.padding(bottom = 6.dp)) {
         Row(
@@ -267,110 +134,9 @@ private fun ThoughtSection(thought: String) {
     }
 }
 
-@Composable
-private fun MetaRow(msg: MessageEntity) {
-    if (msg.tokensPerSec <= 0 && !msg.online && msg.kind != Kinds.CALC) return
-    Row(Modifier.padding(top = 4.dp, start = 2.dp), horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-        if (msg.tokensPerSec > 0) {
-            InfoBadge("${String.format(Locale("id", "ID"), "%.1f", msg.tokensPerSec)} token/detik", GA.TextSecondary, Icons.Filled.Speed)
-        }
-        if (msg.durationMs > 0) InfoBadge("${Fmt.seconds(msg.durationMs)} dtk", GA.TextSecondary)
-        if (msg.online) InfoBadge("Online", LocalAccent.current.main, Icons.Filled.Public)
-        if (msg.kind == Kinds.CALC) InfoBadge("Kalkulator lokal", GA.Green)
-    }
-}
-
-@Composable
-private fun ActionRow(msg: MessageEntity, isLast: Boolean, generating: Boolean, speaking: Boolean, actions: MessageActions) {
-    if (msg.kind == Kinds.ERROR) {
-        if (isLast && !generating) {
-            Row(Modifier.padding(top = 2.dp)) { SmallAction(Icons.Filled.Refresh, "Coba lagi") { actions.onRegenerate(msg) } }
-        }
-        return
-    }
-    var more by remember { mutableStateOf(false) }
-    Row(Modifier.padding(top = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-        SmallAction(Icons.Filled.ContentCopy, "Salin") { actions.onCopy(msg.text) }
-        SmallAction(if (speaking) Icons.Filled.StopCircle else Icons.AutoMirrored.Filled.VolumeUp, if (speaking) "Hentikan suara" else "Bacakan") { actions.onSpeak(msg) }
-        SmallAction(if (msg.starred) Icons.Filled.Star else Icons.Filled.StarBorder, "Bintang", tint = if (msg.starred) GA.Amber else null) { actions.onStar(msg) }
-        SmallAction(Icons.Filled.BookmarkBorder, "Simpan ke Catatan") { actions.onSaveNote(msg) }
-        if (isLast && !generating && msg.kind != Kinds.CHECKLIST) SmallAction(Icons.Filled.Refresh, "Regenerasi") { actions.onRegenerate(msg) }
-        SmallAction(Icons.Filled.Share, "Bagikan sebagai kartu") { actions.onShareCard(msg) }
-        Box {
-            SmallAction(Icons.Filled.MoreHoriz, "Lainnya") { more = true }
-            DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
-                DropdownMenuItem(text = { Text("✅ Jadikan checklist") }, onClick = { more = false; actions.onChecklist(msg) })
-                DropdownMenuItem(text = { Text("📝 Buat kuis") }, enabled = !generating, onClick = { more = false; actions.onQuiz(msg) })
-                DropdownMenuItem(text = { Text("🃏 Buat flashcard") }, enabled = !generating, onClick = { more = false; actions.onFlashcards(msg) })
-            }
-        }
-    }
-}
-
-@Composable
-private fun SmallAction(icon: ImageVector, desc: String, tint: Color? = null, onClick: () -> Unit) {
-    Box(
-        Modifier.size(34.dp).clip(CircleShape).clickable(onClick = onClick),
-        contentAlignment = Alignment.Center,
-    ) { Icon(icon, contentDescription = desc, tint = tint ?: GA.TextSecondary, modifier = Modifier.size(17.dp)) }
-}
-
-/** Kartu sitasi & tautan sumber (fitur 5). */
-@Composable
-private fun Citations(payload: JSONObject?) {
-    val arr = payload?.optJSONArray("citations") ?: return
-    if (arr.length() == 0) return
-    val uri = LocalUriHandler.current
-    val accent = LocalAccent.current.main
-    Row(
-        Modifier.padding(top = 6.dp).horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-    ) {
-        for (i in 0 until arr.length()) {
-            val o = arr.optJSONObject(i) ?: continue
-            val url = o.optString("url")
-            val host = runCatching { java.net.URI(url).host?.removePrefix("www.") }.getOrNull() ?: url
-            Column(
-                Modifier.width(170.dp).clip(RoundedCornerShape(12.dp)).background(GA.Surface)
-                    .border(1.dp, GA.Outline, RoundedCornerShape(12.dp))
-                    .clickable { runCatching { uri.openUri(url) } }.padding(8.dp)
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("[${i + 1}]", color = accent, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.width(4.dp))
-                    Icon(Icons.Filled.Link, null, tint = GA.TextSecondary, modifier = Modifier.size(12.dp))
-                    Spacer(Modifier.width(3.dp))
-                    Text(host, color = GA.TextSecondary, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
-                Text(o.optString("title"), color = GA.TextPrimary, fontSize = 12.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
-            }
-        }
-    }
-}
-
-/** Saran pertanyaan lanjutan (fitur 45). */
-@Composable
-private fun FollowUps(payload: JSONObject?, enabled: Boolean, onClick: (String) -> Unit) {
-    val arr = payload?.optJSONArray("followups") ?: return
-    if (!enabled || arr.length() == 0) return
-    val accent = LocalAccent.current.main
-    Column(Modifier.padding(top = 4.dp), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-        for (i in 0 until arr.length()) {
-            val q = arr.optString(i)
-            Text(
-                "↳ $q",
-                color = accent,
-                fontSize = 13.sp,
-                modifier = Modifier.clip(RoundedCornerShape(50)).border(1.dp, accent.copy(alpha = 0.35f), RoundedCornerShape(50))
-                    .clickable { onClick(q) }.padding(horizontal = 12.dp, vertical = 6.dp),
-            )
-        }
-    }
-}
-
 /** Kuis pilihan ganda interaktif (fitur 18). */
 @Composable
-private fun QuizView(payload: JSONObject?) {
+internal fun QuizView(payload: JSONObject?) {
     val arr = payload?.optJSONArray("questions") ?: return
     val chosen = remember(payload) { mutableStateMapOf<Int, Int>() }
     val accent = LocalAccent.current.main
@@ -420,7 +186,7 @@ private fun QuizView(payload: JSONObject?) {
 
 /** Flashcard bolak-balik (fitur 18). */
 @Composable
-private fun FlashcardsView(payload: JSONObject?) {
+internal fun FlashcardsView(payload: JSONObject?) {
     val arr = payload?.optJSONArray("cards") ?: return
     if (arr.length() == 0) return
     var index by remember(payload) { mutableIntStateOf(0) }
@@ -457,7 +223,7 @@ private fun FlashcardsView(payload: JSONObject?) {
 
 /** Daftar tugas interaktif (fitur 19). */
 @Composable
-private fun ChecklistView(msg: MessageEntity, payload: JSONObject?, actions: MessageActions) {
+internal fun ChecklistView(msg: MessageEntity, payload: JSONObject?, actions: MessageActions) {
     val items = payload?.optJSONArray("items") ?: return
     var done = 0
     for (i in 0 until items.length()) if (items.optJSONObject(i)?.optBoolean("d") == true) done++
@@ -484,7 +250,7 @@ private fun ChecklistView(msg: MessageEntity, payload: JSONObject?, actions: Mes
 
 /** Perbandingan jawaban Cepat vs Mendalam berdampingan (fitur 20). */
 @Composable
-private fun CompareView(payload: JSONObject?, actions: MessageActions) {
+internal fun CompareView(payload: JSONObject?, actions: MessageActions) {
     val fast = payload?.optJSONObject("fast")
     val deep = payload?.optJSONObject("deep")
     if (fast == null && deep == null) {
@@ -498,7 +264,7 @@ private fun CompareView(payload: JSONObject?, actions: MessageActions) {
 }
 
 @Composable
-private fun CompareColumn(title: String, o: JSONObject?, actions: MessageActions) {
+internal fun CompareColumn(title: String, o: JSONObject?, actions: MessageActions) {
     Column(
         Modifier.width(260.dp).clip(RoundedCornerShape(14.dp)).background(GA.Black)
             .border(1.dp, GA.Outline, RoundedCornerShape(14.dp)).padding(10.dp)
@@ -517,7 +283,7 @@ private fun CompareColumn(title: String, o: JSONObject?, actions: MessageActions
 
 /** Indikator langkah pencarian web yang bisa diketuk (fitur 14). */
 @Composable
-private fun SearchSteps(steps: List<String>, query: String?, liveOpen: Boolean) {
+internal fun SearchSteps(steps: List<String>, query: String?, liveOpen: Boolean) {
     var open by remember { mutableStateOf(liveOpen) }
     val accent = LocalAccent.current.main
     Column(Modifier.padding(bottom = 6.dp).clip(RoundedCornerShape(12.dp)).background(GA.Surface).border(1.dp, GA.Outline, RoundedCornerShape(12.dp))) {
@@ -541,22 +307,293 @@ private fun SearchSteps(steps: List<String>, query: String?, liveOpen: Boolean) 
     }
 }
 
-/** Percakapan bercabang: versi jawaban hasil regenerasi (fitur 29). */
+
+// =====================================================================
+// BARIS-BARIS CHAT (tampilan editorial ala Gemini / Perplexity)
+// =====================================================================
+
+/** Pesan pengguna: gelembung membulat modern di sisi kanan. */
 @Composable
-private fun Versions(msg: MessageEntity, payload: JSONObject?, actions: MessageActions) {
-    val arr = payload?.optJSONArray("versions") ?: return
-    val n = arr.length()
-    if (n < 2) return
-    val active = payload.optInt("active", n - 1).coerceIn(0, n - 1)
+fun UserRowView(row: UserRow, actions: MessageActions, enabled: Boolean) {
+    val msg = row.msg
+    val scale = LocalFontScale.current
+    var menu by remember { mutableStateOf(false) }
+    Column(
+        Modifier.fillMaxWidth().padding(start = 48.dp, top = 18.dp, bottom = 6.dp),
+        horizontalAlignment = Alignment.End,
+    ) {
+        msg.imagePath?.let { ImageThumb(it) }
+        if (msg.attachmentName != null && msg.imagePath == null) {
+            AttachmentChip(msg.attachmentName)
+            Spacer(Modifier.height(4.dp))
+        }
+        Box(
+            Modifier
+                .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp, bottomStart = 24.dp, bottomEnd = 8.dp))
+                .background(GA.UserBubble)
+                .clickable { menu = true }
+                .padding(horizontal = 16.dp, vertical = 11.dp)
+        ) {
+            Text(msg.text, color = GA.OnUserBubble, fontSize = (15.5f * scale).sp, lineHeight = (22 * scale).sp)
+            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                DropdownMenuItem(text = { Text("Salin") }, leadingIcon = { Icon(Icons.Filled.ContentCopy, null) },
+                    onClick = { menu = false; actions.onCopy(msg.text) })
+                DropdownMenuItem(text = { Text("Edit & kirim ulang") }, leadingIcon = { Icon(Icons.Filled.Edit, null) },
+                    enabled = enabled, onClick = { menu = false; actions.onEdit(msg) })
+                DropdownMenuItem(text = { Text("Simpan ke Memori AI") }, leadingIcon = { Icon(Icons.Filled.Psychology, null) },
+                    onClick = { menu = false; actions.onRemember(msg) })
+            }
+        }
+    }
+}
+
+/** Thumbnail gambar didekode di Dispatchers.IO (bukan di thread UI). */
+@Composable
+private fun ImageThumb(path: String) {
+    val bmp by produceState<ImageBitmap?>(null, path) {
+        value = withContext(Dispatchers.IO) {
+            runCatching { BitmapFactory.decodeFile(path, BitmapFactory.Options().apply { inSampleSize = 2 })?.asImageBitmap() }.getOrNull()
+        }
+    }
+    Crossfade(targetState = bmp, animationSpec = tween(220), label = "thumb") { b ->
+        if (b != null) {
+            Image(
+                b, contentDescription = "Gambar terlampir", contentScale = ContentScale.Crop,
+                modifier = Modifier.padding(bottom = 6.dp).size(176.dp).clip(RoundedCornerShape(18.dp)),
+            )
+        } else {
+            Box(Modifier.padding(bottom = 6.dp).size(176.dp).clip(RoundedCornerShape(18.dp)).background(GA.SurfaceHigh))
+        }
+    }
+}
+
+@Composable
+fun AttachmentChip(name: String, icon: ImageVector = Icons.Filled.AttachFile) {
+    Row(
+        Modifier.clip(RoundedCornerShape(50)).background(GA.SurfaceHigher).padding(horizontal = 10.dp, vertical = 5.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(icon, null, tint = LocalAccent.current.main, modifier = Modifier.size(14.dp))
+        Spacer(Modifier.width(4.dp))
+        Text(name, color = GA.TextPrimary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+/** Avatar kilau (sparkle) kecil untuk jawaban AI. */
+@Composable
+fun SparkleAvatar(size: androidx.compose.ui.unit.Dp = 26.dp, spinning: Boolean = false) {
+    val rotation = if (spinning) {
+        val t = rememberInfiniteTransition(label = "spark")
+        t.animateFloat(0f, 360f, infiniteRepeatable(tween(2400)), label = "rot").value
+    } else 0f
+    Box(
+        Modifier.size(size).graphicsLayer { rotationZ = rotation }.clip(CircleShape).background(GA.Sparkle),
+        contentAlignment = Alignment.Center,
+    ) { Icon(Icons.Filled.AutoAwesome, null, tint = Color.White, modifier = Modifier.size(size * 0.58f)) }
+}
+
+/** Header jawaban AI: avatar, karusel sumber web (Perplexity), langkah pencarian, proses berpikir. */
+@Composable
+fun AiHeaderView(row: AiHeaderRow) {
+    Column(Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            SparkleAvatar(spinning = row.live)
+            Spacer(Modifier.width(10.dp))
+            Crossfade(targetState = if (row.live) row.phase else "", animationSpec = tween(200), label = "phase") { p ->
+                if (p.isNotBlank()) ShimmerText(p) else Spacer(Modifier.height(1.dp))
+            }
+        }
+        AnimatedVisibility(visible = row.sources.isNotEmpty(), enter = fadeIn(tween(250)) + expandVertically(tween(250))) {
+            SourcesCarousel(row.sources, row.fromCache)
+        }
+        if (row.steps.isNotEmpty()) {
+            Spacer(Modifier.height(6.dp))
+            SearchSteps(row.steps, row.query, liveOpen = false)
+        }
+        if (row.thought.isNotBlank()) {
+            Spacer(Modifier.height(4.dp))
+            if (row.live) {
+                Text("🧠 " + row.thought.takeLast(280), color = GA.Violet.copy(alpha = 0.8f), fontSize = 12.sp,
+                    maxLines = 4, overflow = TextOverflow.Ellipsis)
+            } else ThoughtSection(row.thought)
+        }
+    }
+}
+
+/** Teks status dengan efek kilau halus (shimmer) saat AI bekerja. */
+@Composable
+private fun ShimmerText(text: String) {
+    val t = rememberInfiniteTransition(label = "shimmer")
+    val a by t.animateFloat(0.45f, 1f, infiniteRepeatable(tween(900), RepeatMode.Reverse), label = "a")
+    Text(text, color = GA.TextSecondary, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier.alpha(a))
+}
+
+/** Karusel sumber web horizontal (LazyRow) di atas jawaban — gaya Perplexity. */
+@Composable
+private fun SourcesCarousel(sources: List<SourceItem>, fromCache: Boolean) {
+    val uri = LocalUriHandler.current
     val accent = LocalAccent.current.main
-    Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("‹", color = if (active > 0) accent else GA.TextSecondary, fontSize = 18.sp,
-            modifier = Modifier.clip(CircleShape).clickable(enabled = active > 0) { actions.onSelectVersion(msg, active - 1) }.padding(horizontal = 10.dp))
-        Text("Versi ${active + 1}/$n", color = GA.TextSecondary, fontSize = 12.sp)
-        Text("›", color = if (active < n - 1) accent else GA.TextSecondary, fontSize = 18.sp,
-            modifier = Modifier.clip(CircleShape).clickable(enabled = active < n - 1) { actions.onSelectVersion(msg, active + 1) }.padding(horizontal = 10.dp))
-        val prev = arr.optJSONObject(if (active > 0) active - 1 else 1)?.optString("text").orEmpty()
+    Column(Modifier.padding(top = 8.dp)) {
+        Text(if (fromCache) "Sumber (arsip offline)" else "Sumber", color = GA.TextSecondary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+            modifier = Modifier.padding(bottom = 6.dp))
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp), contentPadding = PaddingValues(end = 8.dp)) {
+            itemsIndexed(sources, key = { i, s -> "$i${s.url}" }) { i, s ->
+                Column(
+                    Modifier.width(168.dp).height(92.dp).clip(RoundedCornerShape(14.dp)).background(GA.SurfaceHigh)
+                        .border(1.dp, GA.Outline, RoundedCornerShape(14.dp))
+                        .clickable { runCatching { uri.openUri(s.url) } }.padding(10.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(s.title, color = GA.TextPrimary, fontSize = 12.5.sp, lineHeight = 16.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(16.dp).clip(CircleShape).background(accent.copy(alpha = 0.18f)), contentAlignment = Alignment.Center) {
+                            Text("${i + 1}", color = accent, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(Modifier.width(5.dp))
+                        Text(s.host, color = GA.TextSecondary, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Satu blok Markdown jawaban AI — teks menyatu dengan latar (tanpa kotak). */
+@Composable
+fun AiBlockView(row: AiBlockRow, actions: MessageActions) {
+    Box(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        MarkdownBlock(row.block, GA.TextPrimary, actions.onWord, actions.onCopyCode, actions.onPreviewCode)
+    }
+}
+
+/** Indikator AI sedang menulis (titik mengetik). */
+@Composable
+fun AiLiveView(row: AiLiveRow) {
+    val accent = LocalAccent.current.main
+    Column(Modifier.padding(top = 6.dp, bottom = 10.dp)) {
+        row.compareFast?.let {
+            Text("⚡ Mode Cepat selesai:", color = GA.TextSecondary, fontSize = 11.sp)
+            Text(it.take(220) + if (it.length > 220) "…" else "", color = GA.TextSecondary, fontSize = 12.sp, maxLines = 4, overflow = TextOverflow.Ellipsis)
+            Spacer(Modifier.height(8.dp))
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) { TypingDots(accent, dotSize = 6.dp) }
+    }
+}
+
+/** Konten khusus: kuis, flashcard, checklist, mode banding, error. */
+@Composable
+fun AiSpecialView(row: AiSpecialRow, actions: MessageActions) {
+    val msg = row.msg
+    val payload = remember(msg.payload) { runCatching { JSONObject(msg.payload) }.getOrNull() }
+    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        when (msg.kind) {
+            Kinds.QUIZ -> { Text(msg.text, color = GA.TextPrimary, fontSize = 14.sp); Spacer(Modifier.height(8.dp)); QuizView(payload) }
+            Kinds.FLASHCARDS -> { Text(msg.text, color = GA.TextPrimary, fontSize = 14.sp); Spacer(Modifier.height(8.dp)); FlashcardsView(payload) }
+            Kinds.CHECKLIST -> ChecklistView(msg, payload, actions)
+            Kinds.COMPARE -> CompareView(payload, actions)
+            Kinds.ERROR -> Row(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(GA.Red.copy(alpha = 0.10f))
+                    .border(1.dp, GA.Red.copy(alpha = 0.35f), RoundedCornerShape(16.dp)).padding(12.dp),
+            ) {
+                Icon(Icons.Filled.WarningAmber, null, tint = GA.Red, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(msg.text.removePrefix("⚠️ "), color = GA.TextPrimary, fontSize = 14.sp)
+            }
+            else -> MarkdownText(msg.text, onWordLongPress = actions.onWord, onCopyCode = actions.onCopyCode, onPreviewCode = actions.onPreviewCode)
+        }
+    }
+}
+
+/** Footer jawaban: versi, metrik, bilah aksi ikon minimalis, saran lanjutan. */
+@Composable
+fun AiFooterView(row: AiFooterRow, generating: Boolean, speaking: Boolean, actions: MessageActions) {
+    val msg = row.msg
+    Column(Modifier.fillMaxWidth().padding(bottom = 10.dp)) {
+        row.versions?.let { VersionsBar(msg, it, actions) }
+        if (msg.kind == Kinds.ERROR) {
+            if (row.isLast && !generating) Row { IconAction(Icons.Filled.Refresh, "Coba lagi") { actions.onRegenerate(msg) } }
+            return@Column
+        }
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconAction(Icons.Filled.ContentCopy, "Salin") { actions.onCopy(msg.text) }
+            IconAction(if (speaking) Icons.Filled.StopCircle else Icons.AutoMirrored.Filled.VolumeUp, if (speaking) "Hentikan suara" else "Bacakan",
+                tint = if (speaking) LocalAccent.current.main else null) { actions.onSpeak(msg) }
+            if (row.isLast && msg.kind != Kinds.CHECKLIST) {
+                IconAction(Icons.Filled.Refresh, "Regenerasi", enabled = !generating) { actions.onRegenerate(msg) }
+            }
+            IconAction(if (msg.starred) Icons.Filled.Star else Icons.Filled.StarBorder, "Bintang", tint = if (msg.starred) GA.Amber else null) { actions.onStar(msg) }
+            IconAction(Icons.Filled.IosShare, "Bagikan sebagai kartu") { actions.onShareCard(msg) }
+            var more by remember { mutableStateOf(false) }
+            Box {
+                IconAction(Icons.Filled.MoreHoriz, "Lainnya") { more = true }
+                DropdownMenu(expanded = more, onDismissRequest = { more = false }) {
+                    DropdownMenuItem(text = { Text("📒 Simpan ke Catatan") }, onClick = { more = false; actions.onSaveNote(msg) })
+                    DropdownMenuItem(text = { Text("✅ Jadikan checklist") }, onClick = { more = false; actions.onChecklist(msg) })
+                    DropdownMenuItem(text = { Text("📝 Buat kuis") }, enabled = !generating, onClick = { more = false; actions.onQuiz(msg) })
+                    DropdownMenuItem(text = { Text("🃏 Buat flashcard") }, enabled = !generating, onClick = { more = false; actions.onFlashcards(msg) })
+                }
+            }
+            Spacer(Modifier.weight(1f))
+            MetaInfo(msg)
+        }
+        AnimatedVisibility(visible = row.isLast && !generating && row.followUps.isNotEmpty(), enter = fadeIn(tween(300)), exit = fadeOut(tween(150))) {
+            FollowUpChips(row.followUps, actions.onFollowUp)
+        }
+    }
+}
+
+@Composable
+private fun MetaInfo(msg: MessageEntity) {
+    val parts = buildList {
+        if (msg.tokensPerSec > 0) add(String.format(Locale.US, "%.1f tok/s", msg.tokensPerSec))
+        if (msg.online) add("Online")
+        if (msg.kind == Kinds.CALC) add("Kalkulator lokal")
+    }
+    if (parts.isEmpty()) return
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        if (msg.tokensPerSec > 0) Icon(Icons.Filled.Speed, null, tint = GA.TextSecondary.copy(alpha = 0.7f), modifier = Modifier.size(12.dp))
+        if (msg.online) Icon(Icons.Filled.Public, null, tint = LocalAccent.current.main.copy(alpha = 0.8f), modifier = Modifier.size(12.dp))
+        Spacer(Modifier.width(4.dp))
+        Text(parts.joinToString(" • "), color = GA.TextSecondary.copy(alpha = 0.8f), fontSize = 10.5.sp)
+    }
+}
+
+@Composable
+private fun IconAction(icon: ImageVector, desc: String, tint: Color? = null, enabled: Boolean = true, onClick: () -> Unit) {
+    Box(
+        Modifier.size(36.dp).clip(CircleShape).clickable(enabled = enabled, onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Icon(icon, contentDescription = desc, tint = (tint ?: GA.TextSecondary).copy(alpha = if (enabled) 1f else 0.35f), modifier = Modifier.size(18.dp))
+    }
+}
+
+@Composable
+private fun VersionsBar(msg: MessageEntity, v: VersionInfo, actions: MessageActions) {
+    val accent = LocalAccent.current.main
+    Row(Modifier.padding(bottom = 2.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text("‹", color = if (v.active > 0) accent else GA.TextSecondary, fontSize = 18.sp,
+            modifier = Modifier.clip(CircleShape).clickable(enabled = v.active > 0) { actions.onSelectVersion(msg, v.active - 1) }.padding(horizontal = 10.dp))
+        Text("Versi ${v.active + 1}/${v.count}", color = GA.TextSecondary, fontSize = 12.sp)
+        Text("›", color = if (v.active < v.count - 1) accent else GA.TextSecondary, fontSize = 18.sp,
+            modifier = Modifier.clip(CircleShape).clickable(enabled = v.active < v.count - 1) { actions.onSelectVersion(msg, v.active + 1) }.padding(horizontal = 10.dp))
         Text("Bandingkan", color = accent, fontSize = 12.sp,
-            modifier = Modifier.clip(RoundedCornerShape(50)).clickable { actions.onCompareVersions(prev, msg.text) }.padding(horizontal = 8.dp, vertical = 4.dp))
+            modifier = Modifier.clip(RoundedCornerShape(50)).clickable { actions.onCompareVersions(v.prevText, msg.text) }.padding(horizontal = 8.dp, vertical = 4.dp))
+    }
+}
+
+@Composable
+private fun FollowUpChips(items: List<String>, onClick: (String) -> Unit) {
+    Column(Modifier.padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        items.forEach { q ->
+            Row(
+                Modifier.clip(RoundedCornerShape(50)).border(1.dp, GA.Outline, RoundedCornerShape(50))
+                    .clickable { onClick(q) }.padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("↳ ", color = LocalAccent.current.main, fontSize = 13.sp)
+                Text(q, color = GA.TextPrimary, fontSize = 13.sp)
+            }
+        }
     }
 }

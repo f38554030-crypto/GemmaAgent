@@ -1,7 +1,6 @@
 package com.gemmaagent.app.data
 
 import android.Manifest
-import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -11,7 +10,10 @@ import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import androidx.core.content.ContextCompat
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
 import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -19,7 +21,6 @@ import androidx.work.workDataOf
 import com.gemmaagent.app.llm.EngineType
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,7 +59,7 @@ data class ModelFile(val path: String, val name: String, val sizeBytes: Long, va
  * - Pemindai otomatis .gguf / .litertlm / .task di folder Download (izin Akses Semua File).
  * - Pemilih file universal (File Manager, ZArchiver, Google Drive): file lokal dibaca langsung (zero-copy),
  *   file dari cloud disalin di latar oleh WorkManager (buffer 64 KB) ke Download/GemmaModels.
- * - Pengunduh dari link Google Drive via DownloadManager.
+ * - Pengunduh dari link Google Drive via WorkManager (file .tmp → rename setelah 100%).
  */
 class ModelRepository(
     private val context: Context,
@@ -204,35 +205,45 @@ class ModelRepository(
         }
     }
 
+    /** Batalkan salin/unduh yang sedang berjalan. */
     fun cancelCopy() {
         WorkManager.getInstance(context).cancelUniqueWork(COPY_WORK)
+        WorkManager.getInstance(context).cancelUniqueWork(DOWNLOAD_WORK)
     }
 
     private fun observeCopyWork() {
+        observeWork(COPY_WORK, "Menyalin dari cloud", ModelCopyWorker.KEY_PERCENT, ModelCopyWorker.KEY_COPIED,
+            ModelCopyWorker.KEY_TOTAL, ModelCopyWorker.KEY_TARGET, ModelCopyWorker.KEY_ERROR)
+        observeWork(DOWNLOAD_WORK, "Mengunduh dari Drive", DriveDownloadWorker.KEY_PERCENT, DriveDownloadWorker.KEY_DONE,
+            DriveDownloadWorker.KEY_TOTAL, DriveDownloadWorker.KEY_TARGET, DriveDownloadWorker.KEY_ERROR)
+    }
+
+    private fun observeWork(name: String, label: String, kPct: String, kDone: String, kTotal: String, kTarget: String, kError: String) {
         scope.launch {
-            WorkManager.getInstance(context).getWorkInfosForUniqueWorkFlow(COPY_WORK).collect { infos ->
+            var active = false
+            WorkManager.getInstance(context).getWorkInfosForUniqueWorkFlow(name).collect { infos ->
                 val info = infos.firstOrNull() ?: return@collect
                 when (info.state) {
-                    WorkInfo.State.RUNNING, WorkInfo.State.ENQUEUED -> {
+                    WorkInfo.State.RUNNING, WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> {
+                        active = true
                         val p = info.progress
-                        _copyState.value = CopyState.Copying(
-                            p.getInt(ModelCopyWorker.KEY_PERCENT, 0), p.getLong(ModelCopyWorker.KEY_COPIED, 0),
-                            p.getLong(ModelCopyWorker.KEY_TOTAL, 0), "Menyalin dari cloud",
-                        )
+                        _copyState.value = CopyState.Copying(p.getInt(kPct, 0), p.getLong(kDone, 0), p.getLong(kTotal, 0), label)
                     }
-                    WorkInfo.State.SUCCEEDED -> {
-                        val path = info.outputData.getString(ModelCopyWorker.KEY_TARGET)
-                        if (path != null && _copyState.value is CopyState.Copying) {
-                            settings.update { it.copy(selectedModelPath = path) }
-                            _copyState.value = CopyState.Done("✅ Tersalin ke ${File(path).parent}")
-                            refresh()
-                        }
+                    WorkInfo.State.SUCCEEDED -> if (active) {
+                        active = false
+                        val path = info.outputData.getString(kTarget)
+                        if (path != null) settings.update { it.copy(selectedModelPath = path) }
+                        _copyState.value = CopyState.Done("✅ Selesai: ${path?.let { File(it).name } ?: "model"} siap dipakai.")
+                        refresh()
                     }
-                    WorkInfo.State.FAILED -> if (_copyState.value is CopyState.Copying) {
-                        _copyState.value = CopyState.Error(info.outputData.getString(ModelCopyWorker.KEY_ERROR) ?: "Penyalinan gagal.")
+                    WorkInfo.State.FAILED -> if (active) {
+                        active = false
+                        _copyState.value = CopyState.Error(info.outputData.getString(kError) ?: "$label gagal.")
                     }
-                    WorkInfo.State.CANCELLED -> if (_copyState.value is CopyState.Copying) _copyState.value = CopyState.Error("Penyalinan dibatalkan.")
-                    else -> Unit
+                    WorkInfo.State.CANCELLED -> if (active) {
+                        active = false
+                        _copyState.value = CopyState.Error("$label dibatalkan.")
+                    }
                 }
             }
         }
@@ -294,9 +305,12 @@ class ModelRepository(
         return null
     }
 
-    // ---------------------- Unduh dari Google Drive ----------------------
+    // ---------------------- Unduh dari Google Drive (WorkManager) ----------------------
 
-    /** Mengubah link berbagi Drive menjadi link unduhan langsung lalu mengunduh lewat DownloadManager. */
+    /**
+     * Mengubah link berbagi Drive menjadi link unduhan langsung lalu mengunduh di latar
+     * (WorkManager, buffer 64 KB). File ditulis ke ".tmp" dan baru diganti nama setelah 100%.
+     */
     fun downloadFromDrive(linkOrId: String, fileName: String) {
         val id = extractDriveId(linkOrId)
         if (id == null) {
@@ -304,53 +318,30 @@ class ModelRepository(
             return
         }
         val name = fileName.trim().ifBlank { "model-$id.gguf" }
-        val url = "https://drive.usercontent.google.com/download?id=$id&export=download&confirm=t"
-        try {
-            val dm = context.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
-            val req = DownloadManager.Request(Uri.parse(url))
-                .setTitle(name)
-                .setDescription("GemmaChat Hybrid — mengunduh model")
-                .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
-                .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "GemmaModels/$name")
-                .setAllowedOverMetered(true)
-            val downloadId = dm.enqueue(req)
-            _copyState.value = CopyState.Copying(0, 0, 0, "Mengunduh dari Drive")
-            trackDownload(dm, downloadId, name)
-        } catch (t: Throwable) {
-            _copyState.value = CopyState.Error("Gagal memulai unduhan: ${t.message}")
+        if (!(name.endsWith(".gguf", true) || name.endsWith(".litertlm", true) || name.endsWith(".task", true))) {
+            _copyState.value = CopyState.Error("Nama file harus berakhiran .gguf / .litertlm / .task.")
+            return
         }
+        val target = File(modelsFolder(), name)
+        if (target.exists() && target.length() > MIN_MODEL_BYTES) {
+            _copyState.value = CopyState.Done("✅ $name sudah ada di ${target.parent}. Tidak perlu diunduh lagi.")
+            refresh()
+            return
+        }
+        val req = OneTimeWorkRequestBuilder<DriveDownloadWorker>()
+            .setInputData(workDataOf(
+                DriveDownloadWorker.KEY_URL to "https://drive.usercontent.google.com/download?id=$id&export=download&confirm=t",
+                DriveDownloadWorker.KEY_TARGET to target.absolutePath,
+            ))
+            .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 30, java.util.concurrent.TimeUnit.SECONDS)
+            .build()
+        WorkManager.getInstance(context).enqueueUniqueWork(DOWNLOAD_WORK, ExistingWorkPolicy.KEEP, req)
+        _copyState.value = CopyState.Copying(0, 0, 0, "Mengunduh dari Drive")
     }
 
-    private fun trackDownload(dm: DownloadManager, id: Long, name: String) {
-        scope.launch(Dispatchers.IO) {
-            while (true) {
-                val q = DownloadManager.Query().setFilterById(id)
-                val done = dm.query(q)?.use { c ->
-                    if (!c.moveToFirst()) return@use true
-                    val status = c.getInt(c.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
-                    val got = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
-                    val total = c.getLong(c.getColumnIndexOrThrow(DownloadManager.COLUMN_TOTAL_SIZE_BYTES))
-                    when (status) {
-                        DownloadManager.STATUS_SUCCESSFUL -> {
-                            _copyState.value = CopyState.Done("✅ $name selesai diunduh ke Download/GemmaModels.")
-                            refresh()
-                            true
-                        }
-                        DownloadManager.STATUS_FAILED -> {
-                            _copyState.value = CopyState.Error("Unduhan gagal. Pastikan file Drive dibagikan \"Siapa saja yang memiliki link\".")
-                            true
-                        }
-                        else -> {
-                            val pct = if (total > 0) ((got * 100) / total).toInt() else 0
-                            _copyState.value = CopyState.Copying(pct, got, total, "Mengunduh dari Drive")
-                            false
-                        }
-                    }
-                } ?: true
-                if (done) break
-                delay(1000)
-            }
-        }
+    fun cancelDownload() {
+        WorkManager.getInstance(context).cancelUniqueWork(DOWNLOAD_WORK)
     }
 
     companion object {
@@ -360,6 +351,7 @@ class ModelRepository(
         const val USER_DRIVE_GGUF_ID = "1vKHZZIx9yrU4QQ4WdvLXV4vgyYkKLNEY"
         const val USER_DRIVE_GGUF_NAME = "gemma4-latih-Q4_K_M.gguf"
         private const val COPY_WORK = "model_copy"
+        private const val DOWNLOAD_WORK = "model_download"
         private const val KEY_EXTRA = "extra_paths"
         private const val MIN_MODEL_BYTES = 50L * 1024 * 1024
 

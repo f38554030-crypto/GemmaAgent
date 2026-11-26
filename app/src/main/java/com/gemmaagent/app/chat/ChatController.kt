@@ -26,6 +26,7 @@ import com.gemmaagent.app.llm.PromptBuilder
 import com.gemmaagent.app.llm.PromptChain
 import com.gemmaagent.app.llm.UnifiedLlmEngine
 import com.gemmaagent.app.tools.Calculator
+import com.gemmaagent.app.util.BitmapUtil
 import com.gemmaagent.app.util.Ocr
 import com.gemmaagent.app.web.WebResult
 import com.gemmaagent.app.web.WebSearchEngine
@@ -59,6 +60,8 @@ data class StreamState(
     val phase: String = "",
     val steps: List<String> = emptyList(),
     val compareFast: String? = null,
+    /** Sumber web (judul, url) yang sudah ditemukan — ditampilkan sebagai karusel saat jawaban masih ditulis. */
+    val sources: List<Pair<String, String>> = emptyList(),
 )
 
 sealed interface DefineState {
@@ -267,12 +270,21 @@ class ChatController(
                 var ocrText: String? = null
                 var imagePath: String? = null
                 if (imageUri != null) {
-                    imagePath = withContext(Dispatchers.IO) { runCatching { ImageStore.save(context, imageUri) }.getOrNull() }
-                    ocrText = runCatching { Ocr.read(context, imageUri) }.getOrElse {
-                        emit("OCR gagal: ${it.message}")
-                        ""
+                    // Dekode SEKALI (maks 1024×1024) di Dispatchers.IO, dipakai untuk thumbnail & OCR.
+                    val bmp = withContext(Dispatchers.IO) { runCatching { BitmapUtil.decodeDownsampled(context, imageUri) }.getOrNull() }
+                    if (bmp == null) {
+                        emit("Gambar tidak bisa dibuka.")
+                    } else {
+                        try {
+                            imagePath = withContext(Dispatchers.IO) { runCatching { ImageStore.save(context, bmp) }.getOrNull() }
+                            ocrText = withContext(Dispatchers.Default) {
+                                runCatching { Ocr.read(bmp) }.getOrElse { emit("OCR gagal: ${it.message}"); "" }
+                            }
+                        } finally {
+                            bmp.recycle()
+                        }
+                        if (ocrText.isNullOrBlank()) emit("Tidak ada teks terbaca pada gambar.")
                     }
-                    if (ocrText.isBlank()) emit("Tidak ada teks terbaca pada gambar.")
                 }
 
                 val userMsg = MessageEntity(
@@ -345,6 +357,8 @@ class ChatController(
             var usedOnline = false
             var searchQuery: String? = null
             var fromCache = false
+            fun liveState(text: String = "", thought: String = "", phase: String = "", steps: List<String> = emptyList(), compareFast: String? = null) =
+                StreamState(aid, text, thought, phase, steps, compareFast, citations.map { it.title to it.url })
             try {
                 val s = settings.current
                 val ec = engineCtx() ?: throw IllegalStateException("Belum ada model. Buka Model Hub untuk memilih file .gguf / .litertlm.")
@@ -370,7 +384,7 @@ class ChatController(
                         } else emit("📴 Internet tidak tersedia — menjawab dengan pengetahuan offline Gemma.")
                     } else if (url != null) {
                         steps = listOf("🔗 Membaca tautan: ${WebSearchEngine.hostOf(url)}")
-                        streamUpdate(StreamState(aid, phase = steps.last(), steps = steps), force = true)
+                        streamUpdate(liveState(phase = steps.last(), steps = steps), force = true)
                         val art = runCatching { web.readArticle(url, (budgetChars * 0.8).toInt()) }.getOrNull()
                         if (art != null && art.snippet.length > 80) {
                             citations = listOf(WebResult(art.title, url, ""))
@@ -386,7 +400,7 @@ class ChatController(
                         val ctx = runCatching {
                             web.searchAndRead(user.text, s.searchSource, (budgetChars * 0.65).toInt()) { st ->
                                 steps = steps + st
-                                streamUpdate(StreamState(aid, phase = "🔎 $st", steps = steps), force = true)
+                                streamUpdate(liveState(phase = "🔎 $st", steps = steps), force = true)
                             }
                         }.getOrNull()
                         if (ctx != null && ctx.results.isNotEmpty()) {
@@ -422,26 +436,27 @@ class ChatController(
                 val searchJson = if (steps.isNotEmpty()) JSONObject().put("query", searchQuery ?: "").put("steps", JSONArray(steps)).put("cache", fromCache) else null
 
                 if (compare) {
-                    streamUpdate(StreamState(aid, phase = "⚡ Mode Cepat…", steps = steps), force = true)
+                    streamUpdate(liveState(phase = "⚡ Mode Cepat…", steps = steps), force = true)
                     val fast = llm.generate(ec.model, ms, ec.threads, GenRequest(
                         PromptBuilder.systemPrompt(s.personaId, s.customSystemPrompt, false, memories, usedOnline), history, prompt, thinking = false,
-                    )) { t, th -> streamUpdate(StreamState(aid, t, th, "⚡ Mode Cepat", steps)) }
+                    )) { t, th -> streamUpdate(liveState(t, th, "⚡ Mode Cepat", steps)) }
                     if (fast.stopped) throw CancellationException("stop")
                     val deep = llm.generate(ec.model, ms, ec.threads, GenRequest(
                         PromptBuilder.systemPrompt(s.personaId, s.customSystemPrompt, true, memories, usedOnline), history, prompt, thinking = true,
-                    )) { t, th -> streamUpdate(StreamState(aid, t, th, "🧠 Mode Mendalam", steps, compareFast = fast.text)) }
+                    )) { t, th -> streamUpdate(liveState(t, th, "🧠 Mode Mendalam", steps, compareFast = fast.text)) }
                     val payload = JSONObject().put("fast", resultJson(fast)).put("deep", resultJson(deep)).put("citations", citeJson)
                     searchJson?.let { payload.put("search", it) }
                     store.update(placeholder.copy(id = aid, text = fast.text.ifBlank { deep.text }, thought = deep.thought, payload = payload.toString(),
                         online = usedOnline, tokensPerSec = deep.tokensPerSec, tokenCount = fast.tokens + deep.tokens, durationMs = fast.durationMs + deep.durationMs))
                 } else {
                     val system = PromptBuilder.systemPrompt(s.personaId, s.customSystemPrompt, s.thinking, memories, usedOnline)
-                    streamUpdate(StreamState(aid, phase = if (s.thinking) "🧠 Berpikir…" else "✍️ Menulis…", steps = steps), force = true)
+                    streamUpdate(liveState(phase = if (s.thinking) "🧠 Berpikir…" else "✍️ Menulis…", steps = steps), force = true)
                     val r = llm.generate(ec.model, ms, ec.threads, GenRequest(system, history, prompt, thinking = s.thinking)) { t, th ->
-                        streamUpdate(StreamState(aid, t, th, if (s.thinking && t.isBlank()) "🧠 Berpikir…" else "✍️ Menulis…", steps))
+                        streamUpdate(liveState(t, th, if (s.thinking && t.isBlank()) "🧠 Berpikir…" else "✍️ Menulis…", steps))
                     }
                     val text = when {
                         r.stopped -> r.text + "\n\n_(dihentikan)_"
+                        r.loopDetected -> r.text + "\n\n_(dihentikan otomatis: model mulai mengulang teks yang sama)_"
                         r.text.isBlank() -> "_(Model tidak menghasilkan jawaban. Coba Regenerasi, ganti Chat Template di Pengaturan Model, atau mulai Sesi Baru.)_"
                         else -> r.text
                     }
@@ -482,7 +497,7 @@ class ChatController(
         val question = user.text
         val room = (budgetChars - question.length - 200).coerceAtLeast(500)
         if (doc.length <= room) return PromptBuilder.withDocument(question, name, doc)
-        val chunks = DocumentReader.chunk(doc, room).take(MAX_CHUNKS)
+        val chunks = DocumentReader.chunk(doc, minOf(room, DocumentReader.MAX_CHUNK_CHARS)).take(MAX_CHUNKS)
         val summaries = StringBuilder()
         chunks.forEachIndexed { i, c ->
             val phase = "📄 Merangkum bagian ${i + 1}/${chunks.size}…"
@@ -720,21 +735,12 @@ class ChatController(
     }
 }
 
-/** Menyimpan gambar terkecil yang masih jelas (maks 1024 px) untuk ditampilkan di gelembung chat. */
+/** Menyimpan gambar (sudah ≤ 1024 px) sebagai JPEG untuk ditampilkan di gelembung chat. Panggil dari Dispatchers.IO. */
 object ImageStore {
-    fun save(context: Context, uri: Uri): String {
-        val resolver = context.contentResolver
-        val bounds = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-        resolver.openInputStream(uri)?.use { android.graphics.BitmapFactory.decodeStream(it, null, bounds) }
-        var sample = 1
-        while (maxOf(bounds.outWidth, bounds.outHeight) / (sample * 2) >= 1024) sample *= 2
-        val bmp = resolver.openInputStream(uri)?.use {
-            android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = sample })
-        } ?: throw IllegalStateException("Gambar tidak bisa dibuka")
+    fun save(context: Context, bmp: android.graphics.Bitmap): String {
         val dir = File(context.filesDir, "images").apply { mkdirs() }
         val file = File(dir, "img_${System.currentTimeMillis()}.jpg")
         file.outputStream().use { bmp.compress(android.graphics.Bitmap.CompressFormat.JPEG, 85, it) }
-        bmp.recycle()
         return file.absolutePath
     }
 }

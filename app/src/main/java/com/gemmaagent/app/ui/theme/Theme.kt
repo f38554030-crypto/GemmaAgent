@@ -9,6 +9,11 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,7 +50,7 @@ val GeminiDark = Palette(
     outline = Color(0xFF2C2E33),
     userBubble = Color(0xFF242938),
     onUserBubble = Color(0xFFE8EAF0),
-    text = Color(0xFFE3E3E8),
+    text = Color(0xFFE3E3E3),
     textSecondary = Color(0xFF9AA0A6),
     strong = Color(0xFFFFFFFF),
     codeBg = Color(0xFF0A0A0C),
@@ -139,7 +144,13 @@ fun GemmaTheme(accent: Accent, mode: ThemeMode, fontScale: Float, content: @Comp
         surfaceContainerHigh = p.cardHigh, surfaceContainerHighest = Color(0xFFE8EAED),
         outline = p.outline, outlineVariant = p.outline, error = GA.Red, onError = Color.White,
     )
-    CompositionLocalProvider(LocalAccent provides ac, LocalFontScale provides fontScale) {
+    // Mode Hening Total: tidak ada getaran otomatis dari komponen Compose mana pun (termasuk dialog).
+    val view = LocalView.current
+    SideEffect {
+        view.isHapticFeedbackEnabled = false
+        view.isSoundEffectsEnabled = false
+    }
+    CompositionLocalProvider(LocalAccent provides ac, LocalFontScale provides fontScale, LocalHapticFeedback provides SilentHaptics) {
         MaterialTheme(
             colorScheme = scheme,
             typography = Typography(),
@@ -147,4 +158,9 @@ fun GemmaTheme(accent: Accent, mode: ThemeMode, fontScale: Float, content: @Comp
             content = content,
         )
     }
+}
+
+/** HapticFeedback yang tidak melakukan apa-apa (Mode Hening). */
+private object SilentHaptics : HapticFeedback {
+    override fun performHapticFeedback(hapticFeedbackType: HapticFeedbackType) = Unit
 }

@@ -47,15 +47,15 @@ jobs:
           path: ~/.android/debug.keystore
           key: gemma-agent-debug-keystore-v1
 
-      - name: Build APK (Gradle + NDK/CMake llama.cpp arm64-v8a)
+      - name: Build APK rilis (Gradle + NDK/CMake llama.cpp arm64-v8a) + unit test
         run: |
           chmod +x ./gradlew
-          ./gradlew assembleDebug testDebugUnitTest --stacktrace --no-daemon
+          ./gradlew assembleRelease testDebugUnitTest --stacktrace --no-daemon
 
       - name: Siapkan file APK
         run: |
           mkdir -p out
-          cp app/build/outputs/apk/debug/app-debug.apk out/GemmaChatHybrid.apk
+          cp app/build/outputs/apk/release/app-release.apk out/GemmaChatHybrid.apk
           ls -lh out
 
       - name: Unggah APK (Artifact)

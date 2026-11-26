@@ -9,11 +9,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,6 +59,9 @@ class MainActivity : FragmentActivity() {
             navigationBarStyle = SystemBarStyle.dark(Color.BLACK),
         )
         super.onCreate(savedInstanceState)
+        // Mode Hening: matikan getaran/haptic otomatis dari semua tampilan aplikasi.
+        window.decorView.isHapticFeedbackEnabled = false
+        window.decorView.isSoundEffectsEnabled = false
         shortcut = intent?.getStringExtra(EXTRA_SHORTCUT)
         sharedText = readShared(intent)
         val app = GemmaChatApp.instance
@@ -78,9 +78,9 @@ class MainActivity : FragmentActivity() {
                     if (s.biometricLock && !unlocked) {
                         LockScreen { authenticate() }
                     } else {
-                        AnimatedContent(
+                        Crossfade(
                             targetState = screen,
-                            transitionSpec = { fadeIn(tween(220)) togetherWith fadeOut(tween(160)) },
+                            animationSpec = tween(260),
                             label = "nav",
                         ) { target ->
                             val back = { screen = SCREEN_CHAT }

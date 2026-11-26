@@ -15,8 +15,8 @@ android {
         applicationId = "com.gemmaagent.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 4
-        versionName = "3.0.0"
+        versionCode = 5
+        versionName = "3.1.0"
 
         ndk {
             // POCO M4 Pro (MediaTek Helio G96) = 64-bit ARM
@@ -39,7 +39,10 @@ android {
 
     buildTypes {
         release {
+            // Build rilis TIDAK debuggable → ART mengoptimalkan kode & memakai baseline profile Compose (UI lebih mulus).
+            // Ditandatangani kunci yang sama dengan versi sebelumnya agar bisa langsung menimpa.
             isMinifyEnabled = false
+            isDebuggable = false
             signingConfig = signingConfigs.getByName("debug")
         }
     }

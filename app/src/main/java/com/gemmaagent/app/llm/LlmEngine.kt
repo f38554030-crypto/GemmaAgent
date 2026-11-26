@@ -62,6 +62,7 @@ data class GenResult(
     val stopped: Boolean,
     val promptTokens: Int = 0,
     val reusedTokens: Int = 0,
+    val loopDetected: Boolean = false,
 )
 
 data class BenchResult(val ppTokensPerSec: Double, val tgTokensPerSec: Double)
@@ -316,9 +317,8 @@ class UnifiedLlmEngine(private val context: Context) {
             delay(400)
         }
 
-        if (!File(model.path).canRead()) {
-            fail("File model tidak bisa dibaca. Buka Model Hub, izinkan Akses Semua File, lalu Pindai Ulang.", null)
-        }
+        // Validasi header file SEBELUM masuk ke kode native (mencegah crash akibat file rusak/terpotong).
+        ModelValidator.check(model.path, model.type)?.let { problem -> fail(problem, null) }
         _status.value = ModelStatus.LOADING
         _error.value = null
         _progress.value = 0f
@@ -415,38 +415,35 @@ class UnifiedLlmEngine(private val context: Context) {
                 ensureLoaded(model, s, threads)
                 val eng = current ?: throw IllegalStateException("Model belum dimuat")
                 _status.value = ModelStatus.BUSY
-                val stops = (s.stopWords + if (model.type == EngineType.GGUF) PromptFormatter.defaultStops(s.template) else emptyList())
-                    .filter { it.isNotEmpty() }
-                val raw = StringBuilder()
+                // Pembersih output real-time + penjaga anti-looping.
+                val cleaner = OutputCleaner(s.stopWords + if (model.type == EngineType.GGUF) PromptFormatter.defaultStops(s.template) else emptyList())
+                val loopGuard = LoopGuard()
                 val channel = StringBuilder()
-                var hitStop = false
+                var loopCut: Int? = null
                 val start = System.currentTimeMillis()
                 val result = try {
                     eng.generate(req, s) { piece, ch ->
-                        raw.append(piece)
                         channel.append(ch)
-                        // Stop words khusus: potong & hentikan.
-                        val txt = raw.toString()
-                        val idx = stops.map { txt.indexOf(it) }.filter { it >= 0 }.minOrNull()
-                        if (idx != null) {
-                            raw.setLength(idx)
-                            hitStop = true
-                        }
-                        val (t, th) = ThoughtSplitter.split(raw.toString())
+                        val visible = cleaner.feed(piece)
+                        if (loopCut == null) loopCut = loopGuard.check(visible)
+                        val shown = loopCut?.let { visible.take(it) } ?: visible
+                        val (t, th) = ThoughtSplitter.split(shown)
                         onUpdate(t, (channel.toString() + th).trim())
-                        !hitStop && !stopRequested
+                        !cleaner.stopped && loopCut == null && !stopRequested
                     }
                 } finally {
                     _status.value = ModelStatus.READY
                 }
-                val (text, th) = ThoughtSplitter.split(raw.toString())
+                val finalRaw = cleaner.finish().let { full -> loopCut?.let { full.take(it) } ?: full }
+                val (text, th) = ThoughtSplitter.split(finalRaw)
                 GenResult(
                     text = text.trim(),
                     thought = (result.channelThought + th).trim(),
                     tokens = result.tokens,
                     tokensPerSec = if (result.tokens > 1 && result.decodeMs > 0) result.tokens * 1000.0 / result.decodeMs else 0.0,
                     durationMs = System.currentTimeMillis() - start,
-                    stopped = stopRequested && !hitStop,
+                    stopped = stopRequested && !cleaner.stopped && loopCut == null,
+                    loopDetected = loopCut != null,
                     promptTokens = result.promptTokens,
                     reusedTokens = result.reused,
                 )

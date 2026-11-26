@@ -7,6 +7,15 @@ Chatbot AI hibrida untuk Android (Kotlin + Jetpack Compose, Material 3):
 - **UI ala Gemini** (Dark AMOLED `#0E0E10` / Clean Light `#F8F9FA`), **Smart Scroll Lock** + tombol "↓ Ke bawah", token buffering 50 ms.
 - Bersih dari fitur agen: tanpa Accessibility Service, overlay, tombol melayang, WhatsApp, getar/TTS otomatis.
 
+## Versi 3.1 — audit performa & UI flagship
+- **Anti-patah-patah**: jawaban AI dipecah per blok di LazyColumn (key unik, `@Immutable`), parsing Markdown/JSON di thread latar, token buffering 50 ms → saat streaming hanya blok terbawah yang dirender ulang.
+- **Smart Scroll Lock**: sentuhan jari langsung mengunci gulir otomatis; tombol kapsul "↓ Ke bawah".
+- **Anti-OOM**: gambar maks 1024×1024 (EXIF) untuk OCR & thumbnail, PDF dibaca per halaman, potongan teks maks 4.000 karakter.
+- **Stabilitas mesin**: pembersih token teknis (`<end_of_turn>`, `<|im_end|>`, `<|eot_id|>`, `</s>`, …), penjaga anti-looping, validasi header GGUF/LITERTLM sebelum load.
+- **Unduhan Drive** lewat WorkManager → `.tmp` → rename setelah 100%; web search timeout 8 detik + fallback Wikipedia.
+- **UI Gemini/Perplexity**: layar awal grid 2×2, jawaban AI menyatu dengan latar `#0E0E10`, karusel sumber web, input kapsul dengan border glow saat Online, pemilih model (bottom sheet) dengan meteran RAM.
+- APK kini **build rilis non-debuggable** (lebih mulus daripada build debug).
+
 ## Unduh APK
 **Releases → `apk-terbaru` → `GemmaChatHybrid.apk`** (dibangun otomatis oleh GitHub Actions setiap push).
 
