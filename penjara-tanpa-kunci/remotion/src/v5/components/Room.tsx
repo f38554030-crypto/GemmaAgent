@@ -10,15 +10,22 @@ export const DOOR = {x0: 700, x1: 880, y0: 700, y1: FLOOR};
 export const CAL = {x: 440, y: 520, w: 124, h: 150};
 export const VENT = {x: 170, y: 420, w: 180, h: 90};
 export const TABLE = {x0: 56, x1: 164, top: 1160};
-export const GUITAR = {x: 600, y: 1010}; // hung on the wall above the foot of the bed
+export const GUITAR = {x: 112, y: 1012, rot: -6}; // hung on the left wall above the bedside table (never behind his head)
 
+/** true if a 60x60 note centred at (x, y) would overlap the hanging guitar (tested in the guitar's rotated frame) */
+const guitarHit = (x: number, y: number) => {
+	const r = (-GUITAR.rot * Math.PI) / 180;
+	const dx = x - GUITAR.x, dy = y - GUITAR.y;
+	const lx = dx * Math.cos(r) - dy * Math.sin(r), ly = dx * Math.sin(r) + dy * Math.cos(r);
+	return Math.abs(lx) < 60 + 42 && ly > -430 - 42 && ly < 10 + 42;
+};
 // sticky notes: first one right next to the pillow (within arm's reach), then spreading over the wall
 const WORDS = ['besok', 'nanti', 'lusa', 'besok!', 'senin', 'minggu', 'besok', 'nanti aja', 'lusa', 'besok'];
 const avoid = (x: number, y: number) =>
 	(x > CAL.x - 70 && x < CAL.x + CAL.w + 30 && y > CAL.y - 60 && y < CAL.y + CAL.h + 40) ||
 	(x > DOOR.x0 - 60 && x < DOOR.x1 + 60 && y > DOOR.y0 - 70) ||
 	(x > VENT.x - 70 && x < VENT.x + VENT.w + 30 && y > VENT.y - 60 && y < VENT.y + VENT.h + 40) ||
-	(x > GUITAR.x - 80 && x < GUITAR.x + 90 && y > GUITAR.y - 440 && y < GUITAR.y + 30) ||
+	guitarHit(x, y) ||
 	y > BED.top - 100 || y < 150 || x < 30 || x > 1040;
 export const NOTES: {x: number; y: number; r: number; w: string}[] = (() => {
 	const first = {x: 262, y: 1036, r: -4, w: 'BESOK'};
@@ -239,10 +246,10 @@ export const Room: React.FC<RoomProps> = ({
 			{/* bedside table + alarm */}
 			<rect x={TABLE.x0} y={TABLE.top} width={TABLE.x1 - TABLE.x0} height={FLOOR - TABLE.top} rx={6} fill={C.table} />
 			<rect x={TABLE.x0 + 10} y={TABLE.top + 40} width={TABLE.x1 - TABLE.x0 - 20} height={8} rx={3} fill="#22283B" />
-			{alarm ? <AlarmClock x={TABLE.x0 + 34} y={TABLE.top - 34} s={0.62} ring={alarm.ring} f={f} hour={alarm.hour} /> : <AlarmClock x={TABLE.x0 + 34} y={TABLE.top - 34} s={0.62} f={f} />}
+			{alarm ? <AlarmClock x={TABLE.x0 + 34} y={TABLE.top - 34} s={0.62} ring={alarm.ring} f={f} hour={alarm.hour} /> : <AlarmClock x={TABLE.x0 + 34} y={TABLE.top - 34} s={0.62} f={f} hour={day > 0.5 ? 10 : 3} />}
 			{phoneOnTable ? <rect x={TABLE.x0 + 60} y={TABLE.top - 9} width={40} height={9} rx={3} fill="#05080F" /> : null}
 			{/* forgotten plans: guitar (dusty), running shoes, books, wilting plant */}
-			<g transform={`translate(${GUITAR.x} ${GUITAR.y}) rotate(14)`}>
+			<g transform={`translate(${GUITAR.x} ${GUITAR.y}) rotate(${GUITAR.rot})`}>
 				<circle cx={0} cy={-418} r={6} fill="#8A93A8" />
 				<rect x={-7} y={-370} width={14} height={240} rx={4} fill="#6B4A2E" />
 				<rect x={-13} y={-400} width={26} height={44} rx={7} fill="#4E3622" />

@@ -16,7 +16,13 @@ const standY = (feet: number, s = S) => feet - STAND_HIP * s;
 const squat = (f: number, extra: Partial<Pose> = {}): Pose => ({...P0, torso: 34, head: 10, legN: [96, 150], legF: [86, 140], armN: [70, 40], armF: [60, 50], bob: 0, ...extra});
 
 // stairs + upper platform
-const ST = {x0: 2960, y0: FEET, x1: 3240, y1: 1010, n: 12};
+const ST = {x0: 3150, y0: WALK, x1: 3430, y1: 1010, n: 12};
+const PLAZA_FEET = 1290; // people standing on the plaza (behind the sidewalk)
+/** hip height so the lowest foot touches the ground (no floating squats) */
+const grounded = (pose: Pose, feetY: number, s: number) => {
+	const a = limbEnd(pose, 'legN'), b = limbEnd(pose, 'legF');
+	return feetY - (Math.max(a.y, b.y) + 10.5) * s;
+};
 const stairPos = (u: number) => {
 	// u: 0..12 steps climbed (fractional)
 	const run = (ST.x1 - ST.x0) / ST.n, rise = (ST.y0 - ST.y1) / ST.n;
@@ -41,22 +47,23 @@ const CityWorld: React.FC<{F: number; camX: number}> = ({F, camX}) => {
 	const wPose = sit(F, {torso: 10, head: 6, armN: [64, 56 + typing], armF: [58, 60 - typing], lookY: 0.4, eyes: blink(F, 23)});
 	// ---- friends (bertemu) ----
 	const meet = clamp((F - 2520) / 46);
-	const ax = lerp(1385, 1515, ease.out(meet)), bx = lerp(1790, 1650, ease.out(meet));
+	const ax = lerp(1385, 1515, ease.out(meet)), bx = lerp(1760, 1650, ease.out(meet));
 	const wave = env(F, 2562, 2576, 3, 3), five = env(F, 2576, 2596, 3, 6);
 	const fA = mix(mix(meet < 1 ? walk(F * 0.3, 1 - meet * 0.3) : idle(F, {mouth: 0.6}), {...idle(F), armN: [160 + Math.sin(F) * 14, 20], mouth: 0.7}, wave), {...idle(F), armN: [150, 10], torso: 6, mouth: 0.8}, five);
 	const fB = mix(mix(meet < 1 ? walk(F * 0.3 + 1, 1 - meet * 0.3) : idle(F + 9, {mouth: 0.6}), {...idle(F), armN: [160 + Math.sin(F + 1) * 14, 20], mouth: 0.7}, wave), {...idle(F), armN: [150, 10], torso: 6, mouth: 0.8}, five);
 	// ---- cyclist (gagal -> mencoba kembali) ----
-	const ROCK = 1975;
+	const ROCK = 2075;
 	const ride1 = clamp((F - 2556) / 62); // to the rock
 	const fall = clamp((F - 2618) / 14);
 	const lie = F >= 2632 && F < 2678;
 	const getUp = clamp((F - 2678) / 18);
 	const lift = clamp((F - 2700) / 12);
-	const ride2 = clamp((F - 2714) / 50);
-	let bx1 = lerp(1690, ROCK - 58, ease.linear(ride1));
+	const t2 = Math.max(0, F - 2714);
+	const ride2X = t2 < 25 ? 0.44 * t2 * t2 : 275 + 22 * (t2 - 25); // accelerates to ~22 px/frame
+	let bx1 = lerp(1860, ROCK - 58, ease.linear(ride1));
 	const wob = F < 2618 ? Math.sin(F * 0.5) * 7 * (1 - ride1 * 0.3) : 0;
 	let bikeRot = wob + fall * 78 - lift * 78;
-	if (F >= 2714) bx1 = lerp(ROCK - 40, 3900, ease.in(ride2));
+	if (F >= 2714) bx1 = ROCK - 40 + ride2X;
 	if (F >= 2714) bikeRot = Math.sin(F * 0.3) * 1.2;
 	const pedal = F * 0.4;
 	const riding = F < 2618 || F >= 2714;
@@ -69,20 +76,20 @@ const CityWorld: React.FC<{F: number; camX: number}> = ({F, camX}) => {
 	const bloom = tween(F, 2640, 2664, 0, 1, ease.out);
 	const wow = env(F, 2652, 2700, 6, 12);
 	const dPose = mix(squat(F, {eyes: 1, look: 0.6, lookY: 0.5}), squat(F, {torso: 10, head: -12, eyes: 1, look: 0.3, lookY: 0, mouth: 0.9, brow: 0.3, armF: [120, 20]}), wow);
+	const DX = 2380, DS = 0.85; // discoverer kneels in the grass of the plaza, away from the cyclist's fall
 	// ---- rain + umbrella (tidak selalu indah) ----
-	const cloudX = lerp(2470, 2660, clamp((F - 2690) / 110));
+	const cloudX = lerp(2660, 2850, clamp((F - 2690) / 110));
 	const rain = env(F, 2732, 2830, 8, 14);
 	const umb = tween(F, 2744, 2754, 0, 1, ease.outBack);
-	const runX = lerp(2900, 2420, clamp((F - 2738) / 56));
 	// ---- stairs climber with a box (tidak selalu mudah) + fork in the fog (ketidakpastian) ----
-	const climbU = keys(F, [[2790, 0], [2814, 6.2], [2819, 5.4], [2827, 5.4], [2850, 12]], ease.inOut);
-	const slip = env(F, 2814, 2828, 2, 6);
+	const climbU = keys(F, [[2750, 0], [2790, 3.2], [2812, 6.2], [2817, 5.4], [2826, 5.4], [2850, 12]], ease.inOut);
+	const slip = env(F, 2812, 2826, 2, 6);
 	const atTop = F >= 2850;
 	const lookAround = F >= 2852 && F < 2876 ? (F < 2864 ? -1 : 1) : 1;
 	const intoFog = clamp((F - 2876) / 20);
 	let cPose: Pose = mix(walk(F * 0.22, 0.7, {torso: 18, armN: [84, 64], armF: [80, 70], brow: 0.9, eyes: 1, head: 4}), {...P0, torso: -14, armN: [120, 40], armF: [110, 60], brow: 1, eyes: 1}, slip);
 	if (atTop) cPose = intoFog > 0 ? walk(F * 0.25, 0.8, {armN: [84, 64], armF: [80, 70], brow: 0.4}) : idle(F, {armN: [84, 64], armF: [80, 70], brow: 0.6, look: 0.8});
-	const cp = atTop ? {x: lerp(3290, 3440, intoFog), y: ST.y1} : stairPos(climbU);
+	const cp = atTop ? {x: lerp(3480, 3630, intoFog), y: ST.y1} : F < 2750 ? {x: lerp(2950, ST.x0 - 30, clamp((F - 2712) / 38)), y: ST.y0} : stairPos(climbU);
 	return (
 		<g>
 			<Sky camX={camX} F={F} />
@@ -94,10 +101,30 @@ const CityWorld: React.FC<{F: number; camX: number}> = ({F, camX}) => {
 			{[1240, 2010].map((x) => <Lamp key={x} x={x} y={WALK + 6} />)}
 			<Ground camX={camX} />
 			{/* upper platform for the stairs */}
-			<rect x={ST.x1 - 4} y={ST.y1} width={1400} height={ST.y0 - ST.y1 + 20} fill="#C9B79B" />
+			<rect x={ST.x1 - 4} y={ST.y1} width={1400} height={ST.y0 - ST.y1} fill="#C9B79B" />
 			<rect x={ST.x1 - 4} y={ST.y1} width={1400} height={14} fill="#A9967A" />
 			<Stairs x0={ST.x0} y0={ST.y0} x1={ST.x1} y1={ST.y1} n={ST.n} />
-			<Signpost x={3370} y={ST.y1} wob={Math.sin(F / 20) * 2} />
+			<Signpost x={3560} y={ST.y1} wob={Math.sin(F / 20) * 2} />
+			{/* background walker on the plaza passes BEHIND the cube */}
+			<Stickman x={lerp(300, 1500, clamp((F - 2330) / 300))} y={standY(PLAZA_TOP + 88, 0.78)} pose={walk(F * 0.3, 1)} scale={0.78} shirt="#5A8DEE" shadow={PLAZA_TOP + 88} />
+			{/* discoverer + flower in the grass of the plaza */}
+			<Flower x={DX + 70} y={PLAZA_FEET - 2} bloom={bloom} />
+			<Stickman x={DX} y={grounded(dPose, PLAZA_FEET, DS)} pose={dPose} scale={DS} shirt="#F2C94C" shadow={PLAZA_FEET}
+				handProp={<g transform="translate(10 0) rotate(-90)"><circle cx={0} cy={-34} r={22} fill="#CFE6FA" fillOpacity={0.4} stroke="#3A4256" strokeWidth={5} /><rect x={-4} y={-12} width={8} height={30} rx={3} fill="#3A4256" /></g>} />
+			{wow > 0.3 ? <text x={DX + 10} y={PLAZA_FEET - 250} fontFamily={FONT} fontWeight={900} fontSize={54} fill="#F2C14E" opacity={wow} textAnchor="middle">!</text> : null}
+			{/* umbrella person on the plaza: looks up at the cloud, opens the umbrella when the rain comes */}
+			{(() => {
+				const US = 0.9, UX = 2850;
+				const up = idle(F, {armN: [60 + umb * 70, 70 - umb * 50], brow: 0.3 + umb * 0.3, lookY: -0.6 * env(F, 2700, 2760, 10, 10), look: 0.3});
+				const h = limbEnd(up, 'armN');
+				const hy = standY(PLAZA_FEET, US);
+				return (
+					<g>
+						<Stickman x={UX} y={hy} pose={up} scale={US} shirt="#5A8DEE" shadow={PLAZA_FEET} />
+						<g transform={`translate(${UX + h.x * US} ${hy + (h.y + 8) * US}) rotate(-6) scale(${US})`}><Umbrella open={umb} /></g>
+					</g>
+				);
+			})()}
 			{/* the cube (his room) stands on the sidewalk, grounded */}
 			<Cube />
 			{/* reader on the bench */}
@@ -120,7 +147,9 @@ const CityWorld: React.FC<{F: number; camX: number}> = ({F, camX}) => {
 			<Stickman x={bx} y={standY(FEET) + fB.bob} pose={{...fB, bob: 0}} facing={-1} shirt="#E5534B" shadow={FEET} />
 			{five > 0.6 ? <g transform={`translate(${(ax + bx) / 2} ${standY(FEET) - 205})`} opacity={(five - 0.6) * 2.5}>{[0, 1, 2, 3, 4, 5].map((i) => <line key={i} x1={Math.cos(i) * 18} y1={Math.sin(i) * 18} x2={Math.cos(i) * 34} y2={Math.sin(i) * 34} stroke="#F2C14E" strokeWidth={5} strokeLinecap="round" />)}</g> : null}
 			{/* rock that causes the fall */}
-			<path d={`M ${ROCK - 22} ${FEET} Q ${ROCK - 18} ${FEET - 24} ${ROCK} ${FEET - 26} Q ${ROCK + 20} ${FEET - 22} ${ROCK + 24} ${FEET} Z`} fill="#8E8A80" />
+			<ellipse cx={ROCK + 4} cy={FEET + 2} rx={34} ry={6} fill="#000" opacity={0.18} />
+			<path d={`M ${ROCK - 28} ${FEET} Q ${ROCK - 26} ${FEET - 34} ${ROCK - 2} ${FEET - 38} Q ${ROCK + 26} ${FEET - 34} ${ROCK + 28} ${FEET} Z`} fill="#5E5A54" />
+			<path d={`M ${ROCK - 16} ${FEET - 26} Q ${ROCK - 4} ${FEET - 34} ${ROCK + 10} ${FEET - 30}`} stroke="#8A857C" strokeWidth={4} fill="none" strokeLinecap="round" />
 			{/* cyclist */}
 			<Bicycle x={bx1} y={FEET} rot={bikeRot} wheel={riding ? F * 14 : 0} />
 			{riding ? (
@@ -132,24 +161,6 @@ const CityWorld: React.FC<{F: number; camX: number}> = ({F, camX}) => {
 			) : (
 				<Stickman x={lerp(ROCK + 120, ROCK + 40, lift)} y={lerp(FEET - 22, standY(FEET, 0.95), getUp)} pose={mix(mix(lyingPose, kneel, clamp(getUp * 2)), idle(F, {eyes: 1, brow: -0.6, mouth: 0.3}), clamp(getUp * 2 - 1))} scale={0.95} shirt="#2FB3B3" rot={lerp(92, 0, clamp(getUp * 1.6))} facing={lift > 0 ? -1 : 1} shadow={FEET} />
 			)}
-			{/* discoverer + flower */}
-			<Flower x={2205} y={FEET - 2} bloom={bloom} />
-			<Stickman x={2130} y={FEET - 92} pose={dPose} scale={0.95} shirt="#F2C94C" shadow={FEET}
-				handProp={<g transform="translate(10 0) rotate(-90)"><circle cx={0} cy={-34} r={22} fill="#CFE6FA" fillOpacity={0.4} stroke="#3A4256" strokeWidth={5} /><rect x={-4} y={-12} width={8} height={30} rx={3} fill="#3A4256" /></g>} />
-			{wow > 0.3 ? <text x={2120} y={FEET - 330} fontFamily={FONT} fontWeight={900} fontSize={54} fill="#F2C14E" opacity={wow} textAnchor="middle">!</text> : null}
-			{/* rain cloud, umbrella person, runner */}
-			{(() => {
-				const up = idle(F, {armN: [60 + umb * 70, 70 - umb * 50], brow: 0.3});
-				const h = limbEnd(up, 'armN');
-				return (
-					<g>
-						<Stickman x={2660} y={standY(FEET)} pose={up} shirt="#5A8DEE" shadow={FEET} />
-						<g transform={`translate(${2660 + h.x} ${standY(FEET) + h.y + 8}) rotate(-6)`}><Umbrella open={umb} /></g>
-					</g>
-				);
-			})()}
-			{rain > 0 ? <rect x={2200} y={-400} width={1000} height={2400} fill="#28324F" opacity={0.18 * rain} /> : null}
-			{F > 2736 && F < 2800 ? <Stickman x={runX} y={standY(FEET) - 6} pose={walk(F * 0.55, 1.4, {armN: [170, 40], armF: [165, 40], torso: 16, brow: 1})} facing={-1} shirt="#F28BB0" shadow={FEET} /> : null}
 			<RainCloud x={cloudX} y={760} F={F} rain={rain} />
 			{/* stairs climber with a box */}
 			{(() => {
@@ -163,20 +174,19 @@ const CityWorld: React.FC<{F: number; camX: number}> = ({F, camX}) => {
 					</g>
 				);
 			})()}
-			<Fog x={3260} y={930} w={640} F={F} a={0.9} />
+			<Fog x={3450} y={930} w={640} F={F} a={0.9} />
 			{/* traffic */}
 			<Car x={-200 + (F - 2323) * 13} F={F} color="#E5534B" />
 			<Car x={3400 - (F - 2323) * 11} F={F} color="#5A8DEE" dir={-1} y={1560} />
 			<Car x={-900 + (F - 2323) * 15} F={F} color="#F2C94C" />
-			{/* front cube occluder is the Cube itself; background walker on the plaza */}
-			<Stickman x={lerp(300, 1500, clamp((F - 2330) / 300))} y={standY(PLAZA_TOP + 88, 0.78)} pose={walk(F * 0.3, 1)} scale={0.78} shirt="#5A8DEE" shadow={PLAZA_TOP + 88} />
 		</g>
 	);
 };
 
-const CAM: [number, number][] = [[2323, 348], [2392, 430], [2470, 880], [2538, 930], [2556, 1330], [2568, 1330], [2590, 1580], [2600, 1600], [2626, 1960], [2650, 2060], [2690, 2110], [2714, 2130], [2740, 2620], [2793, 2650], [2810, 3060], [2850, 3200], [2895, 3350]];
-const CAMY: [number, number][] = [[2323, 1140], [2392, 1000], [2793, 1000], [2808, 1130], [2850, 1010], [2895, 960]];
+const CAM: [number, number][] = [[2323, 348], [2392, 430], [2470, 880], [2538, 930], [2556, 1330], [2568, 1330], [2590, 1580], [2600, 1600], [2626, 1960], [2650, 2200], [2714, 2180], [2760, 2800], [2790, 2900], [2812, 3200], [2850, 3390], [2895, 3540]];
+const CAMY: [number, number][] = [[2323, 1140], [2392, 1000], [2895, 970]];
 
+const rainAt = (F: number) => env(F, 2732, 2830, 8, 14);
 export const CityJourney: React.FC<{f: number; F: number}> = ({F}) => {
 	const camX = keys(F, CAM, ease.inOut);
 	const camY = keys(F, CAMY, ease.inOut);
@@ -187,6 +197,7 @@ export const CityJourney: React.FC<{f: number; F: number}> = ({F}) => {
 			<Cam x={camX} y={camY} z={z}>
 				<CityWorld F={F} camX={camX} />
 			</Cam>
+			{rainAt(F) > 0 ? <rect width={1080} height={1920} fill="#28324F" opacity={0.16 * rainAt(F)} /> : null}
 			{fromVoid > 0 ? (
 				<>
 					<rect width={1080} height={1920} fill="#05070D" opacity={fromVoid} />

@@ -4,7 +4,7 @@ import {FONT} from '../../fonts';
 import {AlarmClock, BED, Blanket, FLOOR, NOTES, Room, StickyNote, TABLE} from '../components/Room';
 import {Phone} from '../components/Phone';
 import {Hand} from '../components/Hand';
-import {P0, Pose, Stickman, mix} from '../components/Stickman';
+import {P0, Pose, Stickman, limbEnd, mix, reachArm, toLocal, toWorld} from '../components/Stickman';
 import {blink, clamp, ease, env, keys, lerp, tween} from '../lib/anim';
 import {calendarAt, notesAt} from '../lib/story';
 import {C} from '../theme';
@@ -61,7 +61,7 @@ const FaceGlow: React.FC<{x: number; y: number; a: number}> = ({x, y, a}) => (
 // ---------------- S01 hook: phone close-up (no title) ----------------
 const HOOK_SWIPES = [2, 14, 26, 44, 58, 70];
 export const Hook: React.FC<{f: number}> = ({f}) => {
-	const hookOp = Math.min(clamp(f / 6), 1 - clamp((f - 66) / 10));
+	const hookOp = 1 - clamp((f - 66) / 10); // fully visible from frame 0 (thumbnail)
 	return (
 		<AbsoluteFill>
 			<Svg bg="#060B15">
@@ -75,7 +75,7 @@ export const Hook: React.FC<{f: number}> = ({f}) => {
 				<rect width={1080} height={1920} fill="url(#hookbg)" />
 				<Phone cx={560} cy={1130 - f * 0.4} w={560} rot={6 - f * 0.01} scroll={scrollFrom(f, HOOK_SWIPES)} thumbY={thumbFrom(f, HOOK_SWIPES)} />
 			</Svg>
-			<div style={{position: 'absolute', left: 0, right: 0, top: 300, textAlign: 'center', fontFamily: FONT, fontWeight: 900, opacity: hookOp, transform: `translateY(${(1 - clamp(f / 8)) * 14}px)`}}>
+			<div style={{position: 'absolute', left: 0, right: 0, top: 300, textAlign: 'center', fontFamily: FONT, fontWeight: 900, opacity: hookOp}}>
 				<div style={{fontSize: 80, lineHeight: 1.08, color: '#fff', textShadow: '0 4px 24px rgba(0,0,0,0.6), 0 0 2px rgba(0,0,0,0.9)'}}>412 kali ia berkata</div>
 				<div style={{fontSize: 108, lineHeight: 1.12, color: C.gold, textShadow: '0 0 30px rgba(242,193,78,0.45), 0 4px 24px rgba(0,0,0,0.6)'}}>“besok”.</div>
 			</div>
@@ -83,11 +83,62 @@ export const Hook: React.FC<{f: number}> = ({f}) => {
 	);
 };
 
-// ---------------- S02 bedroom at night: scrolling, then reaching for the note pad ----------------
+// ---------------- S02 bedroom at night: scrolling, phone down on his belly, then he reaches for the note pad ----------------
+const lieAt = (dx: number) => ({x: LIE.x + dx, y: LIE.y, scale: RS, rot: -90});
+const PAD = {x: 152, y: TABLE.top - 4}; // note pad on the bedside table (world)
+const NOTE_SPOT = {x: 258, y: 1058}; // where his hand presses the first note (lower half of NOTES[0])
+const BELLY = {x: 404, y: 1139}; // where his hand rests on his belly (world, body at LIE.x)
+const armTo = (pose: Pose, wx: number, wy: number, dx: number, flip = false) => {
+	const l = toLocal(wx, wy, lieAt(dx));
+	return reachArm(pose, l.x, l.y, flip);
+};
+const mixArm = (a: [number, number], b: [number, number], t: number): [number, number] => [lerp(a[0], b[0], t), lerp(a[1], b[1], t)];
+
+/** the phone's transform when it leaves the hand (same placement as PhoneInHand) */
+const phoneWorld = (pose: Pose, dx: number) => {
+	const le = limbEnd(pose, 'armN');
+	const r = (le.angle * Math.PI) / 180;
+	const c = toWorld(le.x + 6 * Math.cos(r), le.y - 6 * Math.sin(r), lieAt(dx));
+	return {x: c.x, y: c.y, rot: -le.angle};
+};
+const PhoneLying: React.FC<{x: number; y: number; rot: number}> = ({x, y, rot}) => (
+	<g transform={`translate(${x} ${y}) rotate(${rot}) scale(${RS})`}>
+		<rect x={-30} y={-5} width={60} height={10} rx={3} fill="#05080F" />
+		<rect x={-27} y={-5} width={54} height={2.2} rx={1} fill="#4A5878" />
+	</g>
+);
+const PadInHand: React.FC = () => (
+	<g transform="translate(5 0) rotate(90)">
+		<rect x={-21} y={-5} width={42} height={9} rx={2} fill={C.note} />
+		<rect x={-21} y={-5} width={42} height={3} rx={1.5} fill={C.noteDark} />
+	</g>
+);
+
+const RELEASE = 66; // phone left on his belly
+const REST_F: [number, number] = [4, 6]; // far arm relaxed along the body
+const bedNightPose = (f: number, F: number) => {
+	const base = lieScroll(F);
+	const down = tween(f, 52, RELEASE, 0, 1, ease.inOut); // both hands come down; the near hand lays the phone on his belly
+	const reach = tween(f, RELEASE + 2, 90, 0, 1, ease.inOut); // far hand reaches back over his head for the pad
+	const lift = tween(f, 93, 107, 0, 1, ease.inOut); // pad carried up to the wall above the pillow
+	const dx = -14 * tween(f, 62, 86, 0, 1, ease.inOut); // scoots toward the table
+	const armN = mixArm(base.armN, armTo(base, BELLY.x + dx, BELLY.y, dx), down);
+	let armF = mixArm(base.armF, REST_F, down);
+	armF = mixArm(armF, armTo(base, PAD.x + 8, PAD.y, dx), reach);
+	armF = [armF[0], armF[1] + 46 * Math.sin(Math.PI * reach)]; // elbow bends mid-sweep (no robotic straight arm)
+	armF = mixArm(armF, armTo(base, NOTE_SPOT.x, NOTE_SPOT.y, dx), lift);
+	const pose: Pose = {...base, armN, armF, head: lerp(base.head, -16, reach), look: lerp(1, -0.4, reach), lookY: lerp(-0.5, lerp(0.4, -0.6, lift), reach), eyes: lerp(base.eyes, 1, down), lid: lerp(0.35, 0.15, reach)};
+	return {pose, dx, down, reach, lift};
+};
+
 export const BedNight: React.FC<{f: number; F: number}> = ({f, F}) => {
 	// f: local frame (0..109), F: global frame
-	const reach = tween(f, 70, 100, 0, 1, ease.inOut);
-	const pose = mix(lieScroll(F), {...lieScroll(F), armN: [178, -10], head: -16, look: -0.4, lookY: 0.4, eyes: 1, lid: 0.15}, reach);
+	const {pose, dx, down} = bedNightPose(f, F);
+	const held = f < RELEASE;
+	const rel = bedNightPose(RELEASE, 77 + RELEASE); // S02 starts at global frame 77
+	const ph = phoneWorld(rel.pose, rel.dx);
+	const phoneDx = dx - rel.dx; // the phone rides along when he scoots
+	const grabbed = f >= 91;
 	const z = tween(f, 0, 109, 1.3, 1.42, ease.inOutSine);
 	return (
 		<Svg>
@@ -95,10 +146,11 @@ export const BedNight: React.FC<{f: number; F: number}> = ({f, F}) => {
 				<Room f={F} day={0} notes={0} calValue={1} phoneOnTable={false} beam={0.8}
 					front={<Blanket />}>
 					{/* note pad on the bedside table */}
-					<rect x={TABLE.x0 + 70} y={TABLE.top - 7} width={44} height={7} rx={2} fill={C.note} opacity={1 - reach} />
-					<FaceGlow x={LIE.x - 150} y={LIE.y - 90} a={1 - reach * 0.6} />
-					<Stickman x={LIE.x} y={LIE.y} rot={-90} pose={pose} scale={RS}
-						handProp={<PhoneInHand lit={1 - reach} />} />
+					{!grabbed ? <rect x={PAD.x - 20} y={PAD.y - 4} width={40} height={8} rx={2} fill={C.note} /> : null}
+					<FaceGlow x={LIE.x - 150} y={LIE.y - 90} a={1 - down * 0.85} />
+					{!held ? <PhoneLying x={ph.x + phoneDx} y={ph.y} rot={ph.rot} /> : null}
+					<Stickman x={LIE.x + dx} y={LIE.y} rot={-90} pose={pose} scale={RS}
+						handProp={held ? <PhoneInHand lit={1 - down} /> : undefined} farHandProp={grabbed ? <PadInHand /> : undefined} />
 				</Room>
 			</Cam>
 		</Svg>
@@ -164,45 +216,53 @@ export const NoteClose: React.FC<{f: number}> = ({f}) => {
 
 // ---------------- S04 bedroom: note above the pillow -> sleep -> morning -> alarm starts ----------------
 export const BedMorning: React.FC<{f: number; F: number}> = ({f, F}) => {
-	// local 0..180 (8.0s..14.0s)
-	const lower = tween(f, 0, 12, 1, 0); // arm comes down from the note
+	// local 0..180 (8.0s..14.0s). Starts where S02 ended: hand on the new note, phone on his belly.
+	const end = bedNightPose(109, 186); // pose at the end of S02 (global 186): same hand/phone placement
+	const back = tween(f, 0, 16, 0, 1, ease.inOut); // hand comes down from the note, scoots back
+	const dx = lerp(end.dx, 0, back);
 	const sleep = tween(f, 22, 60, 0, 1);
 	const day = tween(f, 70, 140, 0, 1, ease.inOutSine);
 	const ring = f >= 168 ? 1 : 0;
 	const wake = tween(f, 170, 180, 0, 1);
-	const base = lieScroll(F, {armN: [110, -40], armF: [40, 30], eyes: 1});
-	const asleep: Pose = {...base, armN: [30, 40], armF: [20, 30], head: 2, eyes: 0.05, lid: 0, look: 0.3, lookY: 0};
-	const reachNote: Pose = {...base, armN: [176, -8], armF: [112, -44], eyes: 1, lid: 0.1, look: -0.4, lookY: 0.2};
-	let pose = mix(reachNote, base, 1 - lower);
+	const base = lieScroll(F, {eyes: 1, lid: 0.15, look: -0.2, lookY: -0.3});
+	const onPhone = armTo(base, BELLY.x + dx, BELLY.y, dx);
+	const asleep: Pose = {...base, armN: onPhone, armF: REST_F, head: 2, eyes: 0.05, lid: 0, look: 0.3, lookY: 0};
+	let pose: Pose = {...base, armN: onPhone, armF: mixArm(end.pose.armF, REST_F, back)};
 	pose = mix(pose, asleep, sleep);
 	pose = mix(pose, {...asleep, eyes: 0.5, brow: 1, head: -6}, wake);
+	const rel = bedNightPose(RELEASE, 77 + RELEASE);
+	const ph = phoneWorld(rel.pose, rel.dx);
 	const z = tween(f, 0, 180, 1.42, 1.3, ease.inOutSine);
 	return (
 		<Svg>
 			<Cam x={470} y={1010} z={z}>
 				<Room f={F} day={day} notes={1} calValue={1} alarm={{ring, hour: 7}} beam={0.8 + day * 0.4} front={<Blanket />}>
-					<FaceGlow x={LIE.x - 150} y={LIE.y - 90} a={(1 - sleep) * 0.7} />
-					<Stickman x={LIE.x} y={LIE.y} rot={-90} pose={pose} scale={RS} handProp={sleep < 0.5 ? <PhoneInHand lit={1 - sleep * 2} /> : undefined} />
-					{sleep >= 0.5 ? <rect x={LIE.x - 20} y={LIE.y - 30} width={58} height={10} rx={3} fill="#05080F" transform={`rotate(-8 ${LIE.x} ${LIE.y})`} /> : null}
+					<PhoneLying x={ph.x + (dx - rel.dx)} y={ph.y} rot={ph.rot} />
+					<Stickman x={LIE.x + dx} y={LIE.y} rot={-90} pose={pose} scale={RS} />
 				</Room>
 				{/* zzz while asleep */}
 				{['z', 'z', 'Z'].map((s, i) => {
 					const t = ((f - 40 - i * 14) % 60) / 60;
 					const op = f > 40 && f < 165 ? Math.sin(Math.PI * clamp(t)) * sleep : 0;
-					return <text key={i} x={LIE.x - 160 + i * 18 + t * 30} y={LIE.y - 120 - t * 90} fill="#C8D4F0" opacity={op * 0.8} fontFamily={FONT} fontWeight={900} fontSize={26 + i * 6}>{s}</text>;
+					return <text key={i} x={300 + i * 20 + t * 40} y={1100 - i * 8 - t * 90} fill="#C8D4F0" opacity={op * 0.8} fontFamily={FONT} fontWeight={900} fontSize={26 + i * 6}>{s}</text>;
 				})}
 			</Cam>
 		</Svg>
 	);
 };
 
-// ---------------- S05 alarm close-up, slapped off at 16.1s ----------------
+// ---------------- S05 alarm close-up: the last beep ends at 15.22 s, exactly when the hand hits it ----------------
 export const AlarmClose: React.FC<{f: number; F: number}> = ({f, F}) => {
-	// local 0..69 (14.0s..16.3s); slap at local 63 (16.1s)
-	const slap = 63;
+	// local 0..69 (14.0s..16.3s); slap at local 37 (15.22s, end of the last beep), second press at 51 (click at 15.69s)
+	const slap = 37, click = 51;
 	const ring = f < slap ? 1 : 0;
-	const d = keys(f, [[0, 0], [52, 0], [61, 0.92], [63, 1], [69, 0.97]], ease.in);
-	const squash = f >= slap ? 1 - 0.1 * Math.exp(-(f - slap) / 2.5) : 1;
+	let d: number;
+	if (f < 30) d = tween(f, 10, 30, 0, 0.8, ease.out); // sleepy hand gropes in from the top right
+	else if (f < slap) d = tween(f, 30, slap, 0.8, 1, ease.in); // ...and slaps the button
+	else if (f < click) d = 1 - 0.035 * Math.sin(Math.PI * clamp((f - slap) / (click - slap)));
+	else d = tween(f, 58, 69, 1, 0.62, ease.in); // leaves for the phone
+	const hit = (at: number, k: number) => (f >= at ? k * Math.exp(-(f - at) / 2.5) : 0);
+	const squash = 1 - hit(slap, 0.1) - hit(click, 0.04);
 	return (
 		<Svg>
 			<defs>
@@ -219,7 +279,7 @@ export const AlarmClose: React.FC<{f: number; F: number}> = ({f, F}) => {
 			<g transform={`translate(540 1180) scale(${2 - squash} ${squash}) translate(-540 -1180)`}>
 				<AlarmClock x={540} y={1060} s={3.2} ring={ring} f={F} hour={7} />
 			</g>
-			<Hand x={lerp(1300, 660, d)} y={lerp(-300, 700, d)} rot={208} s={1.7} pose={f >= slap - 2 ? 'press' : 'open'} arm={1200} />
+			<Hand x={lerp(1300, 660, d)} y={lerp(-300, 700, d)} rot={208} s={1.7} pose={f >= slap - 2 && f < 60 ? 'press' : 'open'} arm={1200} />
 		</Svg>
 	);
 };

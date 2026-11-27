@@ -108,6 +108,50 @@ export const limbEnd = (pose: Pose, which: 'armN' | 'armF' | 'legN' | 'legF') =>
 	return {x: ux * L.thigh + fx * L.shin, y: uy * L.thigh + fy * L.shin + pose.bob, angle: h - k};
 };
 
+/** scene point -> the rig's local space (inverse of the Stickman transform) */
+export const toLocal = (wx: number, wy: number, o: {x: number; y: number; scale?: number; facing?: 1 | -1; rot?: number}) => {
+	const s = o.scale ?? 1, fc = o.facing ?? 1, r = -rad(o.rot ?? 0);
+	const dx = wx - o.x, dy = wy - o.y;
+	const rx = dx * Math.cos(r) - dy * Math.sin(r);
+	const ry = dx * Math.sin(r) + dy * Math.cos(r);
+	return {x: rx / (fc * s), y: ry / s};
+};
+
+/** rig local point -> scene point */
+export const toWorld = (lx: number, ly: number, o: {x: number; y: number; scale?: number; facing?: 1 | -1; rot?: number}) => {
+	const s = o.scale ?? 1, fc = o.facing ?? 1, r = rad(o.rot ?? 0);
+	const px = lx * fc * s, py = ly * s;
+	return {x: o.x + px * Math.cos(r) - py * Math.sin(r), y: o.y + px * Math.sin(r) + py * Math.cos(r)};
+};
+
+/** two-bone IK for an arm: returns [shoulder angle, elbow bend] (relative to the torso) so the hand reaches (tx, ty) in local space.
+ *  The elbow bends below/behind the shoulder-target line (natural reach). Targets out of reach give a straight arm. */
+export const reachArm = (pose: Pose, tx: number, ty: number, flip = false): [number, number] => {
+	const tor = pose.torso;
+	const sx = Math.sin(rad(tor)) * L.torso, sy = pose.bob - Math.cos(rad(tor)) * L.torso;
+	const dx = tx - sx, dy = ty - sy;
+	const U = L.upper, F = L.fore;
+	const d = Math.max(Math.abs(U - F) + 1, Math.min(Math.hypot(dx, dy), U + F - 0.5));
+	const base = (Math.atan2(dx, dy) * 180) / Math.PI;
+	const a1 = (Math.acos(Math.max(-1, Math.min(1, (U * U + d * d - F * F) / (2 * U * d)))) * 180) / Math.PI;
+	const g = (Math.acos(Math.max(-1, Math.min(1, (U * U + F * F - d * d) / (2 * U * F)))) * 180) / Math.PI;
+	// flip = elbow on the other side of the shoulder-target line.
+	// Shoulder angle normalised to [-90, 270): blends between IK results sweep through "forward" (+90), never through the back.
+	const norm = (a: number) => ((((a + 90) % 360) + 360) % 360) - 90;
+	return flip ? [norm(base + a1 - tor), -(180 - g)] : [norm(base - a1 - tor), 180 - g];
+};
+
+/** two-bone IK for a leg: returns [hip angle, knee bend] (knee forward, shin back) so the foot (ankle) reaches (tx, ty) in local space */
+export const reachLeg = (pose: Pose, tx: number, ty: number): [number, number] => {
+	const dx = tx, dy = ty - pose.bob;
+	const U = L.thigh, F = L.shin;
+	const d = Math.max(Math.abs(U - F) + 1, Math.min(Math.hypot(dx, dy), U + F - 0.5));
+	const base = (Math.atan2(dx, dy) * 180) / Math.PI;
+	const a1 = (Math.acos(Math.max(-1, Math.min(1, (U * U + d * d - F * F) / (2 * U * d)))) * 180) / Math.PI;
+	const g = (Math.acos(Math.max(-1, Math.min(1, (U * U + F * F - d * d) / (2 * U * F)))) * 180) / Math.PI;
+	return [base + a1, 180 - g];
+};
+
 export const Stickman: React.FC<Props> = ({
 	x, y, pose, scale = 1, facing = 1, rot = 0, shirt = C.shirt, pants = C.pants, skin = C.skin, front = false,
 	shadow = null, opacity = 1, dim = 0, handProp, farHandProp, glow,

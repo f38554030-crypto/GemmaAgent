@@ -12,8 +12,10 @@ import {CityJourney, Experience, FaceImagine, PhoneStop} from './scenes/Act3';
 import {DoorNoAnswer, DoorOpens, EndScene, FaceDoubt, FaceSilent, FaceUnderstand, FirstStep, HandleClose, LookAround, NoPromise, Possibilities, Question, QuestionsBubble, Realize, RiseWalk, Split, StepOut, WalkCity} from './scenes/Act4';
 
 type Scene = {from: number; to: number; name: string; xf?: number; render?: (f: number, F: number) => React.ReactNode};
-// xf = dissolve frames into this scene (0 = deliberate hard cut)
-const XF: Record<string, number> = {hook: 0, 'bed-night': 6, 'note-close': 4, 'bed-morning': 4, alarm: 0, 'phone-grab': 3, montage: 6, 'face-aware': 5, tired: 5, 'want-change': 6, 'face-excuse': 3, reasons: 4, 'face-nod': 3, 'cards-to-bars': 4, 'bars-box': 5, 'city-journey': 0, experience: 6, 'face-imagine': 5, 'phone-stop': 6, 'look-around': 6, question: 6, 'questions-bubble': 6, 'face-silent': 5, 'door-no-answer': 6, 'face-doubt': 5, 'no-promise': 5, 'rise-walk': 6, handle: 4, realize: 4, 'door-opens': 3, 'step-out': 0, possibilities: 6, 'walk-city': 6, 'face-understand': 5, split: 6, 'first-step': 5, end: 6};
+// xf = dissolve frames into this scene (0 = hard cut). Consecutive shots in the same room use a hard cut with a matched camera
+// (want-change, bars-box, question, questions-bubble, door-opens, possibilities, walk-city), so the shot simply continues
+// instead of showing a double image.
+const XF: Record<string, number> = {hook: 0, 'bed-night': 6, 'note-close': 4, 'bed-morning': 4, alarm: 0, 'phone-grab': 3, montage: 6, 'face-aware': 5, tired: 5, 'want-change': 0, 'face-excuse': 3, reasons: 4, 'face-nod': 3, 'cards-to-bars': 4, 'bars-box': 0, 'city-journey': 0, experience: 6, 'face-imagine': 5, 'phone-stop': 6, 'look-around': 6, question: 0, 'questions-bubble': 0, 'face-silent': 5, 'door-no-answer': 6, 'face-doubt': 5, 'no-promise': 5, 'rise-walk': 6, handle: 4, realize: 4, 'door-opens': 0, 'step-out': 0, possibilities: 0, 'walk-city': 0, 'face-understand': 5, split: 6, 'first-step': 5, end: 6};
 
 export const SCENES: Scene[] = [
 	{from: 0, to: 77, name: 'hook', render: (f) => <Hook f={f} />},
@@ -71,14 +73,16 @@ const SceneSlot: React.FC<{s: Scene; xf: number}> = ({s, xf}) => {
 };
 
 // HUD visible in the room / phone scenes (hidden in face close-ups and outside)
-const HUD_WINDOWS: [number, number][] = [[247, 930], [1032, 1451], [1482, 1817], [1875, 2300], [3069, 3925], [4002, 4128]];
+const HUD_WINDOWS: [number, number][] = [[247, 930], [1032, 1451], [1482, 1817], [1875, 2300], [3069, 3498], [4002, 4128]];
 
 const GlobalHud: React.FC = () => {
 	const F = useCurrentFrame();
 	const w = HUD_WINDOWS.find(([a, b]) => F >= a && F < b);
 	if (!w) return null;
 	const pop = F - w[0] < 8 && w[0] === 247 ? tween(F, 247, 254, 0.85, 1, ease.outBack) : 1;
-	const op = (w[0] === 247 ? clamp((F - 247) / 4) : 1) * (w[1] === 2300 ? 1 - clamp((F - 2262) / 30) : 1);
+	// fades in/out at every window edge (no popping across cuts); the box shot fades it out slowly
+	const edge = Math.min(clamp((F - w[0] + 1) / 6), clamp((w[1] - F) / 6));
+	const op = (w[0] === 247 ? Math.min(clamp((F - 247) / 4), clamp((w[1] - F) / 6)) : edge) * (w[1] === 2300 ? 1 - clamp((F - 2262) / 30) : 1);
 	return <Hud value={promises(F)} scale={pop} opacity={op} />;
 };
 

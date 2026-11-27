@@ -6,7 +6,7 @@ import {FaceClose} from '../components/FaceClose';
 import {Hand} from '../components/Hand';
 import {Hud} from '../components/Hud';
 import {BED, CAL, DOOR, FLOOR, Room, StickyNote, VENT} from '../components/Room';
-import {P0, Pose, STAND_HIP, Stickman, idle, mix, sit, walk} from '../components/Stickman';
+import {P0, Pose, STAND_HIP, Stickman, idle, limbEnd, mix, reachArm, sit, toWorld, walk} from '../components/Stickman';
 import {blink, clamp, ease, env, keys, lerp, rand, tween} from '../lib/anim';
 import {C} from '../theme';
 import {Cam, RS, Svg} from './Act1';
@@ -15,6 +15,12 @@ import {Icon, ThoughtBubble} from './Act2';
 const SITH = {x: 330, y: 1186}; // sitting at the head end of the bed
 const STAND_Y = FLOOR - STAND_HIP * RS;
 const night = {day: 0, notes: 170, calValue: 412};
+const HeldPhone: React.FC<{rot?: number}> = ({rot = 90}) => (
+	<g transform={`rotate(${rot})`}>
+		<rect x={-30} y={-5} width={60} height={10} rx={3} fill="#05080F" />
+		<rect x={-27} y={-5} width={54} height={2.2} rx={1} fill="#4A5878" />
+	</g>
+);
 
 // ---------------- S31 looking around: bed, wall, vent, door ----------------
 const SPOTS: [number, {x: number; y: number; r: number}][] = [
@@ -37,8 +43,7 @@ export const LookAround: React.FC<{f: number; F: number}> = ({f, F}) => {
 		<Svg>
 			<Cam x={520} y={950} z={tween(f, 0, 276, 1.28, 1.34, ease.inOutSine)}>
 				<Room f={F} {...night} bars={1} beam={0.55} phoneOnTable={false} spot={sa > 0 ? {x: sx, y: sy, r: sr, a: sa} : null}>
-					<Stickman x={SITH.x} y={SITH.y} pose={pose} scale={RS} shadow={FLOOR}
-						handProp={<g transform="rotate(90)"><rect x={-30} y={-5} width={60} height={10} rx={3} fill="#05080F" /></g>} />
+					<Stickman x={SITH.x} y={SITH.y} pose={pose} scale={RS} shadow={FLOOR} handProp={<HeldPhone />} />
 				</Room>
 			</Cam>
 		</Svg>
@@ -48,16 +53,18 @@ export const LookAround: React.FC<{f: number; F: number}> = ({f, F}) => {
 // ---------------- S32 "Untuk pertama kalinya, ia mempertanyakan sesuatu" ----------------
 export const Question: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const q = tween(F, 3530, 3575, 0, 1, ease.out); // "?" drawn
-	const pose = sit(F, {torso: 4, head: -6, eyes: blink(F, 17), brow: 0.6, look: 0.6, lookY: -0.3, armN: [40, 40]});
+	const qOut = 1 - tween(F, 3662, 3675, 0, 1); // fades before the cut: S33 continues the same shot
+	const was = sit(F, {torso: 6, head: -5.6, eyes: blink(F, 13), lid: 0.15, look: 1, lookY: -0.12, brow: 0.3, armN: [40, 40]}); // S31's last pose (looking at the door)
+	const pose = mix(was, sit(F, {torso: 4, head: -6, eyes: blink(F, 17), brow: 0.6, look: 0.6, lookY: -0.3, armN: [40, 40]}), tween(F, 3498, 3510, 0, 1));
 	const hx = SITH.x + 20, hy = SITH.y - 300;
 	return (
 		<Svg>
 			<Cam x={tween(f, 0, 178, 520, 420)} y={tween(f, 0, 178, 950, 1000)} z={tween(f, 0, 178, 1.34, 1.7, ease.inOut)}>
 				<Room f={F} {...night} bars={1} beam={0.55}>
-					<Stickman x={SITH.x} y={SITH.y} pose={pose} scale={RS} shadow={FLOOR} />
+					<Stickman x={SITH.x} y={SITH.y} pose={pose} scale={RS} shadow={FLOOR} handProp={<HeldPhone />} />
 				</Room>
 				{q > 0 ? (
-					<g transform={`translate(${hx} ${hy - 40 * q})`} opacity={clamp(q * 2)}>
+					<g transform={`translate(${hx} ${hy - 40 * q})`} opacity={clamp(q * 2) * qOut}>
 						<circle r={70} fill="#F2C14E" opacity={0.12 + 0.06 * Math.sin(F / 8)} />
 						<path d="M -26 -30 Q -24 -62 4 -62 Q 34 -60 32 -30 Q 30 -10 6 2 L 4 22" stroke="#F2C14E" strokeWidth={14} fill="none" strokeLinecap="round" strokeDasharray={200} strokeDashoffset={200 * (1 - q)} />
 						<circle cx={4} cy={50} r={9} fill="#F2C14E" opacity={clamp((q - 0.8) * 5)} />
@@ -73,14 +80,16 @@ export const QuestionsBubble: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const b = tween(F, 3680, 3696, 0, 1);
 	const left = tween(F, 3684, 3696, 0, 1), right = tween(F, 3801, 3813, 0, 1);
 	const truth = tween(F, 3860, 3890, 0, 1); // the second question rings true
-	const pose = sit(F, {torso: 10, head: 4, eyes: blink(F, 19), brow: 0.8, look: 0.2, lookY: -0.4, armN: [40, 40]});
+	const was = sit(F, {torso: 4, head: -6, eyes: blink(F, 17), brow: 0.6, look: 0.6, lookY: -0.3, armN: [40, 40]}); // = S32's pose
+	const pose = mix(was, sit(F, {torso: 10, head: 4, eyes: blink(F, 19), brow: 0.8, look: 0.2, lookY: -0.4, armN: [40, 40]}), tween(F, 3676, 3688, 0, 1));
+	const cm = tween(F, 3676, 3694, 0, 1, ease.inOut);
 	return (
 		<Svg>
-			<Cam x={500} y={900} z={1.45}>
-				<Room f={F} {...night} bars={1} beam={0.45}>
-					<Stickman x={SITH.x} y={SITH.y} pose={pose} scale={RS} shadow={FLOOR} />
+			<Cam x={lerp(420, 540, cm)} y={lerp(1000, 900, cm)} z={lerp(1.7, 1.38, cm)}>
+				<Room f={F} {...night} bars={1} beam={lerp(0.55, 0.45, cm)}>
+					<Stickman x={SITH.x} y={SITH.y} pose={pose} scale={RS} shadow={FLOOR} handProp={<HeldPhone />} />
 				</Room>
-				<ThoughtBubble x={540} y={620} w={600} h={360} p={b} from={[SITH.x + 30, SITH.y - 300]}>
+				<ThoughtBubble x={540} y={620} w={560} h={360} p={b} from={[SITH.x + 30, SITH.y - 300]}>
 					<line x1={0} y1={-120} x2={0} y2={120} stroke="#C5CDDC" strokeWidth={4} strokeDasharray="10 10" opacity={right} />
 					<g transform={`translate(${right > 0 ? -140 : 0} 0) scale(${ease.outBack(left)})`} opacity={1 - truth * 0.55}>
 						<g transform="translate(0 -58)">
@@ -134,7 +143,7 @@ export const NoPromise: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const strike = tween(F, 4325, 4328, 0, 1);
 	const punch = F >= 4326 ? 1 + 0.08 * Math.exp(-(F - 4326) / 4) : 1;
 	const sub = tween(F, 4334, 4344, 0, 1);
-	const tx = NX + 40 - (1 - approach) * 260 + retreat * 360, ty = NY + 40 + hover + (1 - approach) * 320 + retreat * 420;
+	const tx = NX + 40 - (1 - approach) * 260 + retreat * 900, ty = NY + 40 + hover + (1 - approach) * 320 + retreat * 1050;
 	const ang = 34, dx = Math.sin((ang * Math.PI) / 180), dy = Math.cos((ang * Math.PI) / 180);
 	return (
 		<AbsoluteFill>
@@ -165,29 +174,48 @@ export const NoPromise: React.FC<{f: number; F: number}> = ({f, F}) => {
 	);
 };
 
-// ---------------- S38 phone down, get up, walk slowly to the door ----------------
-export const RiseWalk: React.FC<{f: number; F: number}> = ({f, F}) => {
-	// local 0..219 (146.4s..153.7s)
-	const put = env(F, 4398, 4444, 12, 10); // lean to the table
-	const phoneDown = F >= 4426;
+// ---------------- S38 phone laid down on the bed, get up, walk slowly to the door ----------------
+const PHONE_BED = {x: 432, y: BED.top - 6}; // on the mattress in front of him (his hand reaches it)
+const RELEASE_P = 4426;
+const riseWalk = (F: number) => {
+	const put = env(F, 4398, 4444, 14, 12); // lean forward and lay the phone down
 	const up = tween(F, 4446, 4478, 0, 1, ease.inOut);
 	const antic = env(F, 4442, 4460, 6, 8);
 	const wT = clamp((F - 4488) / 96);
-	const x = lerp(SITH.x + 10, 640, ease.inOut(wT));
-	let pose: Pose = sit(F, {torso: 8, head: 2, eyes: blink(F, 3), brow: 0.4, look: 0.4});
-	pose = mix(pose, {...pose, torso: -30, head: -10, armN: [160, 8], look: -0.8, lookY: 0.6}, put);
+	const x = lerp(SITH.x, 640, ease.inOut(wT));
+	let pose: Pose = sit(F, {torso: 8, head: 2, eyes: blink(F, 3), brow: 0.4, look: 0.4, armN: [40, 40]});
+	const lean: Pose = {...pose, torso: 26, head: 12, look: 0.5, lookY: 0.9};
+	lean.armN = reachArm(lean, (PHONE_BED.x - SITH.x) / RS, (PHONE_BED.y - SITH.y) / RS);
+	pose = mix(pose, lean, put);
 	pose = mix(pose, {...pose, torso: 32, head: 12}, antic * 0.8);
 	pose = mix(pose, idle(F, {eyes: 1, brow: 0.2, look: 0.8}), up);
 	if (wT > 0 && wT < 1) pose = mix(pose, walk(F * 0.19, 0.65, {eyes: 1, brow: 0.2, look: 0.9}), Math.min(1, Math.sin(Math.PI * wT) * 3));
 	const y = lerp(SITH.y, STAND_Y, up) + (wT > 0 && wT < 1 ? pose.bob * RS : 0);
+	return {pose, x, y, put};
+};
+export const RiseWalk: React.FC<{f: number; F: number}> = ({f, F}) => {
+	// local 0..219 (146.4s..153.7s)
+	const {pose, x, y, put} = riseWalk(F);
+	const held = F < RELEASE_P;
+	const le = limbEnd(pose, 'armN');
+	const flat = tween(F, 4404, 4422, 0, 1, ease.inOut); // phone turns flat as it nears the mattress
+	const rp = riseWalk(RELEASE_P);
+	const lp = limbEnd(rp.pose, 'armN');
+	const onBed = toWorld(lp.x, lp.y, {x: rp.x, y: rp.y, scale: RS});
 	const cx = keys(F, [[4392, 420], [4488, 440], [4584, 640], [4611, 690]], ease.inOut);
 	const z = keys(F, [[4392, 1.32], [4488, 1.32], [4611, 1.62]], ease.inOut);
 	return (
 		<Svg>
 			<Cam x={cx} y={keys(F, [[4392, 980], [4611, 1000]])} z={z}>
-				<Room f={F} {...night} bars={1} beam={0.6} phoneOnTable={phoneDown}>
+				<Room f={F} {...night} bars={1} beam={0.6}>
+					{!held ? (
+						<g transform={`translate(${onBed.x} ${onBed.y}) scale(${RS})`}>
+							<rect x={-30} y={-5} width={60} height={10} rx={3} fill="#05080F" />
+							<rect x={-27} y={-5} width={54} height={2.2} rx={1} fill="#4A5878" />
+						</g>
+					) : null}
 					<Stickman x={x} y={y} pose={{...pose, bob: 0}} scale={RS} shadow={FLOOR}
-						handProp={!phoneDown ? <g transform="rotate(90)"><rect x={-30} y={-5} width={60} height={10} rx={3} fill="#05080F" /></g> : undefined} />
+						handProp={held ? <HeldPhone rot={lerp(90, le.angle, flat * Math.min(1, put * 1.2))} /> : undefined} />
 				</Room>
 			</Cam>
 		</Svg>
@@ -232,15 +260,21 @@ export const HandleClose: React.FC<{f: number}> = ({f}) => {
 };
 
 // ---------------- S40 the bars were never locks ----------------
+const KNOB = {x: DOOR.x0 + 30, y: DOOR.y0 + 330};
+const HERO_D = {x: 640, y: STAND_Y};
+const knobX = (open: number) => DOOR.x1 - (DOOR.x1 - KNOB.x) * (1 - open * 0.86); // the knob travels with the opening door
+const onKnob = (pose: Pose, open = 0) => reachArm(pose, (knobX(open) - HERO_D.x) / RS, (KNOB.y - HERO_D.y) / RS);
+const KnobHand: React.FC = () => <circle r={9.5} fill={C.skin} />; // fingers wrapped around the knob
 export const Realize: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const fall = tween(F, 4700, 4770, 0, 1, ease.in);
 	const surprise = tween(F, 4706, 4716, 0, 1, ease.out);
-	const pose = idle(F, {armN: [96, 20], eyes: 1, look: lerp(0.8, -0.2, surprise), lookY: lerp(0, 0.5, surprise), brow: -0.2 + surprise * 1.0, mouth: surprise * -0.2, head: surprise * 8});
+	const pose = idle(F, {eyes: 1, look: lerp(0.8, -0.2, surprise), lookY: lerp(0, 0.5, surprise), brow: -0.2 + surprise * 1.0, mouth: surprise * -0.2, head: surprise * 8});
+	pose.armN = onKnob(pose);
 	return (
 		<Svg>
 			<Cam x={tween(f, 0, 120, 700, 680)} y={1000} z={tween(f, 0, 120, 1.62, 1.5)}>
 				<Room f={F} {...night} bars={1} barsDissolve={fall} doorGlow={tween(F, 4740, 4800, 0, 0.9)} beam={0.6}>
-					<Stickman x={640} y={STAND_Y} pose={pose} scale={RS} shadow={FLOOR} />
+					<Stickman x={HERO_D.x} y={HERO_D.y} pose={pose} scale={RS} shadow={FLOOR} handProp={<KnobHand />} />
 				</Room>
 			</Cam>
 		</Svg>
@@ -250,14 +284,21 @@ export const Realize: React.FC<{f: number; F: number}> = ({f, F}) => {
 // ---------------- S41 "Pintu tersebut tidak terkunci." door swings open, light floods in ----------------
 export const DoorOpens: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const open = tween(F, 4836, 4884, 0, 1, ease.inOut);
-	const flash = tween(F, 4906, 4929, 0, 1, ease.in);
+	const flash = F < 4908 ? 0 : F < 4914 ? tween(F, 4908, 4914, 0, 1, ease.out) : 1; // bright "ding" at 163.6 s, then holds into the cut
 	const shield = tween(F, 4900, 4912, 0, 1, ease.out);
-	const pose = idle(F, {armN: [96 - shield * 0 + shield * 70, 20 + shield * 60], eyes: 1 - shield * 0.6, look: 0.8, brow: shield * 0.4, mouth: open * 0.3});
+	const release = tween(F, 4848, 4864, 0, 1, ease.inOut); // lets go once the door is moving
+	const calm = tween(F, 4809, 4822, 0, 1); // from S40's surprised look to looking at the door
+	const pose = idle(F, {eyes: 1 - shield * 0.6, look: lerp(-0.2, 0.8, calm), lookY: lerp(0.5, 0, calm), brow: lerp(0.8, 0, calm) + shield * 0.4, mouth: lerp(-0.2, open * 0.3, calm), head: lerp(8, 0, calm)});
+	const held = onKnob(pose, Math.min(open, 0.2));
+	const shieldArm = reachArm(pose, 40, -140); // forearm in front of the eyes
+	let armN: [number, number] = [lerp(held[0], 12, release), lerp(held[1], 16, release)];
+	armN = [lerp(armN[0], shieldArm[0], shield), lerp(armN[1], shieldArm[1], shield)];
 	return (
 		<Svg>
-			<Cam x={tween(f, 0, 120, 700, 720)} y={990} z={tween(f, 0, 120, 1.5, 1.7, ease.inOut)}>
+			<Cam x={tween(f, 0, 120, 680, 720)} y={tween(f, 0, 120, 1000, 990)} z={tween(f, 0, 120, 1.5, 1.7, ease.inOut)}>
 				<Room f={F} {...night} bars={1} barsDissolve={1} doorOpen={open} doorGlow={0.9} beam={0.6}>
-					<Stickman x={640} y={STAND_Y} pose={pose} scale={RS} shadow={FLOOR} glow={open > 0.2 ? '#FFF1C7' : undefined} />
+					<Stickman x={HERO_D.x} y={HERO_D.y} pose={{...pose, armN}} scale={RS} shadow={FLOOR} glow={open > 0.2 ? '#FFF1C7' : undefined}
+						handProp={release < 0.5 ? <KnobHand /> : undefined} />
 				</Room>
 			</Cam>
 			<rect width={1080} height={1920} fill="#FFF7DE" opacity={flash * 0.85} />
@@ -315,13 +356,13 @@ export const StepOut: React.FC<{f: number; F: number}> = ({f, F}) => {
 
 // ---------------- S43 possibilities (and uncertainty) branch out from his feet ----------------
 const PATHS = [
-	{to: [905, 1250], icon: 'book'},
-	{to: [1395, 1180], icon: 'laptop'},
-	{to: [1585, 1150], icon: 'people'},
-	{to: [1150, 820], icon: 'bike'},
-	{to: [380, 700], icon: 'mountain'},
-	{to: [1700, 760], icon: '?'},
-	{to: [130, 900], icon: '?'},
+	{to: [905, 1240], icon: 'book'},
+	{to: [1300, 1150], icon: 'laptop'},
+	{to: [1160, 980], icon: 'people'},
+	{to: [920, 760], icon: 'bike'},
+	{to: [520, 640], icon: 'mountain'},
+	{to: [200, 640], icon: '?'},
+	{to: [1290, 620], icon: '?'},
 ];
 const PathIcon: React.FC<{k: string}> = ({k}) => (
 	<g>
@@ -335,12 +376,13 @@ const PathIcon: React.FC<{k: string}> = ({k}) => (
 	</g>
 );
 export const Possibilities: React.FC<{f: number; F: number}> = ({f, F}) => {
-	const camX = 760;
+	const wide = tween(f, 0, 18, 0, 1, ease.inOut); // starts on S42's last framing, widens for the paths
+	const camX = lerp(640, 760, wide);
 	const pose = idle(F, {eyes: 1, look: 0.7, lookY: -0.3, mouth: 0.5, head: -6});
 	const from: [number, number] = [640, 1392];
 	return (
 		<Svg>
-			<Cam x={camX} y={1000} z={tween(f, 0, 90, 0.86, 0.82)}>
+			<Cam x={camX} y={lerp(960, 1000, wide)} z={lerp(1.0, 0.86, wide) - tween(f, 18, 90, 0, 0.04)}>
 				<OutWorld F={F} camX={camX} heroX={640} heroPose={pose}>
 					{PATHS.map((p, i) => {
 						const g = tween(F, 5046 + i * 6, 5076 + i * 6, 0, 1, ease.out);
@@ -353,8 +395,8 @@ export const Possibilities: React.FC<{f: number; F: number}> = ({f, F}) => {
 						return (
 							<g key={i} opacity={1 - fog * 0.6}>
 								<path d={d} stroke="#F2C14E" strokeWidth={10} fill="none" strokeLinecap="round" strokeDasharray={uncertain ? '6 22' : '2000'} strokeDashoffset={uncertain ? -F * 2 : 2000 * (1 - g)} opacity={0.85} />
-								<g transform={`translate(${x1} ${y1}) scale(${ease.outBack(clamp((g - 0.6) * 2.5))})`}><PathIcon k={p.icon} /></g>
-								{uncertain && fog > 0 ? <ellipse cx={x1} cy={y1} rx={140 * fog} ry={70 * fog} fill="#F4F7FB" opacity={0.7} /> : null}
+								<g transform={`translate(${x1} ${y1}) scale(${1.5 * ease.outBack(clamp((g - 0.6) * 2.5))})`}><PathIcon k={p.icon} /></g>
+								{uncertain && fog > 0 ? <ellipse cx={x1} cy={y1 - 10} rx={120 * fog} ry={56 * fog} fill="#F4F7FB" opacity={0.55} /> : null}
 							</g>
 						);
 					})}
@@ -366,7 +408,7 @@ export const Possibilities: React.FC<{f: number; F: number}> = ({f, F}) => {
 
 // ---------------- S44 walking on: "Ia belum tahu apa yang akan terjadi selanjutnya," ----------------
 export const WalkCity: React.FC<{f: number; F: number}> = ({f, F}) => {
-	const heroX = lerp(660, 1260, f / 92);
+	const heroX = lerp(640, 1240, f / 92);
 	const pose = walk(F * 0.27, 0.9, {eyes: 1, look: Math.sin(f / 14) * 0.8, lookY: -0.2, mouth: 0.4, head: Math.sin(f / 14) * 4});
 	const camX = heroX + 60;
 	return (
@@ -430,17 +472,25 @@ const ik = (hx: number, hy: number, fx: number, fy: number, l1: number, l2: numb
 	const ang = a - fwd * c; // knee bends forward (toward +x)
 	return {kx: hx + Math.cos(ang) * l1, ky: hy + Math.sin(ang) * l1};
 };
-const Leg: React.FC<{hx: number; hy: number; fx: number; fy: number; lit: number; toe: number}> = ({hx, hy, fx, fy, lit, toe}) => {
+const Leg: React.FC<{hx: number; hy: number; fx: number; fy: number; lit: number; toe: number; rim?: number}> = ({hx, hy, fx, fy, lit, toe, rim = 0}) => {
 	const L1 = 760, L2 = 720;
 	const {kx, ky} = ik(hx, hy, fx, fy - 40, L1, L2);
-	const pants = lit > 0 ? `rgb(${Math.round(21 + 40 * lit)},${Math.round(26 + 44 * lit)},${Math.round(38 + 54 * lit)})` : C.pants;
+	// mid-tone jeans so both legs read against the dark room; sunlight brightens the leg that steps out
+	const pants = `rgb(${Math.round(42 + 32 * lit)},${Math.round(51 + 39 * lit)},${Math.round(80 + 48 * lit)})`;
 	return (
 		<g>
 			<line x1={hx} y1={hy} x2={kx} y2={ky} stroke={pants} strokeWidth={128} strokeLinecap="round" />
 			<line x1={kx} y1={ky} x2={fx} y2={fy - 40} stroke={pants} strokeWidth={112} strokeLinecap="round" />
 			<line x1={kx - 40} y1={ky} x2={fx - 40} y2={fy - 40} stroke="#fff" strokeOpacity={0.05 + 0.08 * lit} strokeWidth={22} strokeLinecap="round" />
+			{rim > 0 ? (
+				<>
+					{/* warm rim light from the open door on the leg's right edge */}
+					<line x1={hx + 57} y1={hy} x2={kx + 55} y2={ky} stroke="#FFE9B8" strokeOpacity={0.5 * rim} strokeWidth={10} strokeLinecap="round" />
+					<line x1={kx + 50} y1={ky} x2={fx + 48} y2={fy - 46} stroke="#FFE9B8" strokeOpacity={0.5 * rim} strokeWidth={10} strokeLinecap="round" />
+				</>
+			) : null}
 			<g transform={`translate(${fx} ${fy}) rotate(${toe})`}>
-				<path d="M -70 -86 Q -76 -6 -60 0 L 150 0 Q 182 -4 176 -40 Q 166 -78 96 -84 L 20 -110 Q -40 -118 -70 -86 Z" fill={lit > 0.5 ? '#2F3A57' : '#1C2235'} />
+				<path d="M -70 -86 Q -76 -6 -60 0 L 150 0 Q 182 -4 176 -40 Q 166 -78 96 -84 L 20 -110 Q -40 -118 -70 -86 Z" fill={lit > 0.5 ? '#3A4668' : '#2A3350'} />
 				<rect x={-66} y={-14} width={244} height={20} rx={10} fill="#E9ECF3" />
 				{[30, 62, 94].map((x) => <circle key={x} cx={x} cy={-74 + (x - 30) * 0.12} r={6} fill="#E9ECF3" opacity={0.8} />)}
 			</g>
@@ -491,7 +541,7 @@ export const FirstStep: React.FC<{f: number; F: number}> = ({f, F}) => {
 				<rect x={380} y={0} width={56} height={1920} fill={C.doorFrame} />
 				<rect x={340} y={GROUND - 14} width={150} height={28} rx={8} fill="#6B5A44" />
 				{/* back leg (weight shifts forward), then the stepping leg */}
-				<Leg hx={190 + shift} hy={-330} fx={230} fy={GROUND} lit={0} toe={0} />
+				<Leg hx={190 + shift} hy={-330} fx={230} fy={GROUND} lit={0} toe={0} rim={1} />
 				<Leg hx={250 + shift} hy={-330} fx={fx} fy={fy} lit={lit} toe={toe} />
 				{ring > 0 ? (
 					<g opacity={1 - ring}>
@@ -508,7 +558,7 @@ export const FirstStep: React.FC<{f: number; F: number}> = ({f, F}) => {
 // ---------------- S48 end: walk into the world; no title ----------------
 const FADE = (F: number) => (F < 5710 ? 1 : 1 - tween(F, 5710, 5723, 0, 1, ease.inOut));
 export const EndScene: React.FC<{f: number; F: number}> = ({f, F}) => {
-	const heroX = lerp(660, 900, f / 87);
+	const heroX = lerp(600, 790, f / 87);
 	const camX = 700;
 	const t = tween(f, 6, 22, 0, 1, ease.out);
 	const fade = FADE(F);

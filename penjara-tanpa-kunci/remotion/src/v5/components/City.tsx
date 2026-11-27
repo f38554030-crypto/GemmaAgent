@@ -117,6 +117,53 @@ export const Ground: React.FC<{camX: number}> = ({camX}) => {
 			})}
 			<rect x={x0} y={ROAD1} width={w} height={14} fill={C.curb} />
 			<rect x={x0} y={ROAD1 + 14} width={w} height={2800 - ROAD1} fill="#D6CEBC" />
+			<NearSidewalk x0={x0} />
+		</g>
+	);
+};
+
+/** the sidewalk closest to the viewer: paving joints, bollards, planters with shrubs, a bin (world-anchored) */
+const NearSidewalk: React.FC<{x0: number}> = ({x0}) => {
+	const y0 = ROAD1 + 14;
+	const at = (step: number, i: number, off: number) => Math.floor(x0 / step) * step + i * step + off;
+	return (
+		<g>
+			<rect x={x0} y={y0 + 120} width={3200} height={5} fill="#C4BBA6" />
+			<rect x={x0} y={y0 + 300} width={3200} height={5} fill="#C4BBA6" />
+			{Array.from({length: 30}).map((_, i) => (
+				<line key={`j${i}`} x1={at(130, i, 0)} y1={y0} x2={at(130, i, 0) - 70} y2={y0 + 700} stroke="#C4BBA6" strokeWidth={4} />
+			))}
+			{Array.from({length: 12}).map((_, i) => (
+				<g key={`b${i}`} transform={`translate(${at(300, i, 70)} ${y0 + 70})`}>
+					<ellipse cx={0} cy={2} rx={16} ry={5} fill="#000" opacity={0.12} />
+					<rect x={-9} y={-44} width={18} height={46} rx={7} fill="#5B6478" />
+					<rect x={-9} y={-36} width={18} height={6} fill="#E8C35A" />
+				</g>
+			))}
+			{Array.from({length: 7}).map((_, i) => {
+				const k = Math.floor(x0 / 620) + i;
+				const x = k * 620 + 230;
+				return (
+					<g key={`p${i}`} transform={`translate(${x} ${y0 + 200})`}>
+						<ellipse cx={0} cy={6} rx={84} ry={12} fill="#000" opacity={0.12} />
+						{k % 3 === 2 ? (
+							<g>
+								<rect x={-26} y={-78} width={52} height={82} rx={8} fill="#3F8F6B" />
+								<rect x={-30} y={-84} width={60} height={12} rx={5} fill="#2F6E52" />
+							</g>
+						) : (
+							<g>
+								<circle cx={-30} cy={-62} r={32} fill={C.treeB} />
+								<circle cx={18} cy={-70} r={38} fill={C.treeA} />
+								<circle cx={50} cy={-52} r={22} fill={C.treeB} />
+								{k % 2 ? [-40, -6, 30].map((fx, j) => <circle key={j} cx={fx} cy={-78 + (j % 2) * 18} r={7} fill={j === 1 ? '#F2C14E' : '#F28BB0'} />) : null}
+								<rect x={-70} y={-44} width={140} height={50} rx={10} fill="#8E8270" />
+								<rect x={-70} y={-44} width={140} height={9} rx={4} fill="#A3967F" />
+							</g>
+						)}
+					</g>
+				);
+			})}
 		</g>
 	);
 };

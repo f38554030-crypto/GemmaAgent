@@ -2,7 +2,7 @@ import React from 'react';
 import {FONT} from '../../fonts';
 import {FaceClose} from '../components/FaceClose';
 import {BED, DOOR, FLOOR, GUITAR, Room, TABLE} from '../components/Room';
-import {P0, Pose, STAND_HIP, Stickman, idle, mix, sit, walk} from '../components/Stickman';
+import {P0, Pose, STAND_HIP, Stickman, idle, mix, reachArm, sit, walk} from '../components/Stickman';
 import {blink, clamp, ease, env, keys, lerp, tween} from '../lib/anim';
 import {notesAt, promises} from '../lib/story';
 import {C} from '../theme';
@@ -11,8 +11,11 @@ import {Cam, RS, Svg} from './Act1';
 const SIT = {x: 560, y: 1186};
 const STAND_Y = FLOOR - STAND_HIP * RS;
 
-const tiredSit = (f: number, extra: Partial<Pose> = {}): Pose =>
-	sit(f, {torso: 20, head: 16, armN: [40, 50], armF: [34, 56], eyes: blink(f, 5) * 0.55, lid: 0.55, look: 0.2, lookY: 0.6, brow: 0.6, ...extra});
+/** slumped on the edge of the bed, hands resting on the thighs (IK) */
+const tiredSit = (f: number, extra: Partial<Pose> = {}): Pose => {
+	const p = sit(f, {torso: 20 + Math.sin(f / 26) * 1.5, head: 16, eyes: blink(f, 5) * 0.55, lid: 0.55, look: 0.2, lookY: 0.6, brow: 0.6, ...extra});
+	return {...p, armN: extra.armN ?? reachArm(p, 50, -15), armF: extra.armF ?? reachArm(p, 40, -15)};
+};
 
 // ---------------- icons ----------------
 export const Icon: React.FC<{k: string; s?: number; grey?: number}> = ({k, s = 1, grey = 0}) => {
@@ -100,7 +103,7 @@ export const ThoughtBubble: React.FC<{x: number; y: number; w: number; h: number
 const ReasonCard: React.FC<{x: number; y: number; label: string; icon: string; p: number; check: number; morph?: number; tx?: number; rot?: number}> = ({x, y, label, icon, p, check, morph = 0, tx = 0, rot = 0}) => {
 	if (p <= 0) return null;
 	const s = ease.outBack(clamp(p));
-	const W = 300, H = 120;
+	const W = Math.max(300, 132 + label.length * 18), H = 120; // fits the label
 	const mx = lerp(x, tx, ease.inOut(morph));
 	const sx = lerp(1, 0.06, ease.inOut(morph)), sy = lerp(1, 4.6, ease.inOut(morph));
 	const col = mixHex('#F7F2E8', '#0B0F18', morph);
@@ -143,7 +146,7 @@ export const FaceAware: React.FC<{f: number}> = ({f}) => {
 
 // ---------------- S09 tired, plans only in his head ----------------
 const PLANS = [
-	{k: 'guitar', at: 1158, obj: {x: GUITAR.x + 20, y: GUITAR.y - 150, r: 120}},
+	{k: 'guitar', at: 1158, obj: {x: GUITAR.x - 12, y: GUITAR.y - 150, r: 130}},
 	{k: 'shoe', at: 1176, obj: {x: 595, y: FLOOR - 16, r: 70}},
 	{k: 'book', at: 1194, obj: {x: TABLE.x0 + 52, y: TABLE.top + 40, r: 70}},
 	{k: 'plant', at: 1212, obj: {x: TABLE.x1 - 24, y: TABLE.top - 30, r: 60}},
@@ -189,18 +192,19 @@ export const WantChange: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const up = tween(f, 4, 26, 0, 1, ease.inOut);
 	const antic = env(f, 2, 18, 6, 8);
 	const stepT = clamp((f - 60) / 50);
-	const x = lerp(SIT.x + 10, 616, ease.inOut(stepT));
-	let pose = mix(tiredSit(F, {eyes: 1, lid: 0.2, brow: -0.4, look: 0.6, lookY: 0}), idle(F, {eyes: 1, lid: 0.05, brow: -0.6, look: 0.8}), up);
+	const x = lerp(SIT.x, 616, ease.inOut(stepT));
+	const sitting = mix(tiredSit(F), tiredSit(F, {eyes: 1, lid: 0.2, brow: -0.4, look: 0.6, lookY: 0}), tween(f, 0, 6, 0, 1)); // wakes up from S09's slump
+	let pose = mix(sitting, idle(F, {eyes: 1, lid: 0.05, brow: -0.6, look: 0.8}), up);
 	pose = mix(pose, {...pose, torso: 30, head: 10}, antic * 0.7);
 	if (stepT > 0 && stepT < 1) pose = mix(pose, walk(f * 0.27, 0.8, {eyes: 1, brow: -0.5, look: 0.9}), Math.sin(Math.PI * stepT));
 	const y = lerp(SIT.y, STAND_Y, up) + pose.bob * RS;
 	const glow = tween(f, 40, 70, 0, 1);
-	const z = tween(f, 30, 146, 1.32, 1.6, ease.inOut);
+	const z = tween(f, 30, 146, 1.38, 1.6, ease.inOut); // starts exactly where S09 ended (hard cut = continuous shot)
 	const cx = tween(f, 30, 146, 470, 660, ease.inOut);
 	return (
 		<Svg>
 			<Cam x={cx} y={tween(f, 30, 146, 980, 1010)} z={z}>
-				<Room f={F} day={0} notes={notesAt(F)} calValue={promises(F)} doorGlow={glow * (0.8 + 0.2 * Math.sin(F / 6))} beam={0.6}>
+				<Room f={F} day={0} notes={notesAt(F)} calValue={promises(F)} alarm={{ring: 0, hour: 3}} doorGlow={glow * (0.8 + 0.2 * Math.sin(F / 6))} beam={0.7}>
 					<Stickman x={x} y={y} pose={{...pose, bob: 0}} scale={RS} shadow={FLOOR} />
 				</Room>
 			</Cam>
@@ -220,6 +224,7 @@ const CARDS = [
 	{label: 'Belum siap', icon: 'ready', at: 1635, y: 1140, rot: -2},
 ];
 const CHECKS = [1770, 1782, 1794];
+const CARD_X = 836;
 const BAR_X = (i: number) => DOOR.x0 - 8 + i * ((DOOR.x1 - DOOR.x0 + 16) / 5);
 export const Reasons: React.FC<{f: number; F: number}> = ({f, F}) => {
 	// local 0..335 (49.4s..60.57s)
@@ -242,12 +247,12 @@ export const Reasons: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const z = tween(f, 0, 335, 1.45, 1.36, ease.inOutSine);
 	return (
 		<Svg>
-			<Cam x={650} y={1000} z={z}>
+			<Cam x={700} y={1000} z={z}>
 				<Room f={F} day={0} notes={notesAt(F)} calValue={promises(F)} doorGlow={0.85 * (1 - tween(F, 1503, 1640, 0, 0.7))} beam={0.6}>
 					<Stickman x={lerp(x, SIT.x, sitT)} y={y} pose={{...pose, bob: 0}} scale={RS} shadow={FLOOR} />
 				</Room>
 				{CARDS.map((c, i) => (
-					<ReasonCard key={i} x={770} y={c.y} label={c.label} icon={c.icon} rot={c.rot} p={(F - c.at) / 10} check={(F - CHECKS[i]) / 8} />
+					<ReasonCard key={i} x={CARD_X} y={c.y} label={c.label} icon={c.icon} rot={c.rot} p={(F - c.at) / 10} check={(F - CHECKS[i]) / 8} />
 				))}
 			</Cam>
 		</Svg>
@@ -265,15 +270,15 @@ export const CardsToBars: React.FC<{f: number; F: number}> = ({f, F}) => {
 	const morph = (i: number) => tween(F, 1905 + i * 12, 1965 + i * 12, 0, 1, ease.inOut);
 	const bars = tween(F, 1975, 2010, 0, 1, ease.out);
 	const pose = sit(F, {torso: 22, head: 14, eyes: blink(F, 9) * 0.7, lid: 0.45, brow: 0.8, look: 0.8, lookY: 0.1});
-	const z = tween(f, 0, 150, 1.36, 1.5, ease.inOut);
+	const z = tween(f, 0, 150, 1.32, 1.5, ease.inOut);
 	return (
 		<Svg>
-			<Cam x={tween(f, 0, 150, 600, 680)} y={1000} z={z}>
+			<Cam x={tween(f, 0, 150, 640, 680)} y={1000} z={z}>
 				<Room f={F} day={0} notes={notesAt(F)} calValue={promises(F)} bars={bars} doorGlow={0.25 * (1 - bars)} beam={0.5}>
 					<Stickman x={SIT.x} y={SIT.y} pose={pose} scale={RS} shadow={FLOOR} />
 				</Room>
 				{CARDS.map((c, i) => (
-					<ReasonCard key={i} x={770} y={keys(F, [[1875, c.y], [1905 + i * 12, c.y], [1965 + i * 12, 980]])} tx={BAR_X(i * 2 + 1)} label={c.label} icon={c.icon} rot={c.rot}
+					<ReasonCard key={i} x={CARD_X} y={keys(F, [[1875, c.y], [1905 + i * 12, c.y], [1965 + i * 12, 980]])} tx={BAR_X(i * 2 + 1)} label={c.label} icon={c.icon} rot={c.rot}
 						p={1 - tween(F, 1968 + i * 12, 1985 + i * 12, 0, 1)} check={1} morph={morph(i)} />
 				))}
 			</Cam>
@@ -286,12 +291,14 @@ export const BarsAndBox: React.FC<{f: number; F: number}> = ({f, F}) => {
 	// local 0..298 (67.5s..77.43s)
 	const clang = F >= 2048 ? Math.exp(-(F - 2048) / 5) * Math.sin((F - 2048) * 1.6) * 8 : 0;
 	const pull = tween(F, 2135, 2290, 0, 1, ease.inOut); // camera pull-back
-	const z = lerp(2.5, 0.36, pull);
-	const cx = lerp(720, 560, pull), cy = lerp(1000, 760, pull);
+	const push = tween(F, 2025, 2050, 0, 1, ease.inOut); // continues S16's framing, pushes in onto the clang (2048)
+	const z = pull > 0 ? lerp(2.5, 0.36, pull) : lerp(1.5, 2.5, push);
+	const cx = pull > 0 ? lerp(720, 560, pull) : lerp(680, 720, push), cy = lerp(1000, 760, pull);
 	const close = tween(F, 2262, 2300, 0, 1, ease.inOut); // front face of the box closes ("batas kehidupannya")
 	const D = 300; // box depth (oblique)
 	const ox = D * 0.62, oy = -D * 0.62;
-	const pose = sit(F, {torso: 24, head: 18, eyes: blink(F, 11) * 0.5, lid: 0.6, brow: 0.7, lookY: 0.6});
+	const from = sit(F, {torso: 22, head: 14, eyes: blink(F, 9) * 0.7, lid: 0.45, brow: 0.8, look: 0.8, lookY: 0.1}); // = S16's pose
+	const pose = mix(from, sit(F, {torso: 24, head: 18, eyes: blink(F, 11) * 0.5, lid: 0.6, brow: 0.7, lookY: 0.6}), tween(F, 2030, 2060, 0, 1));
 	const BOXH = 1400;
 	return (
 		<Svg bg="#05070D">
