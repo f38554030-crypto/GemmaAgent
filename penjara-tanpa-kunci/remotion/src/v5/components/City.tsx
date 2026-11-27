@@ -116,7 +116,7 @@ export const Ground: React.FC<{camX: number}> = ({camX}) => {
 				return <rect key={i} x={x} y={(ROAD0 + ROAD1) / 2 - 5} width={80} height={10} rx={5} fill={C.lane} opacity={0.85} />;
 			})}
 			<rect x={x0} y={ROAD1} width={w} height={14} fill={C.curb} />
-			<rect x={x0} y={ROAD1 + 14} width={w} height={2000 - ROAD1} fill="#D6CEBC" />
+			<rect x={x0} y={ROAD1 + 14} width={w} height={2800 - ROAD1} fill="#D6CEBC" />
 		</g>
 	);
 };

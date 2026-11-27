@@ -422,43 +422,81 @@ export const Split: React.FC<{f: number; F: number}> = ({f, F}) => {
 };
 
 // ---------------- S47 first step over the threshold ----------------
+const ik = (hx: number, hy: number, fx: number, fy: number, l1: number, l2: number, fwd = 1) => {
+	const dx = fx - hx, dy = fy - hy;
+	const d = Math.min(Math.hypot(dx, dy), l1 + l2 - 0.5);
+	const a = Math.atan2(dy, dx);
+	const c = Math.acos(Math.max(-1, Math.min(1, (l1 * l1 + d * d - l2 * l2) / (2 * l1 * d))));
+	const ang = a - fwd * c; // knee bends forward (toward +x)
+	return {kx: hx + Math.cos(ang) * l1, ky: hy + Math.sin(ang) * l1};
+};
+const Leg: React.FC<{hx: number; hy: number; fx: number; fy: number; lit: number; toe: number}> = ({hx, hy, fx, fy, lit, toe}) => {
+	const L1 = 760, L2 = 720;
+	const {kx, ky} = ik(hx, hy, fx, fy - 40, L1, L2);
+	const pants = lit > 0 ? `rgb(${Math.round(21 + 40 * lit)},${Math.round(26 + 44 * lit)},${Math.round(38 + 54 * lit)})` : C.pants;
+	return (
+		<g>
+			<line x1={hx} y1={hy} x2={kx} y2={ky} stroke={pants} strokeWidth={128} strokeLinecap="round" />
+			<line x1={kx} y1={ky} x2={fx} y2={fy - 40} stroke={pants} strokeWidth={112} strokeLinecap="round" />
+			<line x1={kx - 40} y1={ky} x2={fx - 40} y2={fy - 40} stroke="#fff" strokeOpacity={0.05 + 0.08 * lit} strokeWidth={22} strokeLinecap="round" />
+			<g transform={`translate(${fx} ${fy}) rotate(${toe})`}>
+				<path d="M -70 -86 Q -76 -6 -60 0 L 150 0 Q 182 -4 176 -40 Q 166 -78 96 -84 L 20 -110 Q -40 -118 -70 -86 Z" fill={lit > 0.5 ? '#2F3A57' : '#1C2235'} />
+				<rect x={-66} y={-14} width={244} height={20} rx={10} fill="#E9ECF3" />
+				{[30, 62, 94].map((x) => <circle key={x} cx={x} cy={-74 + (x - 30) * 0.12} r={6} fill="#E9ECF3" opacity={0.8} />)}
+			</g>
+		</g>
+	);
+};
 export const FirstStep: React.FC<{f: number; F: number}> = ({f, F}) => {
-	// local 0..108 (184.3s..187.9s); foot lands at 186.6s (F 5598)
-	const step = tween(F, 5560, 5598, 0, 1, ease.inOut);
+	// local 0..108 (184.3s..187.9s); front foot lands at 186.6s (F 5598)
+	const step = tween(F, 5556, 5598, 0, 1, ease.inOut);
 	const ring = tween(F, 5598, 5632, 0, 1, ease.out);
 	const hudP = tween(F, 5598, 5606, 0, 1, ease.outBack);
-	const lift = Math.sin(Math.PI * step) * 120;
+	const GROUND = 1270;
+	const fx = lerp(330, 700, step), fy = GROUND - Math.sin(Math.PI * step) * 170;
+	const shift = lerp(0, 150, ease.inOut(step));
+	const toe = Math.sin(Math.PI * step) * -12 + (step < 0.15 ? step * 60 : 0);
+	const lit = clamp((fx - 380) / 120);
 	return (
 		<AbsoluteFill>
 			<Svg>
 				<defs>
 					<linearGradient id="fsIn" x1="0" y1="0" x2="1" y2="0">
-						<stop offset="0%" stopColor="#141B2B" />
-						<stop offset="100%" stopColor="#1E2840" />
+						<stop offset="0%" stopColor="#10151F" />
+						<stop offset="100%" stopColor="#1B2337" />
 					</linearGradient>
 					<linearGradient id="fsSky" x1="0" y1="0" x2="0" y2="1">
 						<stop offset="0%" stopColor={C.skyTop} />
 						<stop offset="100%" stopColor={C.skyBottom} />
 					</linearGradient>
+					<linearGradient id="fsSpill" x1="0" y1="0" x2="1" y2="0">
+						<stop offset="0%" stopColor="#FFF1C7" stopOpacity={0.35} />
+						<stop offset="100%" stopColor="#FFF1C7" stopOpacity={0} />
+					</linearGradient>
 				</defs>
-				{/* outside (right) and inside (left) separated by the threshold */}
+				{/* outside: sky, trees, sidewalk */}
 				<rect width={1080} height={1920} fill="url(#fsSky)" />
-				<rect x={0} y={1240} width={1080} height={680} fill={C.sidewalk} />
-				{Array.from({length: 10}).map((_, i) => <line key={i} x1={i * 140} y1={1240} x2={i * 140 - 80} y2={1920} stroke={C.tile} strokeWidth={5} />)}
-				<rect x={0} y={0} width={360} height={1920} fill="url(#fsIn)" />
-				<rect x={330} y={0} width={60} height={1920} fill={C.doorFrame} />
-				<rect x={300} y={1230} width={120} height={30} rx={6} fill="#6B5A44" />
-				{/* back foot inside, front foot stepping out */}
-				<g>
-					<rect x={180} y={520} width={70} height={720} rx={34} fill={C.pants} />
-					<ellipse cx={230} cy={1236} rx={110} ry={44} fill={C.pants} />
-					<rect x={lerp(220, 560, step)} y={520 - lift * 0.4} width={70} height={720} rx={34} fill={C.pants} transform={`rotate(${Math.sin(Math.PI * step) * -14} ${lerp(255, 595, step)} 520)`} />
-					<ellipse cx={lerp(270, 640, step)} cy={1236 - lift} rx={110} ry={44} fill={C.pants} />
-				</g>
+				<circle cx={900} cy={260} r={150} fill="#FFF4CC" opacity={0.7} />
+				{[620, 880].map((x, i) => (
+					<g key={x} transform={`translate(${x} ${GROUND - 30}) scale(1.8)`}>
+						<rect x={-9} y={-120} width={18} height={124} rx={6} fill={C.trunk} />
+						<circle cx={0} cy={-170} r={70} fill={i ? C.treeB : C.treeA} />
+					</g>
+				))}
+				<rect x={0} y={GROUND} width={1080} height={700} fill={C.sidewalk} />
+				{Array.from({length: 10}).map((_, i) => <line key={i} x1={400 + i * 130} y1={GROUND} x2={400 + i * 130 - 90} y2={1920} stroke={C.tile} strokeWidth={6} />)}
+				{/* inside the room (left) + door frame + threshold */}
+				<rect x={0} y={0} width={410} height={1920} fill="url(#fsIn)" />
+				<polygon points={`410,0 1080,0 1080,1920 410,1920`} fill="url(#fsSpill)" opacity={0.6} />
+				<rect x={380} y={0} width={56} height={1920} fill={C.doorFrame} />
+				<rect x={340} y={GROUND - 14} width={150} height={28} rx={8} fill="#6B5A44" />
+				{/* back leg (weight shifts forward), then the stepping leg */}
+				<Leg hx={190 + shift} hy={-330} fx={230} fy={GROUND} lit={0} toe={0} />
+				<Leg hx={250 + shift} hy={-330} fx={fx} fy={fy} lit={lit} toe={toe} />
 				{ring > 0 ? (
 					<g opacity={1 - ring}>
-						<ellipse cx={640} cy={1250} rx={120 + ring * 320} ry={30 + ring * 80} fill="none" stroke="#F2C14E" strokeWidth={10} />
-						<ellipse cx={640} cy={1250} rx={60 + ring * 200} ry={16 + ring * 50} fill="#F2C14E" opacity={0.25} />
+						<ellipse cx={760} cy={GROUND + 6} rx={150 + ring * 330} ry={34 + ring * 80} fill="none" stroke="#F2C14E" strokeWidth={12} />
+						<ellipse cx={760} cy={GROUND + 6} rx={80 + ring * 220} ry={18 + ring * 50} fill="#F2C14E" opacity={0.28} />
 					</g>
 				) : null}
 			</Svg>

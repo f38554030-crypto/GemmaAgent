@@ -1,12 +1,9 @@
-# Penjara Tanpa Kunci — perbaikan v4
+# Penjara Tanpa Kunci — v4 (tambalan) dan v5 (dibuat ulang)
 
-Folder ini berisi semua yang dipakai untuk menganalisis dan memperbaiki `Penjara_Tanpa_Kunci_v3_final.mp4` menjadi v4.
-Daftar masalah dan statusnya ada di [`ANALISIS.md`](ANALISIS.md).
+- **v5 (utama):** video dibangun ulang dari nol di Remotion, menindaklanjuti masukan soal animasi, peran tokoh, transisi, dan subtitle. Detailnya ada di [`V5.md`](V5.md). Komposisi `PenjaraV5`, kode di `remotion/src/v5/`.
+- **v4:** perbaikan di atas render v3 (tambalan piksel + overlay). Daftar masalah v3 ada di [`ANALISIS.md`](ANALISIS.md). Komposisi `PenjaraV4`.
 
-Source code Remotion v3 tidak tersedia, jadi v4 dibuat dengan cara ini:
-1. Analisis video v3 (frame, audio, transkrip, OCR).
-2. Perbaikan tingkat piksel pada video v3 (Python).
-3. Overlay Remotion baru di atas hasil perbaikan itu.
+Source code Remotion v3 tidak tersedia. v4 dibuat dengan menambal hasil render v3, sedangkan v5 hanya memakai audio aslinya.
 
 ## Isi folder
 
