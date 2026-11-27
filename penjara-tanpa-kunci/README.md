@@ -37,14 +37,22 @@ cd remotion && npm install && npm run render
 ```
 
 ```bash
-# 3) pasang audio asli v3 tanpa re-encode
-ffmpeg -i remotion/out/video_only.mp4 -i v3.mp4 -map 0:v -map 1:a -c copy -movflags +faststart Penjara_Tanpa_Kunci_v4.mp4
+# 3) pasang audio asli v3 + tag warna (tanpa re-encode)
+ffmpeg -i remotion/out/video_only.mp4 -i v3.mp4 -map 0:v -map 1:a -c copy -bsf:v "h264_metadata=colour_primaries=1:transfer_characteristics=13:matrix_coefficients=1:video_full_range_flag=0" -movflags +faststart Penjara_Tanpa_Kunci_v4.mp4
 ```
 
 Pratinjau di Remotion Studio: `cd remotion && npm run studio`.
 
 ## Catatan teknis singkat
-- Bayangan kubus = lapisan hitam transparan 12,5%. Penghapusannya dihitung di ruang YUV (Y−16 dan U/V−128 dibagi 0,875). Mask kecerahan dibuat tajam, sedangkan mask warna dibuat setengah resolusi dan diblur σ 0,75 supaya cocok dengan chroma 4:2:0. Tepi bayangan diukur sub-piksel per frame; frame yang tertutup tokoh/kartu diisi dengan interpolasi.
-- Kalender: pose halaman yang jatuh (pusat, sudut, ukuran) dipasang per frame dengan memaksimalkan IoU terhadap area krem. Angka yang ditulis = angka terakhir yang terlihat sebelum halaman disobek.
-- HUD baru menutup HUD lama 100% (kotak lama opaque). Nilai per frame berasal dari OCR video v3. Sebelum HUD lama terbang ke tengah (frame 4319), HUD baru menyusut tepat ke ukuran HUD lama, jadi serah terimanya tidak terlihat.
-- Hook baru menampilkan caption asli lewat "lubang" berbentuk pill (frame 52–76), jadi sambungan ke adegan kamar di frame 77 identik.
+- **Bayangan kubus** = lapisan hitam transparan 12,5%. Penghapusannya dihitung di ruang YUV (Y−16 dan U/V−128 dibagi 0,875).
+  - Mask kecerahan dibuat tajam; mask warna setengah resolusi dan diblur σ 0,75 supaya cocok dengan chroma 4:2:0.
+  - Tepi bayangan diukur sub-piksel per frame. Frame yang tertutup tokoh/kartu diisi interpolasi; fade di awal/akhir diekstrapolasi.
+  - Di akhir shot kota pertama (kamera pan, kubus keluar layar), posisi dilacak dari tepi kanan kubus lalu dari tepi bayangan itu sendiri.
+  - Geometri dihaluskan per segmen dengan penolakan pencilan. Saat kamera bergerak cepat (>4 px/frame), nilai mentah yang akurat dipakai apa adanya.
+- **Kalender:** pose halaman yang jatuh (pusat, sudut, ukuran) dipasang per frame dengan memaksimalkan IoU terhadap area krem. Angka yang ditulis = angka terakhir yang terlihat sebelum halaman disobek.
+- **Kalender di balik gelembung:** kalender ditutup warna dinding. Tepi gelembung di area itu digambar ulang dari circle fit per lekukan awan.
+- **HUD baru** menutup HUD lama 100% (kotak lama opaque). Nilai per frame berasal dari OCR video v3.
+  - Muncul opaque dari frame 247.
+  - Sebelum HUD lama terbang ke tengah (frame 4319), HUD baru "morph" ke tata letak HUD lama (ukuran kotak, font, posisi), jadi serah terimanya tidak terlihat.
+- **Hook baru** menampilkan caption asli lewat "lubang" berbentuk pill (frame 52–76), jadi sambungan ke adegan kamar di frame 77 identik.
+- **Warna:** Remotion membaca video dasar sebagai BT.709, jadi render final memakai `--color-space=bt709` (YUV identik dengan v3, selisih ±1 level). Tag akhir diset `bt709 / sRGB / tv` tanpa re-encode.

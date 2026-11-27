@@ -5,6 +5,7 @@ import {FONT} from '../fonts';
 // New opening (frames 0-76, before the first cut to the bedroom).
 // v3 problems: 1.7 s with no voice and only a small title pill that collided with the phone and the
 // head outline. Now: title + a hook line readable from the very first frame (also the thumbnail),
+// kept below y=250 so the TikTok/Reels top interface does not cover it,
 // in the same visual language (night, phone scroll). From frame 52 the ORIGINAL caption pill
 // ("Setiap malam ia membuat janji", karaoke) shows through a hole, so the cut at frame 77 is seamless.
 
@@ -57,7 +58,7 @@ const Phone: React.FC<{frame: number}> = ({frame}) => {
 	const cyc = (frame % 21) / 21;
 	const thumbY = interpolate(cyc, [0, 0.75, 1], [70, -60, 70], {easing: Easing.inOut(Easing.quad)});
 	return (
-		<div style={{position: 'absolute', left: 585 - 320, top: 1180 - 590, width: 640, height: 1180, transform: 'rotate(6deg)'}}>
+		<div style={{position: 'absolute', left: 585 - 320, top: 1250 - 590, width: 640, height: 1180, transform: 'rotate(6deg)'}}>
 			<div style={{position: 'absolute', inset: 0, borderRadius: 78, background: '#05080F', boxShadow: '0 40px 90px rgba(0,0,0,0.55)'}} />
 			<div style={{position: 'absolute', left: 16, top: 16, right: 16, bottom: 16, borderRadius: 64, background: '#0E1729', overflow: 'hidden'}}>
 				{Array.from({length: 6}).map((_, k) => (
@@ -93,8 +94,8 @@ export const Hook: React.FC = () => {
 			/>
 			<Phone frame={frame} />
 			{/* soft dark band behind the text so it never fights the phone */}
-			<AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(6,11,21,0.92) 0%, rgba(6,11,21,0.75) 22%, rgba(6,11,21,0) 34%)'}} />
-			<div style={{position: 'absolute', left: 0, right: 0, top: 118, display: 'flex', justifyContent: 'center', fontFamily: FONT}}>
+			<AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(6,11,21,0.92) 0%, rgba(6,11,21,0.78) 26%, rgba(6,11,21,0) 38%)'}} />
+			<div style={{position: 'absolute', left: 0, right: 0, top: 262, display: 'flex', justifyContent: 'center', fontFamily: FONT}}>
 				<div
 					style={{
 						padding: '14px 34px',
@@ -116,7 +117,7 @@ export const Hook: React.FC = () => {
 					position: 'absolute',
 					left: 0,
 					right: 0,
-					top: 236,
+					top: 372,
 					textAlign: 'center',
 					fontFamily: FONT,
 					fontWeight: 900,

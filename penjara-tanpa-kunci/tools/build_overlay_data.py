@@ -55,15 +55,15 @@ for k, e in cal.items():
     n = int(k)
     if f["val"] is None or e["hud"] is None:
         continue
-    if f["val"] >= e["hud"]:          # last cycle (367 -> 367): nothing to tear, keep original
-        continue
+    # every torn-off page carries a number, also when the count did not move since the last page
+    # (e.g. 7 -> 7, 366 -> 366): a blank page flashing is worse than a repeated day
     cal_out[n] = [round(f["cx"], 2), round(f["cy"], 2), round(f["theta"], 2), f["w"], round(f["h"], 2), f["val"]]
 json.dump(cal_out, open(os.path.join(out, "calendar.json"), "w"), separators=(",", ":"))
 
 # ---------------- door close-up caption pills (bar collision) ----------------
 PAD = 41
 pills = {}
-pages = [((4614, 4648), (174, 908)), ((4649, 4691), (309, 770))]
+pages = [((4614, 4648), (174, 908)), ((4649, 4688), (309, 770))]   # 4689 = cut to the wide shot
 for (a, b), (tx0, tx1) in pages:
     for n in range(a, b + 1):
         pills[n] = [tx0 - PAD, tx1 + PAD, 1459, 1559, n - a]

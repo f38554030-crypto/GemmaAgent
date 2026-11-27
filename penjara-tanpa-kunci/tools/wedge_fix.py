@@ -80,7 +80,7 @@ def refine(lum, fbr, bbr):
     tr_x = gr_x + (yg - bbr[1]) * RIGHT_SLOPE
     yp = int(round(bbr[1]))
     tops = []
-    for x in range(int(bbr[0]) + 4, min(W - 1, int(tr_x) - 4)):
+    for x in range(max(0, int(bbr[0]) + 4), min(W - 1, int(tr_x) - 4)):
         p = lum[max(0, yp - 12):yp + 13, x]
         if len(p) < 25:
             continue
