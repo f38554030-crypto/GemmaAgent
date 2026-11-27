@@ -1,0 +1,4772 @@
+[
+{
+"t": 0.0,
+"all": "",
+"lit": "\""
+},
+{
+"t": 0.2,
+"all": "Se",
+"lit": "AL"
+},
+{
+"t": 0.4,
+"all": "aa Ma",
+"lit": "Ia"
+},
+{
+"t": 0.6,
+"all": "",
+"lit": "OA"
+},
+{
+"t": 0.8,
+"all": "aa",
+"lit": "mm ————"
+},
+{
+"t": 1.0,
+"all": "aa Ma",
+"lit": "O————"
+},
+{
+"t": 1.2,
+"all": "Ma",
+"lit": "O———"
+},
+{
+"t": 1.4,
+"all": "",
+"lit": "»"
+},
+{
+"t": 1.6,
+"all": "aa",
+"lit": "O———"
+},
+{
+"t": 1.8,
+"all": "aa Setiap malam ia membuat jssi'",
+"lit": "O——— Setiap"
+},
+{
+"t": 2.0,
+"all": "Setiap malam ia membuat js",
+"lit": "O———— Setiap malam"
+},
+{
+"t": 2.2,
+"all": "Setiap malam ia membuat js",
+"lit": "Setiap malam"
+},
+{
+"t": 2.4,
+"all": "sn Setiap malam ia membuat js",
+"lit": "O——— Setiap malam"
+},
+{
+"t": 2.6,
+"all": "Setiap malam ia membuat",
+"lit": "Setiap malam"
+},
+{
+"t": 2.8,
+"all": "Setiap malam ia membuat",
+"lit": "Setiap malam"
+},
+{
+"t": 3.0,
+"all": "Setiap malam ia membuat",
+"lit": "Setiap malam ia"
+},
+{
+"t": 3.2,
+"all": "Setiap malam ia membuat",
+"lit": "Setiap malam ia membuat"
+},
+{
+"t": 3.4,
+"all": "Setiap malam ia membuat janji",
+"lit": "Setiap malam ia membuat janji"
+},
+{
+"t": 3.6,
+"all": "Setiap malam ia membuat janji",
+"lit": "Setiap malam ia membuat janji"
+},
+{
+"t": 3.8,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang"
+},
+{
+"t": 4.0,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama"
+},
+{
+"t": 4.2,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama"
+},
+{
+"t": 4.4,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada"
+},
+{
+"t": 4.6,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya"
+},
+{
+"t": 4.8,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya"
+},
+{
+"t": 5.0,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya"
+},
+{
+"t": 5.2,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya sendiri."
+},
+{
+"t": 5.4,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya sendiri."
+},
+{
+"t": 5.6,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya sendiri."
+},
+{
+"t": 5.8,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya sendiri."
+},
+{
+"t": 6.0,
+"all": "yang sama kepada dirinya sendiri.",
+"lit": "yang sama kepada dirinya sendiri."
+},
+{
+"t": 6.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 6.4,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok"
+},
+{
+"t": 6.6,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok"
+},
+{
+"t": 6.8,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok"
+},
+{
+"t": 7.0,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok"
+},
+{
+"t": 7.2,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku"
+},
+{
+"t": 7.4,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan"
+},
+{
+"t": 7.6,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan mulai"
+},
+{
+"t": 7.8,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan mulai berubah."
+},
+{
+"t": 8.0,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan mulai berubah."
+},
+{
+"t": 8.2,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan mulai berubah."
+},
+{
+"t": 8.4,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan mulai berubah."
+},
+{
+"t": 8.6,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan mulai berubah."
+},
+{
+"t": 8.8,
+"all": "Besok aku akan mulai berubah.",
+"lit": "Besok aku akan mulai berubah."
+},
+{
+"t": 9.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 9.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 9.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 9.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 9.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 10.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 10.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 10.4,
+"all": "Namun ketika — tiba,",
+"lit": "Namun"
+},
+{
+"t": 10.6,
+"all": "Namun ketika —.. tiba,",
+"lit": "Namun"
+},
+{
+"t": 10.8,
+"all": "Namun ketika ... tiba,",
+"lit": "Namun ketika"
+},
+{
+"t": 11.0,
+"all": "Namun ketika ... tiba,",
+"lit": "Namun ketika"
+},
+{
+"t": 11.2,
+"all": "Namun ketika ... tiba,",
+"lit": "Namun ketika"
+},
+{
+"t": 11.4,
+"all": "Namun ketika ... tiba,",
+"lit": "Namun ketika"
+},
+{
+"t": 11.6,
+"all": "Namun ketika esok tiba,",
+"lit": "Namun ketika esok"
+},
+{
+"t": 11.8,
+"all": "Namun ketika esok tiba,",
+"lit": "Namun ketika esok tiba,"
+},
+{
+"t": 12.0,
+"all": "Namun ketika esok tiba,",
+"lit": "Namun ketika esok tiba,"
+},
+{
+"t": 12.2,
+"all": "Namun ketika esok tiba,",
+"lit": "Namun ketika esok tiba,"
+},
+{
+"t": 12.4,
+"all": "Namun ketika esok tiba,",
+"lit": "Namun ketika esok tiba,"
+},
+{
+"t": 12.6,
+"all": "Namun ketika esok tiba,",
+"lit": "Namun ketika esok tiba,"
+},
+{
+"t": 12.8,
+"all": "Namun ketika esok tiba,",
+"lit": "Namun ketika esok tiba,"
+},
+{
+"t": 13.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 13.2,
+"all": "semuanya kembali ——.....",
+"lit": "semuanya"
+},
+{
+"t": 13.4,
+"all": "semuanya kembali H5.",
+"lit": "semuanya"
+},
+{
+"t": 13.6,
+"all": "semuanya kembali",
+"lit": "semuanya kembali"
+},
+{
+"t": 13.8,
+"all": "semuanya kembali .......",
+"lit": "semuanya kembali"
+},
+{
+"t": 14.0,
+"all": "V y|",
+"lit": "semuanya kembali berulang."
+},
+{
+"t": 14.2,
+"all": "|, 8 semuanya kembali berulang.",
+"lit": "1 ' semuanya kembali berulang."
+},
+{
+"t": 14.4,
+"all": "V 1 semuanya kembali berulang.",
+"lit": "semuanya kembali berulang."
+},
+{
+"t": 14.6,
+"all": "semuanya kembali berulang.",
+"lit": "semuanya kembali berulang."
+},
+{
+"t": 14.8,
+"all": "V 4 semuanya kembali berulang.",
+"lit": "1 ' semuanya kembali berulang."
+},
+{
+"t": 15.0,
+"all": "W 1 semuanya kembali berulang.",
+"lit": "semuanya kembali berulang."
+},
+{
+"t": 15.2,
+"all": "Alarm dimatikan,",
+"lit": "Alarm"
+},
+{
+"t": 15.4,
+"all": "Alarm dimatikan,",
+"lit": "Alarm dimatikan,"
+},
+{
+"t": 15.6,
+"all": "Alarm dimatikan,",
+"lit": "Alarm dimatikan,"
+},
+{
+"t": 15.8,
+"all": "In sg Alarm dimatikan,",
+"lit": "Alarm dimatikan,"
+},
+{
+"t": 16.0,
+"all": "Alarm dimatikan,",
+"lit": "Alarm dimatikan,"
+},
+{
+"t": 16.2,
+"all": "Alarm dimatikan,",
+"lit": "Alarm dimatikan,"
+},
+{
+"t": 16.4,
+"all": "Alarm dimatikan,",
+"lit": "v Alarm dimatikan,"
+},
+{
+"t": 16.6,
+"all": "ponsel kembali digenggam,",
+"lit": "ponsel"
+},
+{
+"t": 16.8,
+"all": "ponsel kembali digenggam,",
+"lit": "ponsel"
+},
+{
+"t": 17.0,
+"all": "Sa Ma ponsel kembali digenggam,",
+"lit": "———— ponsel kembali"
+},
+{
+"t": 17.2,
+"all": "ponsel kembali digenggam,",
+"lit": "ponsel kembali"
+},
+{
+"t": 17.4,
+"all": "ponsel kembali digenggam,",
+"lit": "(me ponsel kembali"
+},
+{
+"t": 17.6,
+"all": "ponsel kembali digenggam,",
+"lit": "Ia ponsel kembali digenggam,"
+},
+{
+"t": 17.8,
+"all": "ponsel kembali digenggam,",
+"lit": "O—— ponsel kembali digenggam,"
+},
+{
+"t": 18.0,
+"all": "ponsel kembali digenggam,",
+"lit": "2 ponsel kembali digenggam,"
+},
+{
+"t": 18.2,
+"all": "ponsel kembali digenggam,",
+"lit": "Ia 3 ponsel kembali digenggam,"
+},
+{
+"t": 18.4,
+"all": "“5 ponsel kembali digenggam,",
+"lit": "aa ponsel kembali digenggam,"
+},
+{
+"t": 18.6,
+"all": "berjam-jam berlatu tanpa terasa.",
+"lit": "berjam-jam"
+},
+{
+"t": 18.8,
+"all": "berjam-jam berlatu tanpa terasa.",
+"lit": "berjam-jam"
+},
+{
+"t": 19.0,
+"all": "berjam-jam berlatu tanpa terasa.",
+"lit": "berjam-jam"
+},
+{
+"t": 19.2,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu"
+},
+{
+"t": 19.4,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu"
+},
+{
+"t": 19.6,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu"
+},
+{
+"t": 19.8,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa"
+},
+{
+"t": 20.0,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa"
+},
+{
+"t": 20.2,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa"
+},
+{
+"t": 20.4,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa terasa."
+},
+{
+"t": 20.6,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa terasa."
+},
+{
+"t": 20.8,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa terasa."
+},
+{
+"t": 21.0,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa terasa."
+},
+{
+"t": 21.2,
+"all": "berjam-jam berlalu tanpa terasa.",
+"lit": "berjam-jam berlalu tanpa terasa."
+},
+{
+"t": 21.4,
+"all": "Malam menjadi —..",
+"lit": "Malam"
+},
+{
+"t": 21.6,
+"all": "Malam menjadi «--",
+"lit": "Malam"
+},
+{
+"t": 21.8,
+"all": "Malam menjadi -..",
+"lit": "Malam menjadi"
+},
+{
+"t": 22.0,
+"all": "Malam menjadi -.",
+"lit": "Malam menjadi"
+},
+{
+"t": 22.2,
+"all": "Malam menjadi pagi,",
+"lit": "Malam menjadi pagi,"
+},
+{
+"t": 22.4,
+"all": "Malam menjadi pagi,",
+"lit": "Malam menjadi pagi,"
+},
+{
+"t": 22.6,
+"all": "Malam menjadi pagi,",
+"lit": "Malam menjadi pagi,"
+},
+{
+"t": 22.8,
+"all": "Malam menjadi pagi,",
+"lit": "Malam menjadi pagi,"
+},
+{
+"t": 23.0,
+"all": "Malam menjadi pagi,",
+"lit": "Malam menjadi pagi,"
+},
+{
+"t": 23.2,
+"all": "hari berganti minggu,",
+"lit": "hari"
+},
+{
+"t": 23.4,
+"all": "hari berganti minggu,",
+"lit": "hari berganti"
+},
+{
+"t": 23.6,
+"all": "hari berganti minggu,",
+"lit": "hari berganti"
+},
+{
+"t": 23.8,
+"all": "hari berganti minggu,",
+"lit": "hari berganti minggu,"
+},
+{
+"t": 24.0,
+"all": "hari berganti minggu,",
+"lit": "hari berganti minggu,"
+},
+{
+"t": 24.2,
+"all": "hari berganti minggu,",
+"lit": "hari berganti minggu,"
+},
+{
+"t": 24.4,
+"all": "hari berganti minggu,",
+"lit": "hari berganti minggu,"
+},
+{
+"t": 24.6,
+"all": "hari berganti minggu,",
+"lit": "hari berganti minggu,"
+},
+{
+"t": 24.8,
+"all": "minggu menjadi ». -",
+"lit": "minggu"
+},
+{
+"t": 25.0,
+"all": "minggu menjadi »-",
+"lit": ""
+},
+{
+"t": 25.2,
+"all": "minggu menjadi» -",
+"lit": "minggu menjadi"
+},
+{
+"t": 25.4,
+"all": "minggu menjadi ..",
+"lit": "minggu menjadi"
+},
+{
+"t": 25.6,
+"all": "minggu menjadi bulan,",
+"lit": "minggu menjadi bulan,"
+},
+{
+"t": 25.8,
+"all": "minggu menjadi bulan,",
+"lit": "minggu menjadi bulan,"
+},
+{
+"t": 26.0,
+"all": "minggu menjadi bulan,",
+"lit": "minggu menjadi bulan,"
+},
+{
+"t": 26.2,
+"all": "minggu menjadi bulan,",
+"lit": "minggu menjadi bulan,"
+},
+{
+"t": 26.4,
+"all": "minggu menjadi bulan,",
+"lit": "minggu menjadi bulan,"
+},
+{
+"t": 26.6,
+"all": "waktu terus berjalan,",
+"lit": "waktu"
+},
+{
+"t": 26.8,
+"all": "waktu terus berjalan,",
+"lit": "waktu terus"
+},
+{
+"t": 27.0,
+"all": "waktu terus berjalan,",
+"lit": "waktu terus"
+},
+{
+"t": 27.2,
+"all": "waktu terus berjalan,",
+"lit": "waktu terus berjalan,"
+},
+{
+"t": 27.4,
+"all": "waktu terus berjalan,",
+"lit": "waktu terus berjalan,"
+},
+{
+"t": 27.6,
+"all": "waktu terus berjalan,",
+"lit": "waktu terus berjalan,"
+},
+{
+"t": 27.8,
+"all": "waktu terus berjalan,",
+"lit": "waktu terus berjalan,"
+},
+{
+"t": 28.0,
+"all": "waktu terus berjalan,",
+"lit": "waktu terus berjalan,"
+},
+{
+"t": 28.2,
+"all": "sementara kehidupannya seolah",
+"lit": "sementara"
+},
+{
+"t": 28.4,
+"all": "sementara kehidupannya seolah",
+"lit": "sementara"
+},
+{
+"t": 28.6,
+"all": "sementara kehidupannya seolah",
+"lit": "sementara kehidupannya"
+},
+{
+"t": 28.8,
+"all": "sementara kehidupannya seolah",
+"lit": "sementara kehidupannya"
+},
+{
+"t": 29.0,
+"all": "sementara kehidupannya seolah",
+"lit": "sementara kehidupannya"
+},
+{
+"t": 29.2,
+"all": "sementara kehidupannya seolah",
+"lit": "sementara kehidupannya seolah"
+},
+{
+"t": 29.4,
+"all": "sementara kehidupannya seolah",
+"lit": "sementara kehidupannya seolah"
+},
+{
+"t": 29.6,
+"all": "tidak -...--.. ke mana-mana.",
+"lit": "tidak"
+},
+{
+"t": 29.8,
+"all": "tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak"
+},
+{
+"t": 30.0,
+"all": "tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak"
+},
+{
+"t": 30.2,
+"all": "tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak"
+},
+{
+"t": 30.4,
+"all": "tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak ke"
+},
+{
+"t": 30.6,
+"all": "tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak ke mana-mana."
+},
+{
+"t": 30.8,
+"all": "tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak ke mana-mana."
+},
+{
+"t": 31.0,
+"all": "NA oa tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak ke mana-mana."
+},
+{
+"t": 31.2,
+"all": "tidak bergerak ke mana-mana.",
+"lit": "tidak bergerak ke mana-mana."
+},
+{
+"t": 31.4,
+"all": "ll vw wi tidak bergerak ke mana-mana.",
+"lit": "LL ..! tidak bergerak ke mana-mana."
+},
+{
+"t": 31.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 31.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 32.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 32.2,
+"all": "——-—wus Sebenarnya, ia sadar,",
+"lit": "w Sebenarnya,"
+},
+{
+"t": 32.4,
+"all": "— ! Sebenarnya, ia sadar,",
+"lit": "— ! Sebenarnya,"
+},
+{
+"t": 32.6,
+"all": "Aa ——— Sebenarnya, ia sadar,",
+"lit": "33 ApRGRfieaia Sebenarnya,"
+},
+{
+"t": 32.8,
+"all": "“—““— Sebenarnya, ia sadar,",
+"lit": "www ! Sebenarnya,"
+},
+{
+"t": 33.0,
+"all": "—— 01 Sebenarnya, ia sadar,",
+"lit": "1 Sebenarnya,"
+},
+{
+"t": 33.2,
+"all": "kn at “ Sebenarnya, ia sadar,",
+"lit": "oa ——— Sebenarnya, ia"
+},
+{
+"t": 33.4,
+"all": "1 Sebenarnya, ia sadar,",
+"lit": "5 33I3 B Sebenarnya, ia sadar,"
+},
+{
+"t": 33.6,
+"all": "AN Sebenarnya, ia sadar,",
+"lit": "—— Sebenarnya, ia sadar,"
+},
+{
+"t": 33.8,
+"all": "Aa Sebenarnya, ia sadar,",
+"lit": "1 Sebenarnya, ia sadar,"
+},
+{
+"t": 34.0,
+"all": "Sebenarnya, ia sadar,",
+"lit": "Sebenarnya, ia sadar,"
+},
+{
+"t": 34.2,
+"all": "Sebenarnya, ia sadar,",
+"lit": "Sebenarnya, ia sadar,"
+},
+{
+"t": 34.4,
+"all": "tidurnya semakin a25.",
+"lit": ""
+},
+{
+"t": 34.6,
+"all": "tidurnya semakin «5.",
+"lit": "tidurnya"
+},
+{
+"t": 34.8,
+"all": "tidurnya semakin «52-.",
+"lit": "tidurnya"
+},
+{
+"t": 35.0,
+"all": "tidurnya semakin -—......",
+"lit": "tidurnya semakin"
+},
+{
+"t": 35.2,
+"all": "tidurnya semakin berantakan,",
+"lit": "tidurnya semakin berantakan,"
+},
+{
+"t": 35.4,
+"all": "tidurnya semakin berantakan,",
+"lit": "tidurnya semakin berantakan,"
+},
+{
+"t": 35.6,
+"all": "tidurnya semakin berantakan,",
+"lit": "tidurnya semakin berantakan,"
+},
+{
+"t": 35.8,
+"all": "tidurnya semakin berantakan,",
+"lit": "tidurnya semakin berantakan,"
+},
+{
+"t": 36.0,
+"all": "tidurnya semakin berantakan,",
+"lit": "tidurnya semakin berantakan,"
+},
+{
+"t": 36.2,
+"all": "tidurnya semakin berantakan,",
+"lit": "tidurnya semakin berantakan,"
+},
+{
+"t": 36.4,
+"all": "tubuhnya mulai 25205",
+"lit": "tubuhnya"
+},
+{
+"t": 36.6,
+"all": "tubuhnya mulai 25255",
+"lit": "tubuhnya"
+},
+{
+"t": 36.8,
+"all": "tubuhnya mulai —...-",
+"lit": "tubuhnya mulai"
+},
+{
+"t": 37.0,
+"all": "tubuhnya mulai... .-",
+"lit": "tubuhnya mulai"
+},
+{
+"t": 37.2,
+"all": "tubuhnya mulai kelelahan.",
+"lit": "tubuhnya mulai kelelahan."
+},
+{
+"t": 37.4,
+"all": "tubuhnya mulai kelelahan.",
+"lit": "tubuhnya mulai kelelahan."
+},
+{
+"t": 37.6,
+"all": "tubuhnya mulai kelelahan.",
+"lit": "tubuhnya mulai kelelahan."
+},
+{
+"t": 37.8,
+"all": "tubuhnya mulai kelelahan.",
+"lit": "tubuhnya mulai kelelahan."
+},
+{
+"t": 38.0,
+"all": "tubuhnya mulai kelelahan.",
+"lit": "tubuhnya mulai kelelahan."
+},
+{
+"t": 38.2,
+"all": "Berbagai —-... - yang dahulu",
+"lit": "Berbagai"
+},
+{
+"t": 38.4,
+"all": "Berbagai ........ yang dahulu",
+"lit": "Berbagai"
+},
+{
+"t": 38.6,
+"all": "— La Berbagai rencana yang dahulu",
+"lit": "— . Berbagai rencana"
+},
+{
+"t": 38.8,
+"all": "had e Berbagai rencana yang dahulu",
+"lit": "had ag Berbagai rencana"
+},
+{
+"t": 39.0,
+"all": "- - Berbagai rencana yang dahulu",
+"lit": "be C Berbagai rencana"
+},
+{
+"t": 39.2,
+"all": "Pa ag Berbagai rencana yang dahulu",
+"lit": "Ma - Berbagai rencana yang dahulu"
+},
+{
+"t": 39.4,
+"all": "ban - Berbagai rencana yang dahulu",
+"lit": "ben ag Berbagai rencana yang dahulu"
+},
+{
+"t": 39.6,
+"all": "ad Cc begitu berarti,",
+"lit": "anda ag begitu"
+},
+{
+"t": 39.8,
+"all": "bed ag begitu berarti,",
+"lit": "ea ag begitu"
+},
+{
+"t": 40.0,
+"all": "he ag begitu berarti,",
+"lit": "be C begitu berarti,"
+},
+{
+"t": 40.2,
+"all": "ne Cc begitu berarti,",
+"lit": "ne ag begitu berarti,"
+},
+{
+"t": 40.4,
+"all": "me - begitu berarti,",
+"lit": "bea ag begitu berarti,"
+},
+{
+"t": 40.6,
+"all": "nd ag begitu berarti,",
+"lit": "NN ag begitu berarti,"
+},
+{
+"t": 40.8,
+"all": "Ma ag begitu berarti,",
+"lit": "NN ag begitu berarti,"
+},
+{
+"t": 41.0,
+"all": "ud ag kini hanya tersimpan dalam 4",
+"lit": "NN ag kini"
+},
+{
+"t": 41.2,
+"all": "si ag kini hanya tersimpan dalam oo",
+"lit": "Nan ag kini hanya"
+},
+{
+"t": 41.4,
+"all": "ni ag kini hanya tersimpan dalam oo",
+"lit": "Ma - kini hanya"
+},
+{
+"t": 41.6,
+"all": "sn “gg kini hanya tersimpan dalam oo",
+"lit": "Ne - kini hanya tersimpan"
+},
+{
+"t": 41.8,
+"all": "Ma ag kini hanya tersimpan dalam oo",
+"lit": "Ma ag kini hanya tersimpan"
+},
+{
+"t": 42.0,
+"all": "Ma ag kini hanya tersimpan dalam",
+"lit": "Ma ag kini hanya tersimpan dalam"
+},
+{
+"t": 42.2,
+"all": "Ma ag kini hanya tersimpan dalam pikirannya.",
+"lit": "an - kini hanya tersimpan dalam pikirannya."
+},
+{
+"t": 42.4,
+"all": "dn ag kini hanya tersimpan dalam pikirannya.",
+"lit": "Ma ag kini hanya tersimpan dalam pikirannya."
+},
+{
+"t": 42.6,
+"all": "da — kini hanya tersimpan dalam pikirannya.",
+"lit": "Gn kini hanya tersimpan dalam pikirannya."
+},
+{
+"t": 42.8,
+"all": "da ag kini hanya tersimpan dalam pikirannya.",
+"lit": "Ma ag kini hanya tersimpan dalam pikirannya."
+},
+{
+"t": 43.0,
+"all": "da ag kini hanya tersimpan dalam pikirannya.",
+"lit": "Tn ag kini hanya tersimpan dalam pikirannya."
+},
+{
+"t": 43.2,
+"all": "de ag kini hanya tersimpan dalam pikirannya.",
+"lit": "Ge ag kini hanya tersimpan dalam pikirannya."
+},
+{
+"t": 43.4,
+"all": "Gn - la ingin sea.",
+"lit": "Ma ag la"
+},
+{
+"t": 43.6,
+"all": "la ingin berubah,",
+"lit": "la ingin"
+},
+{
+"t": 43.8,
+"all": "la ingin berubah,",
+"lit": "la ingin berubah, |"
+},
+{
+"t": 44.0,
+"all": "la ingin berubah, |",
+"lit": "la ingin berubah, |"
+},
+{
+"t": 44.2,
+"all": "la ingin berubah, |",
+"lit": "la ingin berubah, |"
+},
+{
+"t": 44.4,
+"all": "la ingin berubah, |",
+"lit": "la ingin berubah, |"
+},
+{
+"t": 44.6,
+"all": "la ingin berubah, |",
+"lit": "la ingin berubah, |"
+},
+{
+"t": 44.8,
+"all": "namun setiap kali 00 Itu datang,",
+"lit": ""
+},
+{
+"t": 45.0,
+"all": "namUN setiap kali 04 Itu datang,",
+"lit": ""
+},
+{
+"t": 45.2,
+"all": "namUN setiap kali 0 Itu datang,",
+"lit": ""
+},
+{
+"t": 45.4,
+"all": "namUN setiap kali itu datang,",
+"lit": ""
+},
+{
+"t": 45.6,
+"all": "namUN setiap kali itu datang,",
+"lit": ""
+},
+{
+"t": 45.8,
+"all": "namun setiap kali itu datang,",
+"lit": "namun setiap"
+},
+{
+"t": 46.0,
+"all": "namun setiap kali 0 Itu datang,",
+"lit": "namun setiap kali"
+},
+{
+"t": 46.2,
+"all": "namun setiap kali knsarcepan. Itu datang,",
+"lit": "namun setiap kali"
+},
+{
+"t": 46.4,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "| | namun setiap kali kesempatan"
+},
+{
+"t": 46.6,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "namun setiap kali kesempatan"
+},
+{
+"t": 46.8,
+"all": "| 1 namun setiap kali kesempatan itu datang,",
+"lit": "namun setiap kali kesempatan itu"
+},
+{
+"t": 47.0,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "| namun setiap kali kesempatan itu datang, | |"
+},
+{
+"t": 47.2,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "| | namun setiap kali kesempatan itu datang,"
+},
+{
+"t": 47.4,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "namun setiap kali kesempatan itu datang,"
+},
+{
+"t": 47.6,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "namun setiap kali kesempatan itu datang,"
+},
+{
+"t": 47.8,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "namun setiap kali kesempatan itu datang,"
+},
+{
+"t": 48.0,
+"all": "| | namun setiap kali kesempatan itu datang,",
+"lit": "namun setiap kali kesempatan itu datang,"
+},
+{
+"t": 48.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 48.4,
+"all": "selalu muncul alasar.",
+"lit": "selalu"
+},
+{
+"t": 48.6,
+"all": "selalu muncul alasan.",
+"lit": "selalu"
+},
+{
+"t": 48.8,
+"all": "selalu muncul alasan.",
+"lit": "selalu muncul"
+},
+{
+"t": 49.0,
+"all": "selalu muncul alasan.",
+"lit": "selalu muncul alasan."
+},
+{
+"t": 49.2,
+"all": "selalu muncul alasan.",
+"lit": "selalu muncul alasan."
+},
+{
+"t": 49.4,
+"all": "selalu muncul alasan.",
+"lit": "selalu muncul alasan."
+},
+{
+"t": 49.6,
+"all": "selalu muncul alasan.",
+"lit": "selalu muncul alasan."
+},
+{
+"t": 49.8,
+"all": "selalu muncul alasan.",
+"lit": "selalu muncul alasan."
+},
+{
+"t": 50.0,
+"all": "selalu muncul alasan.",
+"lit": "selalu muncul alasan."
+},
+{
+"t": 50.2,
+"all": "Hari ini terlalu 456",
+"lit": "Hari"
+},
+{
+"t": 50.4,
+"all": "Hari ini terlalu 45",
+"lit": "Hari"
+},
+{
+"t": 50.6,
+"all": "Hari ini terlalu 0.",
+"lit": "Hari ini"
+},
+{
+"t": 50.8,
+"all": "Hari ini terlalu 5",
+"lit": "Hari ini"
+},
+{
+"t": 51.0,
+"all": "Hari ini terlalu —.—",
+"lit": "Hari ini terlalu"
+},
+{
+"t": 51.2,
+"all": "Hari ini terlalu ——.—",
+"lit": "Hari ini terlalu"
+},
+{
+"t": 51.4,
+"all": "Hari ini terlalu melelahkan,",
+"lit": "Hari ini terlalu melelahkan,"
+},
+{
+"t": 51.6,
+"all": "Hari ini terlalu melelahkan,",
+"lit": "Hari ini terlalu melelahkan,"
+},
+{
+"t": 51.8,
+"all": "Hari ini terlalu melelahkan,",
+"lit": "Hari ini terlalu melelahkan,"
+},
+{
+"t": 52.0,
+"all": "Hari ini terlalu melelahkan,",
+"lit": "Hari ini terlalu melelahkan,"
+},
+{
+"t": 52.2,
+"all": "Hari ini terlalu melelahkan,",
+"lit": "Hari ini terlalu melelahkan,"
+},
+{
+"t": 52.4,
+"all": "Hari ini terlalu melelahkan,",
+"lit": "Hari ini terlalu melelahkan,"
+},
+{
+"t": 52.6,
+"all": "masih ada banyak —.-- :",
+"lit": "masih"
+},
+{
+"t": 52.8,
+"all": "masih ada banyak —.-:",
+"lit": "masih ada"
+},
+{
+"t": 53.0,
+"all": "masih ada banyak -—.- :",
+"lit": "masih ada banyak"
+},
+{
+"t": 53.2,
+"all": "masih ada banyak waktu,",
+"lit": "masih ada banyak waktu,"
+},
+{
+"t": 53.4,
+"all": "masih ada banyak waktu,",
+"lit": "masih ada banyak waktu,"
+},
+{
+"t": 53.6,
+"all": "masih ada banyak waktu,",
+"lit": "masih ada banyak waktu,"
+},
+{
+"t": 53.8,
+"all": "masih ada banyak waktu,",
+"lit": "masih ada banyak waktu,"
+},
+{
+"t": 54.0,
+"all": "masih ada banyak waktu,",
+"lit": "masih ada banyak waktu,"
+},
+{
+"t": 54.2,
+"all": "masih ada banyak waktu,",
+"lit": "masih ada banyak waktu,"
+},
+{
+"t": 54.4,
+"all": "aku akan mulai ketika semuanya sudah -",
+"lit": "aku"
+},
+{
+"t": 54.6,
+"all": "aku akan mulai ketika semuanya sudah -",
+"lit": "aku akan"
+},
+{
+"t": 54.8,
+"all": "aku akan mulai ketika semuanya sudah -",
+"lit": "aku akan mulai"
+},
+{
+"t": 55.0,
+"all": "aku akan mulai ketika semuanya sudah -",
+"lit": "aku akan mulai"
+},
+{
+"t": 55.2,
+"all": "aku akan mulai ketika semuanya sudah -",
+"lit": "aku akan mulai"
+},
+{
+"t": 55.4,
+"all": "aku akan mulai ketika semuanya sudah -",
+"lit": "aku akan mulai ketika"
+},
+{
+"t": 55.6,
+"all": "aku akan mulai ketika semuanya sudah",
+"lit": "aku akan mulai ketika semuanya"
+},
+{
+"t": 55.8,
+"all": "aku akan mulai ketika semuanya sudah",
+"lit": "aku akan mulai ketika semuanya"
+},
+{
+"t": 56.0,
+"all": "aku akan mulai ketika semuanya sudah ....",
+"lit": "aku akan mulai ketika semuanya sudah"
+},
+{
+"t": 56.2,
+"all": "aku akan mulai ketika semuanya sudah siap.",
+"lit": "aku akan mulai ketika semuanya sudah siap."
+},
+{
+"t": 56.4,
+"all": "aku akan mulai ketika semuanya sudah siap.",
+"lit": "aku akan mulai ketika semuanya sudah siap."
+},
+{
+"t": 56.6,
+"all": "aku akan mulai ketika semuanya sudah siap.",
+"lit": "aku akan mulai ketika semuanya sudah siap."
+},
+{
+"t": 56.8,
+"all": "aku akan mulai ketika semuanya sudah siap.",
+"lit": "aku akan mulai ketika semuanya sudah siap."
+},
+{
+"t": 57.0,
+"all": "aku akan mulai ketika semuanya sudah siap.",
+"lit": "aku akan mulai ketika semuanya sudah siap."
+},
+{
+"t": 57.2,
+"all": "aku akan mulai ketika semuanya sudah siap.",
+"lit": "aku akan mulai ketika semuanya sudah siap."
+},
+{
+"t": 57.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 57.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 57.8,
+"all": "Alasan-alasan itu terdengar masuk",
+"lit": "Alasan-alasan"
+},
+{
+"t": 58.0,
+"all": "Alasan-alasan itu terdengar masuk ::-",
+"lit": "Alasan-alasan"
+},
+{
+"t": 58.2,
+"all": "Alasan-alasan itu terdengar masuk ::-",
+"lit": "Alasan-alasan"
+},
+{
+"t": 58.4,
+"all": "Alasan-alasan itu terdengar masuk ::-",
+"lit": "Alasan-alasan itu"
+},
+{
+"t": 58.6,
+"all": "Alasan-alasan itu terdengar masuk ::-",
+"lit": "Alasan-alasan itu"
+},
+{
+"t": 58.8,
+"all": "Alasan-alasan itu terdengar masuk :--",
+"lit": "Alasan-alasan itu terdengar"
+},
+{
+"t": 59.0,
+"all": "Alasan-alasan itu terdengar masuk :--",
+"lit": "Alasan-alasan itu terdengar"
+},
+{
+"t": 59.2,
+"all": "Alasan-alasan itu terdengar masuk -.-",
+"lit": "Alasan-alasan itu terdengar masuk"
+},
+{
+"t": 59.4,
+"all": "Alasan-alasan itu terdengar masuk ...",
+"lit": "Alasan-alasan itu terdengar masuk"
+},
+{
+"t": 59.6,
+"all": "Alasan-alasan itu terdengar masuk akal,",
+"lit": "Alasan-alasan itu terdengar masuk akal,"
+},
+{
+"t": 59.8,
+"all": "Alasan-alasan itu terdengar masuk akal,",
+"lit": "Alasan-alasan itu terdengar masuk akal,"
+},
+{
+"t": 60.0,
+"all": "Alasan-alasan itu terdengar masuk akal,",
+"lit": "Alasan-alasan itu terdengar masuk akal,"
+},
+{
+"t": 60.2,
+"all": "Alasan-alasan itu terdengar masuk akal,",
+"lit": "Alasan-alasan itu terdengar masuk akal,"
+},
+{
+"t": 60.4,
+"all": "Alasan-alasan itu terdengar masuk akal,",
+"lit": "Alasan-alasan itu terdengar masuk akal,"
+},
+{
+"t": 60.6,
+"all": "bahkan terkadang memang benar.",
+"lit": "AA bahkan"
+},
+{
+"t": 60.8,
+"all": "bahkan terkadang memang benar.",
+"lit": "ae n bahkan"
+},
+{
+"t": 61.0,
+"all": "cc. bahkan terkadang memang benar.",
+"lit": "—. bahkan terkadang"
+},
+{
+"t": 61.2,
+"all": "JA bahkan terkadang memang benar.",
+"lit": "pa — bahkan terkadang"
+},
+{
+"t": 61.4,
+"all": "JA bahkan terkadang memang benar.",
+"lit": "JA bahkan terkadang memang"
+},
+{
+"t": 61.6,
+"all": "JA bahkan terkadang memang benar.",
+"lit": "JA bahkan terkadang memang benar."
+},
+{
+"t": 61.8,
+"all": "MA bahkan terkadang memang benar.",
+"lit": "JA bahkan terkadang memang benar."
+},
+{
+"t": 62.0,
+"all": "SA bahkan terkadang memang benar.",
+"lit": "JA bahkan terkadang memang benar."
+},
+{
+"t": 62.2,
+"all": "SA bahkan terkadang memang benar.",
+"lit": "MA bahkan terkadang memang benar."
+},
+{
+"t": 62.4,
+"all": "MA bahkan terkadang memang benar.",
+"lit": "JA bahkan terkadang memang benar."
+},
+{
+"t": 62.6,
+"all": "Tetapi perlahan,",
+"lit": "Tetapi"
+},
+{
+"t": 62.8,
+"all": "Tetapi perlahan,",
+"lit": "Tetapi"
+},
+{
+"t": 63.0,
+"all": "Tetapi perlahan,",
+"lit": "Tetapi perlahan,"
+},
+{
+"t": 63.2,
+"all": "Tetapi perlahan,",
+"lit": "Tetapi perlahan,"
+},
+{
+"t": 63.4,
+"all": "Tetapi perlahan,",
+"lit": "Tetapi perlahan,"
+},
+{
+"t": 63.6,
+"all": "Tetapi perlahan,",
+"lit": "Tetapi perlahan,"
+},
+{
+"t": 63.8,
+"all": "Tetapi perlahan,",
+"lit": "Tetapi perlahan,"
+},
+{
+"t": 64.0,
+"all": "alasan yang seharusnya Henna kesulitan",
+"lit": "alasan"
+},
+{
+"t": 64.2,
+"all": "alasan yang seharusnya sn tatee kesulitan",
+"lit": "alasan yang"
+},
+{
+"t": 64.4,
+"all": "alasan yang seharusnya On tatee kesulitan",
+"lit": "alasan yang"
+},
+{
+"t": 64.6,
+"all": "alasan yang seharusnya Na na kesulitan",
+"lit": "alasan yang seharusnya"
+},
+{
+"t": 64.8,
+"all": "alasan yang seharusnya Na na kesulitan",
+"lit": "alasan yang seharusnya"
+},
+{
+"t": 65.0,
+"all": "alasan yang seharusnya Na na kesulitan",
+"lit": "alasan yang seharusnya"
+},
+{
+"t": 65.2,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan"
+},
+{
+"t": 65.4,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan"
+},
+{
+"t": 65.6,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan kesulitan"
+},
+{
+"t": 65.8,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan kesulitan"
+},
+{
+"t": 66.0,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan kesulitan"
+},
+{
+"t": 66.2,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan kesulitan"
+},
+{
+"t": 66.4,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan kesulitan"
+},
+{
+"t": 66.6,
+"all": "alasan yang seharusnya menjelaskan kesulitan",
+"lit": "alasan yang seharusnya menjelaskan kesulitan"
+},
+{
+"t": 66.8,
+"all": "justru menjadi",
+"lit": "justru"
+},
+{
+"t": 67.0,
+"all": "justru menjadi \".-",
+"lit": "justru"
+},
+{
+"t": 67.2,
+"all": "justru menjadi 1...",
+"lit": "justru menjadi"
+},
+{
+"t": 67.4,
+"all": "justru menjadi pembenaran",
+"lit": "justru menjadi pembenaran"
+},
+{
+"t": 67.6,
+"all": "justru menjadi pembenaran",
+"lit": "justru menjadi pembenaran"
+},
+{
+"t": 67.8,
+"all": "justru menjadi pembenaran",
+"lit": "justru menjadi pembenaran"
+},
+{
+"t": 68.0,
+"all": "justru menjadi pembenaran",
+"lit": "justru menjadi pembenaran"
+},
+{
+"t": 68.2,
+"all": "untuk terus menghindarinya.",
+"lit": "untuk"
+},
+{
+"t": 68.4,
+"all": "untuk terus menghindarinya.",
+"lit": "untuk terus"
+},
+{
+"t": 68.6,
+"all": "untuk terus menghindarinya.",
+"lit": "untuk terus"
+},
+{
+"t": 68.8,
+"all": "untuk terus menghindarinya.",
+"lit": "untuk terus menghindarinya."
+},
+{
+"t": 69.0,
+"all": "—i untuk terus menghindarinya.",
+"lit": "m—if untuk terus menghindarinya."
+},
+{
+"t": 69.2,
+"all": "« untuk terus menghindarinya.",
+"lit": "« untuk terus menghindarinya."
+},
+{
+"t": 69.4,
+"all": "ru untuk terus menghindarinya.",
+"lit": "( untuk terus menghindarinya."
+},
+{
+"t": 69.6,
+"all": "Ne untuk terus menghindarinya.",
+"lit": "Ne untuk terus menghindarinya."
+},
+{
+"t": 69.8,
+"all": "untuk terus menghindarinya.",
+"lit": "untuk terus menghindarinya."
+},
+{
+"t": 70.0,
+"all": "untuk terus menghindarinya.",
+"lit": "untuk terus menghindarinya."
+},
+{
+"t": 70.2,
+"all": "untuk terus menghindarinya.",
+"lit": "untuk terus menghindarinya."
+},
+{
+"t": 70.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 70.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 70.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 71.0,
+"all": "Dan tanpa disadari,",
+"lit": "Dan"
+},
+{
+"t": 71.2,
+"all": "Dan tanpa disadari,",
+"lit": "Dan tanpa"
+},
+{
+"t": 71.4,
+"all": "Dan tanpa disadari,",
+"lit": "Dan tanpa"
+},
+{
+"t": 71.6,
+"all": "Dan tanpa disadari,",
+"lit": "Dan tanpa disadari,"
+},
+{
+"t": 71.8,
+"all": "Dan tanpa disadari,",
+"lit": "Dan tanpa disadari,"
+},
+{
+"t": 72.0,
+"all": "Dan tanpa disadari,",
+"lit": "Dan tanpa disadari,"
+},
+{
+"t": 72.2,
+"all": "Dan tanpa disadari,",
+"lit": "Dan tanpa disadari,"
+},
+{
+"t": 72.4,
+"all": "Dan tanpa disadari,",
+"lit": "Dan tanpa disadari,"
+},
+{
+"t": 72.6,
+"all": "sesuatu yang awalnya hanya Tg",
+"lit": "sesuatu"
+},
+{
+"t": 72.8,
+"all": "sesuatu yang awalnya hanya Tg",
+"lit": "sesuatu"
+},
+{
+"t": 73.0,
+"all": "sesuatu yang awalnya hanya |",
+"lit": "sesuatu yang"
+},
+{
+"t": 73.2,
+"all": "sesuatu yang awalnya hanya |",
+"lit": "sesuatu yang awalnya"
+},
+{
+"t": 73.4,
+"all": "sesuatu yang awalnya hanya |",
+"lit": "sesuatu yang awalnya"
+},
+{
+"t": 73.6,
+"all": "sesuatu yang awalnya hanya |",
+"lit": "sesuatu yang awalnya"
+},
+{
+"t": 73.8,
+"all": "sesuatu yang awalnya hanya !",
+"lit": "sesuatu yang awalnya hanya"
+},
+{
+"t": 74.0,
+"all": "sesuatu yang awalnya hanya kebiasaan,",
+"lit": "sesuatu yang awalnya hanya kebiasaan,"
+},
+{
+"t": 74.2,
+"all": "sesuatu yang awalnya hanya kebiasaan,",
+"lit": "sesuatu yang awalnya hanya kebiasaan,"
+},
+{
+"t": 74.4,
+"all": "sesuatu yang awalnya hanya kebiasaan,",
+"lit": "sesuatu yang awalnya hanya kebiasaan,"
+},
+{
+"t": 74.6,
+"all": "sesuatu yang awalnya hanya kebiasaan,",
+"lit": "sesuatu yang awalnya hanya kebiasaan,"
+},
+{
+"t": 74.8,
+"all": "sesuatu yang awalnya hanya kebiasaan,",
+"lit": "sesuatu yang awalnya hanya kebiasaan,"
+},
+{
+"t": 75.0,
+"all": "sesuatu yang awalnya hanya kebiasaan,",
+"lit": "sesuatu yang awalnya hanya kebiasaan,"
+},
+{
+"t": 75.2,
+"all": "mulai berubah menjadi kehidupannya.",
+"lit": "mulai"
+},
+{
+"t": 75.4,
+"all": "mulai berubah menjadi kehidupannya.",
+"lit": "mulai"
+},
+{
+"t": 75.6,
+"all": "mulai berubah menjadi kehidupannya.",
+"lit": "mulai berubah"
+},
+{
+"t": 75.8,
+"all": "mulai berubah menjadi kehidupannya.",
+"lit": "mulai berubah"
+},
+{
+"t": 76.0,
+"all": "mulai berubah menjadi kehidupannya.",
+"lit": "mulai berubah menjadi"
+},
+{
+"t": 76.2,
+"all": "mulai berubah menjadi kehidupannya.",
+"lit": "mulai berubah menjadi"
+},
+{
+"t": 76.4,
+"all": "mulai berubah menjadi batas kehidupannya.",
+"lit": "mulai berubah menjadi batas"
+},
+{
+"t": 76.6,
+"all": "mulai berubah menjadi batas kehidupannya.",
+"lit": "mulai berubah menjadi batas"
+},
+{
+"t": 76.8,
+"all": "mulai berubah menjadi batas kehidupannya.",
+"lit": "mulai berubah menjadi batas"
+},
+{
+"t": 77.0,
+"all": "mulai berubah menjadi batas kehidupannya.",
+"lit": "mulai berubah menjadi batas kehidupannya."
+},
+{
+"t": 77.2,
+"all": "mulai berubah menjadi batas kehidupannya.",
+"lit": "mulai berubah menjadi batas kehidupannya."
+},
+{
+"t": 77.4,
+"all": "mulai berubah menjadi batas kehidupannya.",
+"lit": "mulai berubah menjadi batas kehidupannya."
+},
+{
+"t": 77.6,
+"all": "mulai berubah menjadi batas kehidupannya.",
+"lit": "mulai berubah menjadi batas kehidupannya."
+},
+{
+"t": 77.8,
+"all": "ae 65— Mw — mulai berubah menjadi - batas kehidupannya.",
+"lit": "mulai berubah menjadi batas kehidupannya."
+},
+{
+"t": 78.0,
+"all": "- mulai berubah menjadi : .— batas kehidupannya. —",
+"lit": "“P””e@@€FEF,G6 — mulai berubah menjadi 2 batas kehidupannya."
+},
+{
+"t": 78.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 78.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 78.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 78.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 79.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 79.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 79.4,
+"all": "",
+"lit": "LOL — Sementara"
+},
+{
+"t": 79.6,
+"all": "",
+"lit": "AM A(€ Sementara"
+},
+{
+"t": 79.8,
+"all": "",
+"lit": "aa“ Sementara itu,"
+},
+{
+"t": 80.0,
+"all": "",
+"lit": "aa“ Sementara itu,"
+},
+{
+"t": 80.2,
+"all": "",
+"lit": "aw“ Sementara itu,"
+},
+{
+"t": 80.4,
+"all": "",
+"lit": "aa —— Sementara itu,"
+},
+{
+"t": 80.6,
+"all": "dunia di luar terus bergerak.",
+"lit": "OA dunia"
+},
+{
+"t": 80.8,
+"all": "dunia di luar terus bergerak.",
+"lit": "an dunia"
+},
+{
+"t": 81.0,
+"all": "dunia di luar terus bergerak.",
+"lit": "a.s uw —— dunia di luar"
+},
+{
+"t": 81.2,
+"all": "dunia di luar terus bergerak.",
+"lit": "aa —— dunia di luar —"
+},
+{
+"t": 81.4,
+"all": "dunia di luar terus bergerak.",
+"lit": "Ba —— dunia di luar —"
+},
+{
+"t": 81.6,
+"all": "dunia di luar terus bergerak.",
+"lit": "aa —— dunia di luar terus bergerak. ——"
+},
+{
+"t": 81.8,
+"all": "dunia di luar terus bergerak.",
+"lit": "aa —— —— dunia di luar terus bergerak. ——"
+},
+{
+"t": 82.0,
+"all": "dunia di luar terus bergerak.",
+"lit": "aa — — dunia di luar terus bergerak. ——"
+},
+{
+"t": 82.2,
+"all": "dunia di luar terus bergerak.",
+"lit": ", , “1 dunia di luar terus bergerak. —"
+},
+{
+"t": 82.4,
+"all": "dunia di luar terus bergerak.",
+"lit": "www — '\" dunia di luar terus bergerak."
+},
+{
+"t": 82.6,
+"all": "dunia di luar terus bergerak.",
+"lit": ", dunia diluar terus bergerak."
+},
+{
+"t": 82.8,
+"all": "dunia di luar terus bergerak.",
+"lit": "dunia di luar terus bergerak."
+},
+{
+"t": 83.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 83.2,
+"all": "Manusia belajar, bekerja,",
+"lit": "Manusia"
+},
+{
+"t": 83.4,
+"all": "Manusia belajar, bekerja,",
+"lit": "Manusia"
+},
+{
+"t": 83.6,
+"all": "Manusia belajar, bekerja,",
+"lit": "Manusia belajar,"
+},
+{
+"t": 83.8,
+"all": "Manusia belajar, bekerja,",
+"lit": "Manusia belajar,"
+},
+{
+"t": 84.0,
+"all": "Manusia belajar, bekerja,",
+"lit": "Manusia belajar,"
+},
+{
+"t": 84.2,
+"all": "Manusia belajar, bekerja,",
+"lit": "Manusia belajar,"
+},
+{
+"t": 84.4,
+"all": "Manusia belajar, bekerja,",
+"lit": "Manusia belajar,"
+},
+{
+"t": 84.6,
+"all": "Manusia belajar, bekerja,",
+"lit": "0 Manusia belajar, bekerja, 0"
+},
+{
+"t": 84.8,
+"all": "Manusia belajar, bekerja,",
+"lit": ". Manusia belajar, bekerja, —"
+},
+{
+"t": 85.0,
+"all": "Manusia belajar, bekerja,",
+"lit": "— Manusia belajar, bekerja, ."
+},
+{
+"t": 85.2,
+"all": "Manusia belajar, bekerja,",
+"lit": "0 Manusia belajar, bekerja, 0"
+},
+{
+"t": 85.4,
+"all": "- -— tdi - bertemu, mengalami kegagalan,",
+"lit": "bertemu, I"
+},
+{
+"t": 85.6,
+"all": "3 .. —-— 3 3 bertemu, mengalami kegagalan,",
+"lit": "bertemu, I"
+},
+{
+"t": 85.8,
+"all": "- — aa - bertemu, mengalami kegagalan,",
+"lit": ". bertemu, l"
+},
+{
+"t": 86.0,
+"all": "3 — 3 bertemu, mengalami kegagalan,",
+"lit": ". bertemu, l"
+},
+{
+"t": 86.2,
+"all": "- — - - bertemu, mengalami kegagalan,",
+"lit": ""
+},
+{
+"t": 86.4,
+"all": "3 — - - bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami l"
+},
+{
+"t": 86.6,
+"all": "bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami"
+},
+{
+"t": 86.8,
+"all": "“ bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami kegagalan,"
+},
+{
+"t": 87.0,
+"all": "bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami kegagalan,"
+},
+{
+"t": 87.2,
+"all": "bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami kegagalan,"
+},
+{
+"t": 87.4,
+"all": "bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami kegagalan,"
+},
+{
+"t": 87.6,
+"all": "bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami kegagalan,"
+},
+{
+"t": 87.8,
+"all": "bertemu, mengalami kegagalan,",
+"lit": "bertemu, mengalami kegagalan,"
+},
+{
+"t": 88.0,
+"all": "| menemukan hal baru,",
+"lit": "Tn menemukan -"
+},
+{
+"t": 88.2,
+"all": "I menemukan hal baru, I",
+"lit": "Tn menemukan -"
+},
+{
+"t": 88.4,
+"all": "Me —.om me",
+"lit": "Tn menemukan hal -"
+},
+{
+"t": 88.6,
+"all": "I menemukan hal baru, I",
+"lit": "Tn menemukan hal baru, -"
+},
+{
+"t": 88.8,
+"all": "I menemukan hal baru, I",
+"lit": "Jaa menemukan hal baru, -"
+},
+{
+"t": 89.0,
+"all": "menemukan hal baru,",
+"lit": "menemukan hal baru,"
+},
+{
+"t": 89.2,
+"all": "menemukan hal baru,",
+"lit": "menemukan hal baru,"
+},
+{
+"t": 89.4,
+"all": "dan mencoba kembali.",
+"lit": "dan mencoba"
+},
+{
+"t": 89.6,
+"all": "dan mencoba kembali.",
+"lit": "dan mencoba"
+},
+{
+"t": 89.8,
+"all": "“- dan mencoba kembati. Tn",
+"lit": "dan mencoba"
+},
+{
+"t": 90.0,
+"all": "dan mencoba kembali.",
+"lit": "dan mencoba kembali."
+},
+{
+"t": 90.2,
+"all": "dan mencoba kembali.",
+"lit": "dan mencoba kembali."
+},
+{
+"t": 90.4,
+"all": "dan mencoba kembali.",
+"lit": "dan mencoba kembali."
+},
+{
+"t": 90.6,
+"all": "dan mencoba kembali.",
+"lit": "an “YP dan mencoba kembali. “—"
+},
+{
+"t": 90.8,
+"all": "dan mencoba kembali.",
+"lit": "oa “—— \" dan mencoba kembali. ———"
+},
+{
+"t": 91.0,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "oa “— Dunia Tn"
+},
+{
+"t": 91.2,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "OA “Dunia itu"
+},
+{
+"t": 91.4,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "pn “7 Dunia itu ——"
+},
+{
+"t": 91.6,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "Ba “Dunia itu tidak Na"
+},
+{
+"t": 91.8,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "Ba “— Dunia itu tidak selalu Tn"
+},
+{
+"t": 92.0,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "“AA KK. “— Dunia itu tidak selalu indah,” Naa"
+},
+{
+"t": 92.2,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "5 “—. Dunia itu tidak selalu indah, “— Naa"
+},
+{
+"t": 92.4,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "LA “— Dunia itu tidak selalu indah, “— Naa"
+},
+{
+"t": 92.6,
+"all": "Dunia itu tidak selalu indah,",
+"lit": "LA “— Dunia itu tidak selalu indah, “— Naa"
+},
+{
+"t": 92.8,
+"all": "tidak selalu mudah,",
+"lit": "—— To PP tidak Nan Naa"
+},
+{
+"t": 93.0,
+"all": "tidak selalu mudah,",
+"lit": "Ba — \"P tidak selalu Nan Naa"
+},
+{
+"t": 93.2,
+"all": "tidak selalu mudah,",
+"lit": "Ba oo PP tidak selalu Po Naa"
+},
+{
+"t": 93.4,
+"all": "tidak selalu mudah,",
+"lit": "an .E“P€CEp oo TP tidak selalu mudah, Na Naa"
+},
+{
+"t": 93.6,
+"all": "tidak selalu mudah,",
+"lit": "Ba — TX tidak selalu mudah, Tan Naa"
+},
+{
+"t": 93.8,
+"all": "tidak selalu mudah,",
+"lit": "Ba — tidak selalu mudah, — — Nan"
+},
+{
+"t": 94.0,
+"all": "tidak selalu mudah,",
+"lit": "BE — SS tidak selalu mudah, — — Ne"
+},
+{
+"t": 94.2,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "Ba —— bahkan na NN"
+},
+{
+"t": 94.4,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "- bahkan - NN"
+},
+{
+"t": 94.6,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "Ba - bahkan . Nan"
+},
+{
+"t": 94.8,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "www — — bahkan penuh - Ne"
+},
+{
+"t": 95.0,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "aa — bahkan penuh — NN"
+},
+{
+"t": 95.2,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "Ba — bahkan penuh ketidakpastian. — A6"
+},
+{
+"t": 95.4,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "www — bahkan penuh ketidakpastian. — aa 5101111,,5,7."
+},
+{
+"t": 95.6,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "au. — bahkan penuh ketidakpastian. — Aam, 7,"
+},
+{
+"t": 95.8,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "MP —— - bahkan penuh ketidakpastian. — Nun"
+},
+{
+"t": 96.0,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "... ——.. bahkan penuh ketidakpastian. — Nee"
+},
+{
+"t": 96.2,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "... - bahkan penuh ketidakpastian. — Nan"
+},
+{
+"t": 96.4,
+"all": "bahkan penuh ketidakpastian.",
+"lit": "- bahkan penuh ketidakpastian. —- NN n"
+},
+{
+"t": 96.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 96.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 97.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 97.2,
+"all": "Namun, ada pengalaman",
+"lit": ""
+},
+{
+"t": 97.4,
+"all": "Namun, ada pengalaman",
+"lit": "oo OLA AM PM. Tn Namun, Tn"
+},
+{
+"t": 97.6,
+"all": "Namun, ada pengalaman",
+"lit": ""
+},
+{
+"t": 97.8,
+"all": "Namun, ada pengalaman",
+"lit": ""
+},
+{
+"t": 98.0,
+"all": "8 1 JAWA Li » Namun, ada pengalaman",
+"lit": "“—T Namun, ada TT"
+},
+{
+"t": 98.2,
+"all": "CVI se Il | Namun, ada pengalaman",
+"lit": "— — Namun, ada — —"
+},
+{
+"t": 98.4,
+"all": "ti Ne “| U Il Namun, ada pengalaman",
+"lit": "— — Namun, ada pengalaman — — Naa"
+},
+{
+"t": 98.6,
+"all": "1 ME KAT",
+"lit": "— — Namun, ada pengalaman — — Nan"
+},
+{
+"t": 98.8,
+"all": "4 In” | 4 yang tidak mungkin diperoleh",
+"lit": ""
+},
+{
+"t": 99.0,
+"all": ", sy | Al yang tidak mungkin diperoleh",
+"lit": "| t | ” | . . yang tidak 0. NN"
+},
+{
+"t": 99.2,
+"all": "A BEE | Al",
+"lit": "- | | P k yang tidak mungkin 2. am iaaaaaaawawawawi"
+},
+{
+"t": 99.4,
+"all": "kh ee | ||",
+"lit": "! — T | Ka | \" | yang tidak mungkin No"
+},
+{
+"t": 99.6,
+"all": "IA ME | AI",
+"lit": "yang tidak mungkin diperoleh"
+},
+{
+"t": 99.8,
+"all": "IA NN” | Al",
+"lit": "yang tidak mungkin diperoleh"
+},
+{
+"t": 100.0,
+"all": "| 2 | N",
+"lit": "yang tidak mungkin diperoleh"
+},
+{
+"t": 100.2,
+"all": "| | a hanya dengan terus membayangkannya.",
+"lit": ""
+},
+{
+"t": 100.4,
+"all": "hanya dengan terus membayangkannya.",
+"lit": "AA hanya"
+},
+{
+"t": 100.6,
+"all": "hanya dengan terus membayangkannya.",
+"lit": "JA hanya dengan"
+},
+{
+"t": 100.8,
+"all": "hanya dengan terus membayangkannya.",
+"lit": "AA hanya dengan terus"
+},
+{
+"t": 101.0,
+"all": "hanya dengan terus membayangkannya.",
+"lit": "JA hanya dengan terus"
+},
+{
+"t": 101.2,
+"all": "JA hanya dengan terus membayangkannya.",
+"lit": "hanya dengan terus membayangkannya."
+},
+{
+"t": 101.4,
+"all": "AA hanya dengan terus membayangkannya.",
+"lit": "JA hanya dengan terus membayangkannya."
+},
+{
+"t": 101.6,
+"all": "AA hanya dengan terus membayangkannya.",
+"lit": "JA hanya dengan terus membayangkannya."
+},
+{
+"t": 101.8,
+"all": "O0r( hanya dengan terus membayangkannya.",
+"lit": "JA hanya dengan terus membayangkannya."
+},
+{
+"t": 102.0,
+"all": "JA hanya dengan terus membayangkannya.",
+"lit": "JA hanya dengan terus membayangkannya."
+},
+{
+"t": 102.2,
+"all": "AMP. hanya dengan terus membayangkannya.",
+"lit": "JA hanya dengan terus membayangkannya."
+},
+{
+"t": 102.4,
+"all": "au hanya dengan terus membayangkannya.",
+"lit": "» hanya dengan terus membayangkannya."
+},
+{
+"t": 102.6,
+"all": "Ae hanya dengan terus membayangkannya.",
+"lit": "hanya dengan terus membayangkannya."
+},
+{
+"t": 102.8,
+"all": "Ba",
+"lit": ""
+},
+{
+"t": 103.0,
+"all": "Sa MN",
+"lit": "NN"
+},
+{
+"t": 103.2,
+"all": "so",
+"lit": ""
+},
+{
+"t": 103.4,
+"all": "Se",
+"lit": "me"
+},
+{
+"t": 103.6,
+"all": "se",
+"lit": "PN"
+},
+{
+"t": 103.8,
+"all": "",
+"lit": "cs oo @ ,"
+},
+{
+"t": 104.0,
+"all": "aa Suatu malam,",
+"lit": "mam ————"
+},
+{
+"t": 104.2,
+"all": "“Te Suatu malam,",
+"lit": "O—— Suatu"
+},
+{
+"t": 104.4,
+"all": "sa Suatu malam,",
+"lit": "O———— Suatu malam,"
+},
+{
+"t": 104.6,
+"all": "Suatu malam,",
+"lit": "v Suatu malam,"
+},
+{
+"t": 104.8,
+"all": "Suatu malam,",
+"lit": "O——— Suatu malam,"
+},
+{
+"t": 105.0,
+"all": "aa Suatu malam,",
+"lit": "O———— Suatu malam,"
+},
+{
+"t": 105.2,
+"all": "ya” ia .»rk--:! menatap layar ponselnya.",
+"lit": "—an . ia"
+},
+{
+"t": 105.4,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "v” ia berhenti"
+},
+{
+"t": 105.6,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti"
+},
+{
+"t": 105.8,
+"all": "0 ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap"
+},
+{
+"t": 106.0,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap"
+},
+{
+"t": 106.2,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap layar"
+},
+{
+"t": 106.4,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap layar"
+},
+{
+"t": 106.6,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap layar ponselnya."
+},
+{
+"t": 106.8,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap layar ponselnya."
+},
+{
+"t": 107.0,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap layar ponselnya."
+},
+{
+"t": 107.2,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap layar ponselnya."
+},
+{
+"t": 107.4,
+"all": "ia berhenti menatap layar ponselnya.",
+"lit": "ia berhenti menatap layar ponselnya."
+},
+{
+"t": 107.6,
+"all": "Pandangannya beralih ke sekeliling $",
+"lit": "Pandangannya"
+},
+{
+"t": 107.8,
+"all": "Pandangannya beralih ke sekeliling $",
+"lit": "Pandangannya"
+},
+{
+"t": 108.0,
+"all": "Pandangannya beralih ke sekeliling $",
+"lit": "Pandangannya"
+},
+{
+"t": 108.2,
+"all": "Pandangannya beralih ke sekeliling $",
+"lit": "Pandangannya beralih"
+},
+{
+"t": 108.4,
+"all": "Pandangannya beralih ke sekeliling",
+"lit": "Pandangannya beralih"
+},
+{
+"t": 108.6,
+"all": "Pandangannya beralih ke sekeliling",
+"lit": "Pandangannya beralih"
+},
+{
+"t": 108.8,
+"all": "Pandangannya beralih ke sekeliling",
+"lit": "Pandangannya beralih"
+},
+{
+"t": 109.0,
+"all": "Pandangannya beralih ke sekeliling",
+"lit": "Pandangannya beralih ke sekeliling"
+},
+{
+"t": 109.2,
+"all": "Pandangannya beralih ke sekeliling",
+"lit": "Pandangannya beralih ke sekeliling"
+},
+{
+"t": 109.4,
+"all": "Pandangannya beralih ke sekeliling ruangan,",
+"lit": "Pandangannya beralih ke sekeliling ruangan,"
+},
+{
+"t": 109.6,
+"all": "Pandangannya beralih ke sekeliling ruangan,",
+"lit": "Pandangannya beralih ke sekeliling ruangan,"
+},
+{
+"t": 109.8,
+"all": "Pandangannya beralih ke sekeliling ruangan,",
+"lit": "Pandangannya beralih ke sekeliling ruangan,"
+},
+{
+"t": 110.0,
+"all": "Pandangannya beralih ke sekeliling ruangan,",
+"lit": "Pandangannya beralih ke sekeliling ruangan,"
+},
+{
+"t": 110.2,
+"all": "Pandangannya beralih ke sekeliling ruangan,",
+"lit": "Pandangannya beralih ke sekeliling ruangan,"
+},
+{
+"t": 110.4,
+"all": "ranjang,",
+"lit": "ranjang,"
+},
+{
+"t": 110.6,
+"all": "ranjang,",
+"lit": "ranjang,"
+},
+{
+"t": 110.8,
+"all": "ranjang,",
+"lit": "ranjang,"
+},
+{
+"t": 111.0,
+"all": "ranjang,",
+"lit": "ranjang,"
+},
+{
+"t": 111.2,
+"all": "ranjang,",
+"lit": "ranjang,"
+},
+{
+"t": 111.4,
+"all": "ranjang,",
+"lit": "ranjang,"
+},
+{
+"t": 111.6,
+"all": "- —| a “— dinding yang sunyi, y GR «",
+"lit": "dinding"
+},
+{
+"t": 111.8,
+"all": "ban g — - | a MH dinding yang sunyi, «",
+"lit": "dinding yang"
+},
+{
+"t": 112.0,
+"all": "- ai ol 3 cl dinding yang sunyi, an «",
+"lit": "dinding yang sunyi,"
+},
+{
+"t": 112.2,
+"all": "- | mm dinding yang sunyi, aa «",
+"lit": "dinding yang sunyi,"
+},
+{
+"t": 112.4,
+"all": "| 2. N - z - dinding yang sunyi, P",
+"lit": "dinding yang sunyi,"
+},
+{
+"t": 112.6,
+"all": "a 1» - rom dinding yang sunyi, P",
+"lit": "dinding yang sunyi,"
+},
+{
+"t": 112.8,
+"all": "ai 1 » - a m dinding yang sunyi, «",
+"lit": "dinding yang sunyi,"
+},
+{
+"t": 113.0,
+"all": "3 ventilasi kecil, | t",
+"lit": "ventilasi"
+},
+{
+"t": 113.2,
+"all": "pa — - & ventilasi kecit, 9 Tn 1 3",
+"lit": "ventilasi"
+},
+{
+"t": 113.4,
+"all": "5—— ventilasi kecil, 1 E — 0",
+"lit": "ventilasi"
+},
+{
+"t": 113.6,
+"all": "- - (entitas kecil, 3 E 0 Tg",
+"lit": "ventilasi kecil,"
+},
+{
+"t": 113.8,
+"all": "aa — an V rontitsi keci ) Long E 0. Ma",
+"lit": "ventilasi kecil,"
+},
+{
+"t": 114.0,
+"all": "aa - |. NU bentitasi kecil j “ I TN .",
+"lit": "NN — ventilasi kecil, j"
+},
+{
+"t": 114.2,
+"all": "ai UV eentitasi kec E",
+"lit": "ventilasi kecil,"
+},
+{
+"t": 114.4,
+"all": "dan sebuah : -- .",
+"lit": "dan sebuah"
+},
+{
+"t": 114.6,
+"all": "dan sebuah : -..",
+"lit": "dan sebuah"
+},
+{
+"t": 114.8,
+"all": "dan sebuah : -..",
+"lit": "dan sebuah"
+},
+{
+"t": 115.0,
+"all": "dan sebuah pintu.",
+"lit": "dan sebuah pintu."
+},
+{
+"t": 115.2,
+"all": "dan sebuah pintu.",
+"lit": "dan sebuah pintu."
+},
+{
+"t": 115.4,
+"all": "dan sebuah pintu.",
+"lit": "dan sebuah pintu."
+},
+{
+"t": 115.6,
+"all": "dan sebuah pintu.",
+"lit": "dan sebuah pintu."
+},
+{
+"t": 115.8,
+"all": "dan sebuah pintu.",
+"lit": "dan sebuah pintu."
+},
+{
+"t": 116.0,
+"all": "dan sebuah pintu.",
+"lit": "dan sebuah pintu."
+},
+{
+"t": 116.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 116.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 116.6,
+"all": "Untuk pertama kalinya,",
+"lit": "Untuk"
+},
+{
+"t": 116.8,
+"all": "Untuk pertama kalinya,",
+"lit": "Untuk"
+},
+{
+"t": 117.0,
+"all": "Untuk pertama kalinya,",
+"lit": "Untuk pertama"
+},
+{
+"t": 117.2,
+"all": "Untuk pertama kalinya,",
+"lit": "Untuk pertama kalinya,"
+},
+{
+"t": 117.4,
+"all": "Untuk pertama kalinya,",
+"lit": "Untuk pertama kalinya,"
+},
+{
+"t": 117.6,
+"all": "Untuk pertama kalinya,",
+"lit": "Untuk pertama kalinya,"
+},
+{
+"t": 117.8,
+"all": "Untuk pertama kalinya,",
+"lit": "Untuk pertama kalinya,"
+},
+{
+"t": 118.0,
+"all": "ia nempertanyakan sesuatu",
+"lit": ""
+},
+{
+"t": 118.2,
+"all": "ia mempertanyakan sesuatu",
+"lit": "ia mempertanyakan"
+},
+{
+"t": 118.4,
+"all": "ia mempertanyakan sesuatu",
+"lit": "ia mempertanyakan"
+},
+{
+"t": 118.6,
+"all": "ia mempertanyakan sesuatu",
+"lit": "ia mempertanyakan"
+},
+{
+"t": 118.8,
+"all": "ia mempertanyakan sesuatu",
+"lit": "ia mempertanyakan"
+},
+{
+"t": 119.0,
+"all": "ia mempertanyakan sesuatu",
+"lit": "ia mempertanyakan sesuatu"
+},
+{
+"t": 119.2,
+"all": "ia mempertanyakan sesuatu",
+"lit": "ia mempertanyakan sesuatu"
+},
+{
+"t": 119.4,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": ""
+},
+{
+"t": 119.6,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang"
+},
+{
+"t": 119.8,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama"
+},
+{
+"t": 120.0,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini"
+},
+{
+"t": 120.2,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini"
+},
+{
+"t": 120.4,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu"
+},
+{
+"t": 120.6,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu"
+},
+{
+"t": 120.8,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu"
+},
+{
+"t": 121.0,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu dihindarinya."
+},
+{
+"t": 121.2,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu dihindarinya."
+},
+{
+"t": 121.4,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu dihindarinya."
+},
+{
+"t": 121.6,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu dihindarinya."
+},
+{
+"t": 121.8,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu dihindarinya."
+},
+{
+"t": 122.0,
+"all": "yang selama ini selalu dihindarinya.",
+"lit": "yang selama ini selalu dihindarinya."
+},
+{
+"t": 122.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 122.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 122.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 122.8,
+"all": "Apakah aku benar-benar",
+"lit": ""
+},
+{
+"t": 123.0,
+"all": "Apakah aku benar-benar",
+"lit": "Apakah"
+},
+{
+"t": 123.2,
+"all": "Apakah aku benar-benar",
+"lit": "Apakah aku"
+},
+{
+"t": 123.4,
+"all": "Apakah aku benar-benar",
+"lit": "Apakah aku benar-benar"
+},
+{
+"t": 123.6,
+"all": "Apakah aku benar-benar",
+"lit": "Apakah aku benar-benar"
+},
+{
+"t": 123.8,
+"all": "tidak 1 mengubah hidupku?",
+"lit": ""
+},
+{
+"t": 124.0,
+"all": "tidak -—...... mengubah hidupku?",
+"lit": "tidak"
+},
+{
+"t": 124.2,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu"
+},
+{
+"t": 124.4,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu"
+},
+{
+"t": 124.6,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah"
+},
+{
+"t": 124.8,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah"
+},
+{
+"t": 125.0,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah hidupku?"
+},
+{
+"t": 125.2,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah hidupku?"
+},
+{
+"t": 125.4,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah hidupku?"
+},
+{
+"t": 125.6,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah hidupku?"
+},
+{
+"t": 125.8,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah hidupku?"
+},
+{
+"t": 126.0,
+"all": "tidak mampu mengubah hidupku?",
+"lit": "tidak mampu mengubah hidupku?"
+},
+{
+"t": 126.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 126.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 126.6,
+"all": "Atau selama ini aku terus",
+"lit": "Atau"
+},
+{
+"t": 126.8,
+"all": "Atau selama ini aku terus",
+"lit": "Atau"
+},
+{
+"t": 127.0,
+"all": "Atau selama ini aku terus",
+"lit": "Atau selama"
+},
+{
+"t": 127.2,
+"all": "Ne Atau selama ini aku terus",
+"lit": "Atau selama ini"
+},
+{
+"t": 127.4,
+"all": "4.5 Atau selama ini aku terus",
+"lit": "NX Atau selama ini aku"
+},
+{
+"t": 127.6,
+"all": "h Atau selama ini aku terus",
+"lit": "Xx Atau selama ini aku"
+},
+{
+"t": 127.8,
+"all": "x mencari ». «untuk tidak mencobanya?",
+"lit": "xXx mencari"
+},
+{
+"t": 128.0,
+"all": "xXx mencari -. . untuk tidak mencobanya?",
+"lit": "NX mencari"
+},
+{
+"t": 128.2,
+"all": "xx mencari alasan untuk tidak mencobanya?",
+"lit": "NN mencari alasan"
+},
+{
+"t": 128.4,
+"all": "xXx mencari alasan untuk tidak mencobanya?",
+"lit": "xX mencari alasan"
+},
+{
+"t": 128.6,
+"all": "xXx mencari alasan untuk tidak mencobanya?",
+"lit": "Xx mencari alasan"
+},
+{
+"t": 128.8,
+"all": "Xx mencari alasan untuk tidak mencobanya?",
+"lit": "xX mencari alasan untuk"
+},
+{
+"t": 129.0,
+"all": "Xx mencari alasan untuk tidak mencobanya?",
+"lit": "x mencari alasan untuk"
+},
+{
+"t": 129.2,
+"all": "9 mencari alasan untuk tidak mencobanya?",
+"lit": ". mencari alasan untuk tidak mencobanya?"
+},
+{
+"t": 129.4,
+"all": "xx mencari alasan untuk tidak mencobanya?",
+"lit": "x mencari alasan untuk tidak mencobanya?"
+},
+{
+"t": 129.6,
+"all": "Gg mencari alasan untuk tidak mencobanya?",
+"lit": "Gg mencari alasan untuk tidak mencobanya?"
+},
+{
+"t": 129.8,
+"all": "Gg mencari alasan untuk tidak mencobanya?",
+"lit": "Gg mencari alasan untuk tidak mencobanya?"
+},
+{
+"t": 130.0,
+"all": "mencari alasan untuk tidak mencobanya?",
+"lit": "CG mencari alasan untuk tidak mencobanya?"
+},
+{
+"t": 130.2,
+"all": "mencari alasan untuk tidak mencobanya?",
+"lit": "ca mencari alasan untuk tidak mencobanya?"
+},
+{
+"t": 130.4,
+"all": "Ga mencari alasan untuk tidak mencobanya?",
+"lit": "Ga mencari alasan untuk tidak mencobanya?"
+},
+{
+"t": 130.6,
+"all": "|",
+"lit": "ci"
+},
+{
+"t": 130.8,
+"all": "ci",
+"lit": "\""
+},
+{
+"t": 131.0,
+"all": "Gn",
+"lit": "Ga"
+},
+{
+"t": 131.2,
+"all": "ca",
+"lit": "| Ca"
+},
+{
+"t": 131.4,
+"all": "Ca",
+"lit": "Cc"
+},
+{
+"t": 131.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 131.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 132.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 132.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 132.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 132.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 132.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 133.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 133.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 133.4,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak"
+},
+{
+"t": 133.6,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak"
+},
+{
+"t": 133.8,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak ada jawaban"
+},
+{
+"t": 134.0,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak ada jawaban"
+},
+{
+"t": 134.2,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak ada jawaban"
+},
+{
+"t": 134.4,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak ada jawaban yang"
+},
+{
+"t": 134.6,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak ada jawaban yang langsung"
+},
+{
+"t": 134.8,
+"all": "Tidak ada jawaban yang langsung",
+"lit": "Tidak ada jawaban yang langsung"
+},
+{
+"t": 135.0,
+"all": "mengubah segalanya.",
+"lit": "mengubah"
+},
+{
+"t": 135.2,
+"all": "mengubah segalanya.",
+"lit": "mengubah"
+},
+{
+"t": 135.4,
+"all": "mengubah segalanya.",
+"lit": "mengubah"
+},
+{
+"t": 135.6,
+"all": "mengubah segalanya.",
+"lit": "mengubah"
+},
+{
+"t": 135.8,
+"all": "mengubah segalanya.",
+"lit": "mengubah segalanya."
+},
+{
+"t": 136.0,
+"all": "mengubah segalanya.",
+"lit": "mengubah segalanya."
+},
+{
+"t": 136.2,
+"all": "mengubah segalanya.",
+"lit": "mengubah segalanya."
+},
+{
+"t": 136.4,
+"all": "mengubah segalanya.",
+"lit": "mengubah segalanya."
+},
+{
+"t": 136.6,
+"all": "Rasa »-.. masih ada,",
+"lit": "Rasa"
+},
+{
+"t": 136.8,
+"all": "Rasa takutnya masih ada,",
+"lit": "Rasa takutnya"
+},
+{
+"t": 137.0,
+"all": "Rasa takutnya masih ada,",
+"lit": "Rasa takutnya"
+},
+{
+"t": 137.2,
+"all": "Rasa takutnya masih ada,",
+"lit": "Rasa takutnya"
+},
+{
+"t": 137.4,
+"all": "Rasa takutnya masih ada,",
+"lit": "Rasa takutnya masih"
+},
+{
+"t": 137.6,
+"all": "Rasa takutnya masih ada,",
+"lit": "Rasa takutnya masih ada,"
+},
+{
+"t": 137.8,
+"all": "TEA Rasa takutnya masih ada,",
+"lit": "MEN Rasa takutnya masih ada,"
+},
+{
+"t": 138.0,
+"all": "3 Rasa takutnya masih ada,",
+"lit": "TN Rasa takutnya masih ada,"
+},
+{
+"t": 138.2,
+"all": "EN Rasa takutnya masih ada,",
+"lit": "KE Rasa takutnya masih ada,"
+},
+{
+"t": 138.4,
+"all": "D keraguannya belum menghilang.",
+"lit": ""
+},
+{
+"t": 138.6,
+"all": ", keraguannya belum menghilang.",
+"lit": "Aa SD keraguannya"
+},
+{
+"t": 138.8,
+"all": "keraguannya belum menghilang.",
+"lit": "eh keraguannya"
+},
+{
+"t": 139.0,
+"all": "keraguannya belum menghilang.",
+"lit": "keraguannya belum"
+},
+{
+"t": 139.2,
+"all": "AO, keraguannya belum menghilang.",
+"lit": "ee , keraguannya belum"
+},
+{
+"t": 139.4,
+"all": "AA O, keraguannya belum menghilang.",
+"lit": "ea , keraguannya belum menghilang."
+},
+{
+"t": 139.6,
+"all": "| keraguannya belum menghilang.",
+"lit": "ee — keraguannya belum menghilang."
+},
+{
+"t": 139.8,
+"all": "or... keraguannya belum menghilang.",
+"lit": "an keraguannya belum menghilang."
+},
+{
+"t": 140.0,
+"all": "om. keraguannya belum menghilang.",
+"lit": "ME WA keraguannya belum menghilang."
+},
+{
+"t": 140.2,
+"all": "MA WA keraguannya belum menghilang.",
+"lit": "ah keraguannya belum menghilang."
+},
+{
+"t": 140.4,
+"all": "PA YNA. keraguannya belum menghilang.",
+"lit": "EA keraguannya belum menghilang."
+},
+{
+"t": 140.6,
+"all": "PA WA, keraguannya belum menghilang.",
+"lit": "MA WA keraguannya belum menghilang."
+},
+{
+"t": 140.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 141.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 141.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 141.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 141.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 141.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 142.0,
+"all": "Namun, kali ini",
+"lit": "Namun,"
+},
+{
+"t": 142.2,
+"all": "Namun, kali ini",
+"lit": "Namun,"
+},
+{
+"t": 142.4,
+"all": "Namun, kali ini",
+"lit": "Namun,"
+},
+{
+"t": 142.6,
+"all": "Namun, kali ini",
+"lit": "Namun,"
+},
+{
+"t": 142.8,
+"all": "Namun, kali ini",
+"lit": "Namun, kali"
+},
+{
+"t": 143.0,
+"all": "Namun, kali ini",
+"lit": "Namun, kali ini"
+},
+{
+"t": 143.2,
+"all": "ia tidak membuat “ss. untuk esok hari.",
+"lit": ""
+},
+{
+"t": 143.4,
+"all": "ia tidak membuat “as. untuk esok hari.",
+"lit": ""
+},
+{
+"t": 143.6,
+"all": "ia tidak membuat “as. untuk esok hari.",
+"lit": "ia tidak"
+},
+{
+"t": 143.8,
+"all": "ia tidak membuat “as. untuk esok hari.",
+"lit": "ia tidak membuat"
+},
+{
+"t": 144.0,
+"all": "ia tidak membuat “as. untuk esok hari.",
+"lit": "ia tidak membuat"
+},
+{
+"t": 144.2,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji"
+},
+{
+"t": 144.4,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji"
+},
+{
+"t": 144.6,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk"
+},
+{
+"t": 144.8,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk esok"
+},
+{
+"t": 145.0,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk esok"
+},
+{
+"t": 145.2,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk esok hari."
+},
+{
+"t": 145.4,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk esok hari."
+},
+{
+"t": 145.6,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk esok hari."
+},
+{
+"t": 145.8,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk esok hari."
+},
+{
+"t": 146.0,
+"all": "ia tidak membuat janji untuk esok hari.",
+"lit": "ia tidak membuat janji untuk esok hari."
+},
+{
+"t": 146.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 146.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 146.6,
+"all": "la meletakkan ponselnya,",
+"lit": ""
+},
+{
+"t": 146.8,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan"
+},
+{
+"t": 147.0,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan"
+},
+{
+"t": 147.2,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan"
+},
+{
+"t": 147.4,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan ponselnya,"
+},
+{
+"t": 147.6,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan ponselnya,"
+},
+{
+"t": 147.8,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan ponselnya,"
+},
+{
+"t": 148.0,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan ponselnya,"
+},
+{
+"t": 148.2,
+"all": "la meletakkan ponselnya,",
+"lit": "la meletakkan ponselnya,"
+},
+{
+"t": 148.4,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit"
+},
+{
+"t": 148.6,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit"
+},
+{
+"t": 148.8,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit"
+},
+{
+"t": 149.0,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit dari"
+},
+{
+"t": 149.2,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit dari ranjang,"
+},
+{
+"t": 149.4,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit dari ranjang,"
+},
+{
+"t": 149.6,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit dari ranjang,"
+},
+{
+"t": 149.8,
+"all": "bangkit dari ranjang,",
+"lit": "bangkit dari ranjang,"
+},
+{
+"t": 150.0,
+"all": "dan perlahan berjalan menuju — “.",
+"lit": "dan"
+},
+{
+"t": 150.2,
+"all": "dan perlahan berjalan menuju — “.",
+"lit": "dan"
+},
+{
+"t": 150.4,
+"all": "dan perlahan berjalan menuju —",
+"lit": "dan perlahan"
+},
+{
+"t": 150.6,
+"all": "dan perlahan berjalan menuju —",
+"lit": "dan perlahan"
+},
+{
+"t": 150.8,
+"all": "dan perlahan berjalan menuju —",
+"lit": "dan perlahan berjalan"
+},
+{
+"t": 151.0,
+"all": "dan perlahan berjalan menuju —",
+"lit": "dan perlahan berjalan"
+},
+{
+"t": 151.2,
+"all": "dan perlahan berjalan menuju —",
+"lit": "dan perlahan berjalan"
+},
+{
+"t": 151.4,
+"all": "dan perlahan berjalan menuju -",
+"lit": "dan perlahan berjalan menuju"
+},
+{
+"t": 151.6,
+"all": "dan perlahan berjalan menuju pintu.",
+"lit": "dan perlahan berjalan menuju pintu."
+},
+{
+"t": 151.8,
+"all": "dan perlahan berjalan menuju pintu.",
+"lit": "dan perlahan berjalan menuju pintu."
+},
+{
+"t": 152.0,
+"all": "dan perlahan berjalan menuju pintu.",
+"lit": "dan perlahan berjalan menuju pintu."
+},
+{
+"t": 152.2,
+"all": "dan perlahan berjalan menuju pintu.",
+"lit": "dan perlahan berjalan menuju pintu."
+},
+{
+"t": 152.4,
+"all": "dan perlahan berjalan menuju pintu.",
+"lit": "dan perlahan berjalan menuju pintu."
+},
+{
+"t": 152.6,
+"all": "dan perlahan berjalan menuju pintu.",
+"lit": "dan perlahan berjalan menuju pintu."
+},
+{
+"t": 152.8,
+"all": "dan perlahan berjalan menuju pintu.",
+"lit": "dan perlahan berjalan menuju pintu."
+},
+{
+"t": 153.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 153.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 153.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 153.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 153.8,
+"all": "Ketika tangannya memutar",
+"lit": "Ketika"
+},
+{
+"t": 154.0,
+"all": "Ketika tangannya memutar",
+"lit": "Ketika"
+},
+{
+"t": 154.2,
+"all": "Ketika tangannya memutar",
+"lit": "Ketika tangannya"
+},
+{
+"t": 154.4,
+"all": "Ketika tangannya memutar",
+"lit": "Ketika tangannya"
+},
+{
+"t": 154.6,
+"all": "Ketika tangannya memutar",
+"lit": "Ketika tangannya memutar"
+},
+{
+"t": 154.8,
+"all": "Ketika tangannya memutar",
+"lit": "Ketika tangannya memutar"
+},
+{
+"t": 155.0,
+"all": "gagang pintu itu,",
+"lit": ""
+},
+{
+"t": 155.2,
+"all": "gagang pintu itu,",
+"lit": "gagang"
+},
+{
+"t": 155.4,
+"all": "gagang pintu itu,",
+"lit": "gagang pintu"
+},
+{
+"t": 155.6,
+"all": "gagang pintu itu,",
+"lit": "gagang pintu"
+},
+{
+"t": 155.8,
+"all": "gagang pintu itu,",
+"lit": "gagang pintu itu,"
+},
+{
+"t": 156.0,
+"all": "gagang pintu itu,",
+"lit": "gagang pintu itu,"
+},
+{
+"t": 156.2,
+"all": "gagang pintu itu,",
+"lit": "gagang pintu itu,"
+},
+{
+"t": 156.4,
+"all": "ia menemukan sesuatu",
+"lit": ""
+},
+{
+"t": 156.6,
+"all": "ia menemukan sesuatu",
+"lit": "ia menemukan"
+},
+{
+"t": 156.8,
+"all": "ia menemukan sesuatu",
+"lit": "ia menemukan"
+},
+{
+"t": 157.0,
+"all": "ia menemukan sesuatu",
+"lit": "ia menemukan sesuatu"
+},
+{
+"t": 157.2,
+"all": "ia menemukan sesuatu",
+"lit": "ia menemukan sesuatu"
+},
+{
+"t": 157.4,
+"all": "ia menemukan sesuatu",
+"lit": "ia menemukan sesuatu"
+},
+{
+"t": 157.6,
+"all": "yang tak pernah benar-benar ia",
+"lit": ""
+},
+{
+"t": 157.8,
+"all": "yang tak pernah benar-benar ia\".",
+"lit": "yang"
+},
+{
+"t": 158.0,
+"all": "Ih IM IM yang tak pernah benar-benar ia «ds",
+"lit": "yang tak"
+},
+{
+"t": 158.2,
+"all": "8. B3 yang tak pernah benar-benar ia sd:",
+"lit": "B3 yang tak"
+},
+{
+"t": 158.4,
+"all": "yang tak pernah benar-benar ia sda.",
+"lit": "yang tak pernah"
+},
+{
+"t": 158.6,
+"all": "yang tak pernah benar-benar ja - d2”.",
+"lit": "yang tak pernah benar-benar"
+},
+{
+"t": 158.8,
+"all": "yang tak pernah benar-benar ja - de”:",
+"lit": "yang tak pernah benar-benar"
+},
+{
+"t": 159.0,
+"all": "yang tak pernah benar-benar ja - da”:",
+"lit": "yang tak pernah benar-benar"
+},
+{
+"t": 159.2,
+"all": "| yang tak pernah benar-benar ia -- de”:",
+"lit": "yang tak pernah benar-benar ia"
+},
+{
+"t": 159.4,
+"all": "| yang tak pernah benar-benar ia sadari.",
+"lit": "| yang tak pernah benar-benar ia sadari."
+},
+{
+"t": 159.6,
+"all": "| yang tak pernah benar-benar ia sadari.",
+"lit": "| yang tak pernah benar-benar ia sadari."
+},
+{
+"t": 159.8,
+"all": "| yang tak pernah benar-benar ia sadari.",
+"lit": "| yang tak pernah benar-benar ia sadari."
+},
+{
+"t": 160.0,
+"all": "| yang tak pernah benar-benar ia sadari.",
+"lit": "| yang tak pernah benar-benar ia sadari."
+},
+{
+"t": 160.2,
+"all": "| yang tak pernah benar-benar ia sadari.",
+"lit": "| yang tak pernah benar-benar ia sadari."
+},
+{
+"t": 160.4,
+"all": "5.",
+"lit": ""
+},
+{
+"t": 160.6,
+"all": "Na...",
+"lit": ""
+},
+{
+"t": 160.8,
+"all": "aa",
+"lit": "UN..."
+},
+{
+"t": 161.0,
+"all": "aa",
+"lit": "aa"
+},
+{
+"t": 161.2,
+"all": "aa",
+"lit": "ea"
+},
+{
+"t": 161.4,
+"all": "aa",
+"lit": ""
+},
+{
+"t": 161.6,
+"all": "aa",
+"lit": "aa"
+},
+{
+"t": 161.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 162.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 162.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 162.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 162.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 162.8,
+"all": "| tidak terkunsi. !",
+"lit": ""
+},
+{
+"t": 163.0,
+"all": "4 N tidak terkussi.",
+"lit": "an tidak"
+},
+{
+"t": 163.2,
+"all": "p N |",
+"lit": "p N —"
+},
+{
+"t": 163.4,
+"all": "4 N |",
+"lit": "4 N ."
+},
+{
+"t": 163.6,
+"all": "4 N '",
+"lit": "p N '"
+},
+{
+"t": 163.8,
+"all": "4 N |",
+"lit": "h N '"
+},
+{
+"t": 164.0,
+"all": "4 N '",
+"lit": "4 N :"
+},
+{
+"t": 164.2,
+"all": "MA N '",
+"lit": "h N '"
+},
+{
+"t": 164.4,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di"
+},
+{
+"t": 164.6,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya"
+},
+{
+"t": 164.8,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya"
+},
+{
+"t": 165.0,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya"
+},
+{
+"t": 165.2,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya terbentang Nee"
+},
+{
+"t": 165.4,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "-— Di hadapannya terbentang — rr"
+},
+{
+"t": 165.6,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "- Di hadapannya terbentang -— dunia Naa"
+},
+{
+"t": 165.8,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": ". Di hadapannya terbentang — dunia"
+},
+{
+"t": 166.0,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya terbentang - dunia yang"
+},
+{
+"t": 166.2,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya terbentang - dunia yang tuas."
+},
+{
+"t": 166.4,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya terbentang ' dunia yang luas."
+},
+{
+"t": 166.6,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "\" Di hadapannya terbentang | dunia yang luas."
+},
+{
+"t": 166.8,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "” Di hadapannya terbentang \" dunia yang luas."
+},
+{
+"t": 167.0,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya terbentang dunia yang luas. —"
+},
+{
+"t": 167.2,
+"all": "Di hadapannya terbentang dunia yang luas.",
+"lit": "Di hadapannya terbentang dunia yang luas. —"
+},
+{
+"t": 167.4,
+"all": "",
+"lit": ". —rvv'v:z:z:zwv"
+},
+{
+"t": 167.6,
+"all": "",
+"lit": "” ———— www"
+},
+{
+"t": 167.8,
+"all": "Dengan segala kemungkinan",
+"lit": ""
+},
+{
+"t": 168.0,
+"all": "Dengan segala kemungkinan",
+"lit": "Dengan segala Na"
+},
+{
+"t": 168.2,
+"all": "Dengan segala kemungkinan",
+"lit": "Dengan segala —"
+},
+{
+"t": 168.4,
+"all": "Dengan segala kemungkinan",
+"lit": "Dengan segala —"
+},
+{
+"t": 168.6,
+"all": "Dengan segala kemungkinan",
+"lit": "f Dengan segala kemungkinan —"
+},
+{
+"t": 168.8,
+"all": "Dengan segala kemungkinan",
+"lit": "f Dengan segala kemungkinan —"
+},
+{
+"t": 169.0,
+"all": "Dengan segala kemungkinan",
+"lit": "f Dengan segala kemungkinan —"
+},
+{
+"t": 169.2,
+"all": "dan ketidakpastiannya,",
+"lit": "5."
+},
+{
+"t": 169.4,
+"all": "dan ketidakpastiannya,",
+"lit": "— dan ketidakpastiannya, ' —"
+},
+{
+"t": 169.6,
+"all": "dan ketidakpastiannya,",
+"lit": "— dan ketidakpastiannya, .— ."
+},
+{
+"t": 169.8,
+"all": "dan ketidakpastiannya,",
+"lit": "— dan ketidakpastiannya, ... ."
+},
+{
+"t": 170.0,
+"all": "dan ketidakpastiannya,",
+"lit": "— dan ketidakpastiannya, ... .."
+},
+{
+"t": 170.2,
+"all": "dan ketidakpastiannya,",
+"lit": "— dan ketidakpastiannya, .. ”.."
+},
+{
+"t": 170.4,
+"all": "dan ketidakpastiannya,",
+"lit": "— dan ketidakpastiannya,"
+},
+{
+"t": 170.6,
+"all": "dan ketidakpastiannya,",
+"lit": "— dan ketidakpastiannya,"
+},
+{
+"t": 170.8,
+"all": "dan ketidakpastiannya,",
+"lit": "ee —— dan ketidakpastiannya, cc. ci Pd ..."
+},
+{
+"t": 171.0,
+"all": "dan ketidakpastiannya,",
+"lit": "www“ dan ketidakpastiannya,"
+},
+{
+"t": 171.2,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "0 EFLPA ia ca PI Di ..."
+},
+{
+"t": 171.4,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "Ba ia belum Pi Pi Mi —"
+},
+{
+"t": 171.6,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "Ja ia belum tahu — Pi MW —— ..."
+},
+{
+"t": 171.8,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "ia belum tahu apa ad ci ci"
+},
+{
+"t": 172.0,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "ia belum tahu apa Ta aw aw ——"
+},
+{
+"t": 172.2,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "ia belum tahu apa yang"
+},
+{
+"t": 172.4,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": ". ia belum tahu apa yang 3 akan"
+},
+{
+"t": 172.6,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "Ta ia belum tahu apa yang m5. akan terjadi"
+},
+{
+"t": 172.8,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "— ia belum tahu apa yang — akan terjadi"
+},
+{
+"t": 173.0,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "— ia belum tahu apa yang - akan terjadi selanjutnya,"
+},
+{
+"t": 173.2,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "— ia belum tahu apa yang — akan terjadi selanjutnya,"
+},
+{
+"t": 173.4,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "0 ia belum tahu apa yang - akan terjadi selanjutnya,"
+},
+{
+"t": 173.6,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "0 ia belum tahu apa yang 0 akan terjadi selanjutnya,"
+},
+{
+"t": 173.8,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "— ia belum tahu apa yang 0 akan terjadi selanjutnya,"
+},
+{
+"t": 174.0,
+"all": "ia belum tahu apa yang akan terjadi selanjutnya,",
+"lit": "— ia belum tahu apa yang — akan terjadi selanjutnya,"
+},
+{
+"t": 174.2,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi"
+},
+{
+"t": 174.4,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi"
+},
+{
+"t": 174.6,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "—.—. tetapi kini"
+},
+{
+"t": 174.8,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "—.—.'' tetapi kini ia"
+},
+{
+"t": 175.0,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "om. tetapi kini ia"
+},
+{
+"t": 175.2,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "Ja tetapi kini ia"
+},
+{
+"t": 175.4,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami"
+},
+{
+"t": 175.6,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "Sea tetapi kini ia memahami"
+},
+{
+"t": 175.8,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami"
+},
+{
+"t": 176.0,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami satu"
+},
+{
+"t": 176.2,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami satu hal."
+},
+{
+"t": 176.4,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami satu hal."
+},
+{
+"t": 176.6,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami satu hal."
+},
+{
+"t": 176.8,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami satu hal."
+},
+{
+"t": 177.0,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami satu hal."
+},
+{
+"t": 177.2,
+"all": "tetapi kini ia memahami satu hal.",
+"lit": "tetapi kini ia memahami satu hal."
+},
+{
+"t": 177.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 177.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 177.8,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "Kesadaran"
+},
+{
+"t": 178.0,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran"
+},
+{
+"t": 178.2,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran"
+},
+{
+"t": 178.4,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak"
+},
+{
+"t": 178.6,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan"
+},
+{
+"t": 178.8,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan"
+},
+{
+"t": 179.0,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan mengubah"
+},
+{
+"t": 179.2,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan mengubah"
+},
+{
+"t": 179.4,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan mengubah kehidupan,"
+},
+{
+"t": 179.6,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan mengubah kehidupan,"
+},
+{
+"t": 179.8,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan mengubah kehidupan,"
+},
+{
+"t": 180.0,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan mengubah kehidupan,"
+},
+{
+"t": 180.2,
+"all": "Kesadaran tidak akan mengubah kehidupan,",
+"lit": "| Kesadaran tidak akan mengubah kehidupan,"
+},
+{
+"t": 180.4,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "| en"
+},
+{
+"t": 180.6,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama"
+},
+{
+"t": 180.8,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama"
+},
+{
+"t": 181.0,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama tidak"
+},
+{
+"t": 181.2,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama tidak diikuti"
+},
+{
+"t": 181.4,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama tidak diikuti"
+},
+{
+"t": 181.6,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama tidak diikuti"
+},
+{
+"t": 181.8,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama tidak diikuti keberanian"
+},
+{
+"t": 182.0,
+"all": "selama tidak diikuti keberanian 1",
+"lit": "selama tidak diikuti keberanian"
+},
+{
+"t": 182.2,
+"all": "untuk mengambil tindakan, .",
+"lit": "aa untuk"
+},
+{
+"t": 182.4,
+"all": "untuk mengambil tindakan, .",
+"lit": "Ba po"
+},
+{
+"t": 182.6,
+"all": "untuk mengambil tindakan, .",
+"lit": "Ba po"
+},
+{
+"t": 182.8,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil —"
+},
+{
+"t": 183.0,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil —"
+},
+{
+"t": 183.2,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil tindakan,"
+},
+{
+"t": 183.4,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil tindakan, —"
+},
+{
+"t": 183.6,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil tindakan, —"
+},
+{
+"t": 183.8,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil tindakan, —"
+},
+{
+"t": 184.0,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil tindakan, —"
+},
+{
+"t": 184.2,
+"all": "untuk mengambil tindakan, .",
+"lit": "untuk mengambil tindakan, —"
+},
+{
+"t": 184.4,
+"all": "dan perubahan itu",
+"lit": "dan perubahan"
+},
+{
+"t": 184.6,
+"all": "dan perubahan itu",
+"lit": "dan perubahan"
+},
+{
+"t": 184.8,
+"all": "dan perubahan itu",
+"lit": "dan perubahan itu"
+},
+{
+"t": 185.0,
+"all": "dan perubahan itu",
+"lit": "dan perubahan itu"
+},
+{
+"t": 185.2,
+"all": "dimulai dari langkah pertamanya.",
+"lit": ""
+},
+{
+"t": 185.4,
+"all": "dimulai dari langkah pertamanya.",
+"lit": ""
+},
+{
+"t": 185.6,
+"all": "dimulai dari langkah pertamanya.",
+"lit": ""
+},
+{
+"t": 185.8,
+"all": "dimulai dari langkah pertamanya.",
+"lit": ""
+},
+{
+"t": 186.0,
+"all": "dimulai dari langkah pertamanya.",
+"lit": ""
+},
+{
+"t": 186.2,
+"all": "dimulai dari langkah pertamanya.",
+"lit": ""
+},
+{
+"t": 186.4,
+"all": "dimulai dari langkah pertamanya.",
+"lit": ""
+},
+{
+"t": 186.6,
+"all": "dimulai dari langkah pertamanya.",
+"lit": "dimulai dari langkah"
+},
+{
+"t": 186.8,
+"all": "dimulai dari langkah pertamanya.",
+"lit": "dimulai dari langkah"
+},
+{
+"t": 187.0,
+"all": "dimulai dari langkah pertamanya.",
+"lit": "dimulai dari langkah pertamanya."
+},
+{
+"t": 187.2,
+"all": "dimulai dari langkah pertamanya.",
+"lit": "dimulai dari langkah pertamanya."
+},
+{
+"t": 187.4,
+"all": "dimulai dari langkah pertamanya.",
+"lit": "dimulai dari langkah pertamanya."
+},
+{
+"t": 187.6,
+"all": "dimulai dari langkah pertamanya.",
+"lit": "dimulai dari langkah pertamanya."
+},
+{
+"t": 187.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 188.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 188.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 188.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 188.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 188.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 189.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 189.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 189.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 189.6,
+"all": "",
+"lit": ""
+},
+{
+"t": 189.8,
+"all": "",
+"lit": ""
+},
+{
+"t": 190.0,
+"all": "",
+"lit": ""
+},
+{
+"t": 190.2,
+"all": "",
+"lit": ""
+},
+{
+"t": 190.4,
+"all": "",
+"lit": ""
+},
+{
+"t": 190.6,
+"all": "",
+"lit": ""
+}
+]

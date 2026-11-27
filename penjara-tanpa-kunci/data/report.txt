@@ -1,0 +1,77 @@
+== ffprobe ==
+index=0
+codec_name=h264
+profile=High
+codec_type=video
+width=1080
+height=1920
+pix_fmt=yuv420p
+color_range=tv
+color_space=unknown
+r_frame_rate=30/1
+avg_frame_rate=30/1
+bit_rate=1655719
+nb_frames=5724
+index=1
+codec_name=aac
+profile=LC
+codec_type=audio
+sample_rate=48000
+channels=2
+r_frame_rate=0/0
+avg_frame_rate=0/0
+bit_rate=265766
+nb_frames=8944
+duration=190.800000
+size=46038117
+bit_rate=1930319
+duration=190.800000
+== black frames (pic_th=0.98, d>=0.05s) ==
+black_start:190.633 black_end:190.767 black_duration:0.133333
+== frozen video (>=1.5s, noise -60dB) ==
+== scene changes (score>0.25) ==
+2.56667 6.2 14 16.3 18.5 31 34.4 43.5 44.8 48.3667 49.4 57 60.5667 62.5 67.5 84.6 86.6 87.9 88.9 90.5 96.5 100.3 102.3 117.2 118.9 131.6 133.5 137.6 141.4 156.3 160.3 164.3 167 170.7 174.1 177.6 184.3 187.9 
+== audio: silence (<-40dB, >=0.6s) ==
+silence_start: 121.783
+silence_end: 122.803 | silence_duration: 1.01979
+silence_start: 130.036
+silence_end: 131.003 | silence_duration: 0.967083
+== audio: EBU R128 loudness ==
+[Parsed_ebur128_0 @ 0x55b002fb5600] Summary:
+
+  Integrated loudness:
+    I:         -14.2 LUFS
+    Threshold: -25.1 LUFS
+
+  Loudness range:
+    LRA:         4.1 LU
+    Threshold: -35.0 LUFS
+    LRA low:   -17.3 LUFS
+    LRA high:  -13.2 LUFS
+
+  True peak:
+    Peak:       -1.4 dBFS
+== audio: astats ==
+[Parsed_astats_0 @ 0x55b0c7f11600] DC offset: -0.000307
+[Parsed_astats_0 @ 0x55b0c7f11600] Peak level dB: -1.562112
+[Parsed_astats_0 @ 0x55b0c7f11600] RMS level dB: -17.764995
+[Parsed_astats_0 @ 0x55b0c7f11600] Flat factor: 0.000000
+[Parsed_astats_0 @ 0x55b0c7f11600] Peak count: 2
+[Parsed_astats_0 @ 0x55b0c7f11600] Abs Peak count: 1
+[Parsed_astats_0 @ 0x55b0c7f11600] Noise floor dB: -83.081290
+[Parsed_astats_0 @ 0x55b0c7f11600] DC offset: -0.000303
+[Parsed_astats_0 @ 0x55b0c7f11600] Peak level dB: -1.494870
+[Parsed_astats_0 @ 0x55b0c7f11600] RMS level dB: -17.763460
+[Parsed_astats_0 @ 0x55b0c7f11600] Flat factor: 0.000000
+[Parsed_astats_0 @ 0x55b0c7f11600] Peak count: 2
+[Parsed_astats_0 @ 0x55b0c7f11600] Abs Peak count: 1
+[Parsed_astats_0 @ 0x55b0c7f11600] Noise floor dB: -83.387150
+[Parsed_astats_0 @ 0x55b0c7f11600] Overall
+[Parsed_astats_0 @ 0x55b0c7f11600] DC offset: -0.000307
+[Parsed_astats_0 @ 0x55b0c7f11600] Peak level dB: -1.494870
+[Parsed_astats_0 @ 0x55b0c7f11600] RMS level dB: -17.764228
+[Parsed_astats_0 @ 0x55b0c7f11600] Flat factor: 0.000000
+[Parsed_astats_0 @ 0x55b0c7f11600] Peak count: 2.000000
+[Parsed_astats_0 @ 0x55b0c7f11600] Abs Peak count: 1.000000
+[Parsed_astats_0 @ 0x55b0c7f11600] Noise floor dB: -83.081290
+[Parsed_astats_0 @ 0x55b0c7f11600] Number of samples: 9157632

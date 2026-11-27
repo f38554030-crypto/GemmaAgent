@@ -1,0 +1,21 @@
+{
+  "name": "penjara-tanpa-kunci-v4",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts PenjaraV4 out/video_only.mp4 --muted --crf=17 --x264-preset=slow --color-space=bt709 --browser-executable=/opt/pw-browsers/chromium_headless_shell",
+    "still": "remotion still src/index.ts PenjaraV4 --browser-executable=/opt/pw-browsers/chromium_headless_shell"
+  },
+  "dependencies": {
+    "@fontsource/nunito": "5.1.0",
+    "@remotion/cli": "4.0.547",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "remotion": "4.0.547"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.12",
+    "typescript": "5.6.3"
+  }
+}
