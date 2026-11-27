@@ -3,10 +3,12 @@ import {bundle} from '@remotion/bundler';
 import {renderStill, selectComposition} from '@remotion/renderer';
 import path from 'node:path';
 
-const [outDir, ...frames] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const compId = args[0].startsWith('--comp=') ? args.shift().slice(7) : 'PenjaraV4';
+const [outDir, ...frames] = args;
 const serveUrl = await bundle({entryPoint: path.resolve('src/index.ts')});
 const browserExecutable = '/opt/pw-browsers/chromium_headless_shell';
-const composition = await selectComposition({serveUrl, id: 'PenjaraV4', browserExecutable});
+const composition = await selectComposition({serveUrl, id: compId, browserExecutable});
 for (const f of frames) {
 	await renderStill({
 		composition,

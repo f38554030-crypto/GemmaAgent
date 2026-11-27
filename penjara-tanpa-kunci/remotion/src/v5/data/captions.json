@@ -1,0 +1,2221 @@
+[
+ {
+  "text": "Setiap malam ia membuat janji",
+  "words": [
+   {
+    "t": "Setiap",
+    "s": 1.7,
+    "hl": false
+   },
+   {
+    "t": "malam",
+    "s": 1.92,
+    "hl": false
+   },
+   {
+    "t": "ia",
+    "s": 3.0,
+    "hl": false
+   },
+   {
+    "t": "membuat",
+    "s": 3.05,
+    "hl": false
+   },
+   {
+    "t": "janji",
+    "s": 3.46,
+    "hl": true
+   }
+  ],
+  "in": 1.58,
+  "out": 3.74
+ },
+ {
+  "text": "yang sama kepada dirinya sendiri.",
+  "words": [
+   {
+    "t": "yang",
+    "s": 3.86,
+    "hl": false
+   },
+   {
+    "t": "sama",
+    "s": 3.96,
+    "hl": false
+   },
+   {
+    "t": "kepada",
+    "s": 4.36,
+    "hl": false
+   },
+   {
+    "t": "dirinya",
+    "s": 4.66,
+    "hl": false
+   },
+   {
+    "t": "sendiri.",
+    "s": 5.06,
+    "hl": false
+   }
+  ],
+  "in": 3.74,
+  "out": 6.28
+ },
+ {
+  "text": "“Besok, aku akan mulai berubah.”",
+  "words": [
+   {
+    "t": "“Besok,",
+    "s": 6.4,
+    "hl": true
+   },
+   {
+    "t": "aku",
+    "s": 6.78,
+    "hl": false
+   },
+   {
+    "t": "akan",
+    "s": 7.3,
+    "hl": false
+   },
+   {
+    "t": "mulai",
+    "s": 7.48,
+    "hl": false
+   },
+   {
+    "t": "berubah.”",
+    "s": 7.76,
+    "hl": false
+   }
+  ],
+  "in": 6.28,
+  "out": 9.36
+ },
+ {
+  "text": "Namun, ketika esok tiba,",
+  "words": [
+   {
+    "t": "Namun,",
+    "s": 10.4,
+    "hl": false
+   },
+   {
+    "t": "ketika",
+    "s": 10.84,
+    "hl": false
+   },
+   {
+    "t": "esok",
+    "s": 11.54,
+    "hl": true
+   },
+   {
+    "t": "tiba,",
+    "s": 11.8,
+    "hl": false
+   }
+  ],
+  "in": 10.28,
+  "out": 13.08
+ },
+ {
+  "text": "semuanya kembali berulang.",
+  "words": [
+   {
+    "t": "semuanya",
+    "s": 13.2,
+    "hl": false
+   },
+   {
+    "t": "kembali",
+    "s": 13.58,
+    "hl": false
+   },
+   {
+    "t": "berulang.",
+    "s": 14.06,
+    "hl": true
+   }
+  ],
+  "in": 13.08,
+  "out": 15.08
+ },
+ {
+  "text": "Alarm dimatikan,",
+  "words": [
+   {
+    "t": "Alarm",
+    "s": 15.2,
+    "hl": true
+   },
+   {
+    "t": "dimatikan,",
+    "s": 15.44,
+    "hl": false
+   }
+  ],
+  "in": 15.08,
+  "out": 16.58
+ },
+ {
+  "text": "ponsel kembali digenggam,",
+  "words": [
+   {
+    "t": "ponsel",
+    "s": 16.7,
+    "hl": false
+   },
+   {
+    "t": "kembali",
+    "s": 16.98,
+    "hl": false
+   },
+   {
+    "t": "digenggam,",
+    "s": 17.52,
+    "hl": true
+   }
+  ],
+  "in": 16.58,
+  "out": 18.48
+ },
+ {
+  "text": "berjam-jam berlalu tanpa terasa.",
+  "words": [
+   {
+    "t": "berjam-jam",
+    "s": 18.6,
+    "hl": false
+   },
+   {
+    "t": "berlalu",
+    "s": 19.24,
+    "hl": false
+   },
+   {
+    "t": "tanpa",
+    "s": 19.84,
+    "hl": true
+   },
+   {
+    "t": "terasa.",
+    "s": 20.18,
+    "hl": true
+   }
+  ],
+  "in": 18.48,
+  "out": 21.28
+ },
+ {
+  "text": "Malam menjadi pagi,",
+  "words": [
+   {
+    "t": "Malam",
+    "s": 21.4,
+    "hl": false
+   },
+   {
+    "t": "menjadi",
+    "s": 21.82,
+    "hl": false
+   },
+   {
+    "t": "pagi,",
+    "s": 22.0,
+    "hl": true
+   }
+  ],
+  "in": 21.28,
+  "out": 23.08
+ },
+ {
+  "text": "hari berganti minggu,",
+  "words": [
+   {
+    "t": "hari",
+    "s": 23.2,
+    "hl": false
+   },
+   {
+    "t": "berganti",
+    "s": 23.3,
+    "hl": false
+   },
+   {
+    "t": "minggu,",
+    "s": 23.9,
+    "hl": true
+   }
+  ],
+  "in": 23.08,
+  "out": 24.78
+ },
+ {
+  "text": "minggu menjadi bulan,",
+  "words": [
+   {
+    "t": "minggu",
+    "s": 24.9,
+    "hl": false
+   },
+   {
+    "t": "menjadi",
+    "s": 25.24,
+    "hl": false
+   },
+   {
+    "t": "bulan,",
+    "s": 25.42,
+    "hl": true
+   }
+  ],
+  "in": 24.78,
+  "out": 26.48
+ },
+ {
+  "text": "waktu terus berjalan,",
+  "words": [
+   {
+    "t": "waktu",
+    "s": 26.6,
+    "hl": false
+   },
+   {
+    "t": "terus",
+    "s": 26.76,
+    "hl": false
+   },
+   {
+    "t": "berjalan,",
+    "s": 27.08,
+    "hl": true
+   }
+  ],
+  "in": 26.48,
+  "out": 27.98
+ },
+ {
+  "text": "sementara kehidupannya seolah",
+  "words": [
+   {
+    "t": "sementara",
+    "s": 28.1,
+    "hl": false
+   },
+   {
+    "t": "kehidupannya",
+    "s": 28.48,
+    "hl": false
+   },
+   {
+    "t": "seolah",
+    "s": 29.1,
+    "hl": false
+   }
+  ],
+  "in": 27.98,
+  "out": 29.44
+ },
+ {
+  "text": "tidak bergerak ke mana-mana.",
+  "words": [
+   {
+    "t": "tidak",
+    "s": 29.56,
+    "hl": false
+   },
+   {
+    "t": "bergerak",
+    "s": 29.74,
+    "hl": true
+   },
+   {
+    "t": "ke",
+    "s": 30.32,
+    "hl": false
+   },
+   {
+    "t": "mana-mana.",
+    "s": 30.4,
+    "hl": false
+   }
+  ],
+  "in": 29.44,
+  "out": 31.92
+ },
+ {
+  "text": "Sebenarnya, ia sadar.",
+  "words": [
+   {
+    "t": "Sebenarnya,",
+    "s": 32.04,
+    "hl": false
+   },
+   {
+    "t": "ia",
+    "s": 32.82,
+    "hl": false
+   },
+   {
+    "t": "sadar.",
+    "s": 33.32,
+    "hl": true
+   }
+  ],
+  "in": 31.92,
+  "out": 34.38
+ },
+ {
+  "text": "Tidurnya semakin berantakan,",
+  "words": [
+   {
+    "t": "Tidurnya",
+    "s": 34.5,
+    "hl": false
+   },
+   {
+    "t": "semakin",
+    "s": 34.9,
+    "hl": false
+   },
+   {
+    "t": "berantakan,",
+    "s": 35.24,
+    "hl": true
+   }
+  ],
+  "in": 34.38,
+  "out": 36.28
+ },
+ {
+  "text": "tubuhnya mulai kelelahan.",
+  "words": [
+   {
+    "t": "tubuhnya",
+    "s": 36.4,
+    "hl": false
+   },
+   {
+    "t": "mulai",
+    "s": 36.78,
+    "hl": false
+   },
+   {
+    "t": "kelelahan.",
+    "s": 37.1,
+    "hl": true
+   }
+  ],
+  "in": 36.28,
+  "out": 38.08
+ },
+ {
+  "text": "Berbagai rencana yang dahulu",
+  "words": [
+   {
+    "t": "Berbagai",
+    "s": 38.2,
+    "hl": false
+   },
+   {
+    "t": "rencana",
+    "s": 38.52,
+    "hl": true
+   },
+   {
+    "t": "yang",
+    "s": 38.98,
+    "hl": false
+   },
+   {
+    "t": "dahulu",
+    "s": 39.24,
+    "hl": false
+   }
+  ],
+  "in": 38.08,
+  "out": 39.5
+ },
+ {
+  "text": "begitu berarti,",
+  "words": [
+   {
+    "t": "begitu",
+    "s": 39.62,
+    "hl": false
+   },
+   {
+    "t": "berarti,",
+    "s": 39.82,
+    "hl": false
+   }
+  ],
+  "in": 39.5,
+  "out": 40.48
+ },
+ {
+  "text": "kini hanya tersimpan dalam pikirannya.",
+  "words": [
+   {
+    "t": "kini",
+    "s": 40.6,
+    "hl": false
+   },
+   {
+    "t": "hanya",
+    "s": 41.14,
+    "hl": false
+   },
+   {
+    "t": "tersimpan",
+    "s": 41.28,
+    "hl": false
+   },
+   {
+    "t": "dalam",
+    "s": 41.96,
+    "hl": false
+   },
+   {
+    "t": "pikirannya.",
+    "s": 42.2,
+    "hl": true
+   }
+  ],
+  "in": 40.48,
+  "out": 43.38
+ },
+ {
+  "text": "Ia ingin berubah,",
+  "words": [
+   {
+    "t": "Ia",
+    "s": 43.5,
+    "hl": false
+   },
+   {
+    "t": "ingin",
+    "s": 43.58,
+    "hl": true
+   },
+   {
+    "t": "berubah,",
+    "s": 43.88,
+    "hl": true
+   }
+  ],
+  "in": 43.38,
+  "out": 44.68
+ },
+ {
+  "text": "namun setiap kali kesempatan itu datang,",
+  "words": [
+   {
+    "t": "namun",
+    "s": 44.8,
+    "hl": false
+   },
+   {
+    "t": "setiap",
+    "s": 45.26,
+    "hl": false
+   },
+   {
+    "t": "kali",
+    "s": 45.96,
+    "hl": false
+   },
+   {
+    "t": "kesempatan",
+    "s": 46.12,
+    "hl": true
+   },
+   {
+    "t": "itu",
+    "s": 46.72,
+    "hl": false
+   },
+   {
+    "t": "datang,",
+    "s": 46.88,
+    "hl": false
+   }
+  ],
+  "in": 44.68,
+  "out": 48.16
+ },
+ {
+  "text": "selalu muncul alasan.",
+  "words": [
+   {
+    "t": "selalu",
+    "s": 48.28,
+    "hl": false
+   },
+   {
+    "t": "muncul",
+    "s": 48.66,
+    "hl": false
+   },
+   {
+    "t": "alasan.",
+    "s": 48.96,
+    "hl": true
+   }
+  ],
+  "in": 48.16,
+  "out": 49.98
+ },
+ {
+  "text": "“Hari ini terlalu melelahkan.”",
+  "words": [
+   {
+    "t": "“Hari",
+    "s": 50.1,
+    "hl": false
+   },
+   {
+    "t": "ini",
+    "s": 50.5,
+    "hl": false
+   },
+   {
+    "t": "terlalu",
+    "s": 50.94,
+    "hl": false
+   },
+   {
+    "t": "melelahkan.”",
+    "s": 51.34,
+    "hl": true
+   }
+  ],
+  "in": 49.98,
+  "out": 52.38
+ },
+ {
+  "text": "“Masih ada banyak waktu.”",
+  "words": [
+   {
+    "t": "“Masih",
+    "s": 52.5,
+    "hl": false
+   },
+   {
+    "t": "ada",
+    "s": 52.88,
+    "hl": false
+   },
+   {
+    "t": "banyak",
+    "s": 52.98,
+    "hl": false
+   },
+   {
+    "t": "waktu.”",
+    "s": 53.22,
+    "hl": true
+   }
+  ],
+  "in": 52.38,
+  "out": 54.0
+ },
+ {
+  "text": "“Aku akan mulai ketika semuanya sudah siap.”",
+  "words": [
+   {
+    "t": "“Aku",
+    "s": 54.12,
+    "hl": false
+   },
+   {
+    "t": "akan",
+    "s": 54.5,
+    "hl": false
+   },
+   {
+    "t": "mulai",
+    "s": 54.72,
+    "hl": false
+   },
+   {
+    "t": "ketika",
+    "s": 55.2,
+    "hl": false
+   },
+   {
+    "t": "semuanya",
+    "s": 55.48,
+    "hl": false
+   },
+   {
+    "t": "sudah",
+    "s": 55.86,
+    "hl": false
+   },
+   {
+    "t": "siap.”",
+    "s": 56.1,
+    "hl": true
+   }
+  ],
+  "in": 54.0,
+  "out": 57.52
+ },
+ {
+  "text": "Alasan-alasan itu terdengar masuk akal,",
+  "words": [
+   {
+    "t": "Alasan-alasan",
+    "s": 57.64,
+    "hl": false
+   },
+   {
+    "t": "itu",
+    "s": 58.42,
+    "hl": false
+   },
+   {
+    "t": "terdengar",
+    "s": 58.72,
+    "hl": false
+   },
+   {
+    "t": "masuk",
+    "s": 59.2,
+    "hl": true
+   },
+   {
+    "t": "akal,",
+    "s": 59.4,
+    "hl": true
+   }
+  ],
+  "in": 57.52,
+  "out": 60.48
+ },
+ {
+  "text": "bahkan terkadang memang benar.",
+  "words": [
+   {
+    "t": "bahkan",
+    "s": 60.6,
+    "hl": false
+   },
+   {
+    "t": "terkadang",
+    "s": 60.88,
+    "hl": false
+   },
+   {
+    "t": "memang",
+    "s": 61.32,
+    "hl": false
+   },
+   {
+    "t": "benar.",
+    "s": 61.5,
+    "hl": true
+   }
+  ],
+  "in": 60.48,
+  "out": 62.48
+ },
+ {
+  "text": "Tetapi perlahan,",
+  "words": [
+   {
+    "t": "Tetapi",
+    "s": 62.6,
+    "hl": false
+   },
+   {
+    "t": "perlahan,",
+    "s": 62.84,
+    "hl": false
+   }
+  ],
+  "in": 62.48,
+  "out": 63.42
+ },
+ {
+  "text": "alasan yang seharusnya menjelaskan kesulitan",
+  "words": [
+   {
+    "t": "alasan",
+    "s": 63.54,
+    "hl": false
+   },
+   {
+    "t": "yang",
+    "s": 64.22,
+    "hl": false
+   },
+   {
+    "t": "seharusnya",
+    "s": 64.48,
+    "hl": false
+   },
+   {
+    "t": "menjelaskan",
+    "s": 65.08,
+    "hl": false
+   },
+   {
+    "t": "kesulitan",
+    "s": 65.66,
+    "hl": true
+   }
+  ],
+  "in": 63.42,
+  "out": 66.68
+ },
+ {
+  "text": "justru menjadi pembenaran",
+  "words": [
+   {
+    "t": "justru",
+    "s": 66.8,
+    "hl": false
+   },
+   {
+    "t": "menjadi",
+    "s": 67.14,
+    "hl": false
+   },
+   {
+    "t": "pembenaran",
+    "s": 67.38,
+    "hl": true
+   }
+  ],
+  "in": 66.68,
+  "out": 67.96
+ },
+ {
+  "text": "untuk terus menghindarinya.",
+  "words": [
+   {
+    "t": "untuk",
+    "s": 68.08,
+    "hl": false
+   },
+   {
+    "t": "terus",
+    "s": 68.42,
+    "hl": false
+   },
+   {
+    "t": "menghindarinya.",
+    "s": 68.78,
+    "hl": true
+   }
+  ],
+  "in": 67.96,
+  "out": 70.38
+ },
+ {
+  "text": "Dan tanpa disadari,",
+  "words": [
+   {
+    "t": "Dan",
+    "s": 71.0,
+    "hl": false
+   },
+   {
+    "t": "tanpa",
+    "s": 71.1,
+    "hl": false
+   },
+   {
+    "t": "disadari,",
+    "s": 71.48,
+    "hl": false
+   }
+  ],
+  "in": 70.88,
+  "out": 72.06
+ },
+ {
+  "text": "sesuatu yang awalnya hanya kebiasaan",
+  "words": [
+   {
+    "t": "sesuatu",
+    "s": 72.18,
+    "hl": false
+   },
+   {
+    "t": "yang",
+    "s": 73.1,
+    "hl": false
+   },
+   {
+    "t": "awalnya",
+    "s": 73.24,
+    "hl": false
+   },
+   {
+    "t": "hanya",
+    "s": 73.68,
+    "hl": false
+   },
+   {
+    "t": "kebiasaan",
+    "s": 73.92,
+    "hl": true
+   }
+  ],
+  "in": 72.06,
+  "out": 74.62
+ },
+ {
+  "text": "mulai berubah menjadi batas kehidupannya.",
+  "words": [
+   {
+    "t": "mulai",
+    "s": 74.74,
+    "hl": false
+   },
+   {
+    "t": "berubah",
+    "s": 75.48,
+    "hl": false
+   },
+   {
+    "t": "menjadi",
+    "s": 76.02,
+    "hl": false
+   },
+   {
+    "t": "batas",
+    "s": 76.2,
+    "hl": true
+   },
+   {
+    "t": "kehidupannya.",
+    "s": 76.82,
+    "hl": false
+   }
+  ],
+  "in": 74.62,
+  "out": 78.42
+ },
+ {
+  "text": "Sementara itu,",
+  "words": [
+   {
+    "t": "Sementara",
+    "s": 79.4,
+    "hl": false
+   },
+   {
+    "t": "itu,",
+    "s": 79.78,
+    "hl": false
+   }
+  ],
+  "in": 79.28,
+  "out": 80.08
+ },
+ {
+  "text": "dunia di luar terus bergerak.",
+  "words": [
+   {
+    "t": "dunia",
+    "s": 80.2,
+    "hl": false
+   },
+   {
+    "t": "di",
+    "s": 80.88,
+    "hl": false
+   },
+   {
+    "t": "luar",
+    "s": 80.98,
+    "hl": false
+   },
+   {
+    "t": "terus",
+    "s": 81.32,
+    "hl": false
+   },
+   {
+    "t": "bergerak.",
+    "s": 81.54,
+    "hl": true
+   }
+  ],
+  "in": 80.08,
+  "out": 83.08
+ },
+ {
+  "text": "Manusia belajar, bekerja,",
+  "words": [
+   {
+    "t": "Manusia",
+    "s": 83.2,
+    "hl": false
+   },
+   {
+    "t": "belajar,",
+    "s": 83.52,
+    "hl": true
+   },
+   {
+    "t": "bekerja,",
+    "s": 84.36,
+    "hl": true
+   }
+  ],
+  "in": 83.08,
+  "out": 85.1
+ },
+ {
+  "text": "bertemu, mengalami kegagalan,",
+  "words": [
+   {
+    "t": "bertemu,",
+    "s": 85.22,
+    "hl": true
+   },
+   {
+    "t": "mengalami",
+    "s": 86.06,
+    "hl": false
+   },
+   {
+    "t": "kegagalan,",
+    "s": 86.82,
+    "hl": true
+   }
+  ],
+  "in": 85.1,
+  "out": 87.52
+ },
+ {
+  "text": "menemukan hal baru,",
+  "words": [
+   {
+    "t": "menemukan",
+    "s": 87.64,
+    "hl": false
+   },
+   {
+    "t": "hal",
+    "s": 88.28,
+    "hl": true
+   },
+   {
+    "t": "baru,",
+    "s": 88.52,
+    "hl": true
+   }
+  ],
+  "in": 87.52,
+  "out": 88.98
+ },
+ {
+  "text": "dan mencoba kembali.",
+  "words": [
+   {
+    "t": "dan",
+    "s": 89.1,
+    "hl": false
+   },
+   {
+    "t": "mencoba",
+    "s": 89.44,
+    "hl": true
+   },
+   {
+    "t": "kembali.",
+    "s": 89.84,
+    "hl": true
+   }
+  ],
+  "in": 88.98,
+  "out": 90.68
+ },
+ {
+  "text": "Dunia itu tidak selalu indah,",
+  "words": [
+   {
+    "t": "Dunia",
+    "s": 90.8,
+    "hl": false
+   },
+   {
+    "t": "itu",
+    "s": 91.26,
+    "hl": false
+   },
+   {
+    "t": "tidak",
+    "s": 91.44,
+    "hl": false
+   },
+   {
+    "t": "selalu",
+    "s": 91.68,
+    "hl": false
+   },
+   {
+    "t": "indah,",
+    "s": 92.06,
+    "hl": true
+   }
+  ],
+  "in": 90.68,
+  "out": 92.78
+ },
+ {
+  "text": "tidak selalu mudah,",
+  "words": [
+   {
+    "t": "tidak",
+    "s": 92.9,
+    "hl": false
+   },
+   {
+    "t": "selalu",
+    "s": 93.02,
+    "hl": false
+   },
+   {
+    "t": "mudah,",
+    "s": 93.42,
+    "hl": true
+   }
+  ],
+  "in": 92.78,
+  "out": 94.18
+ },
+ {
+  "text": "bahkan penuh ketidakpastian.",
+  "words": [
+   {
+    "t": "bahkan",
+    "s": 94.3,
+    "hl": false
+   },
+   {
+    "t": "penuh",
+    "s": 94.56,
+    "hl": false
+   },
+   {
+    "t": "ketidakpastian.",
+    "s": 95.02,
+    "hl": true
+   }
+  ],
+  "in": 94.18,
+  "out": 96.62
+ },
+ {
+  "text": "Namun, ada pengalaman",
+  "words": [
+   {
+    "t": "Namun,",
+    "s": 97.3,
+    "hl": false
+   },
+   {
+    "t": "ada",
+    "s": 97.76,
+    "hl": false
+   },
+   {
+    "t": "pengalaman",
+    "s": 98.22,
+    "hl": true
+   }
+  ],
+  "in": 97.18,
+  "out": 98.68
+ },
+ {
+  "text": "yang tidak mungkin diperoleh",
+  "words": [
+   {
+    "t": "yang",
+    "s": 98.8,
+    "hl": false
+   },
+   {
+    "t": "tidak",
+    "s": 99.0,
+    "hl": false
+   },
+   {
+    "t": "mungkin",
+    "s": 99.24,
+    "hl": false
+   },
+   {
+    "t": "diperoleh",
+    "s": 99.54,
+    "hl": false
+   }
+  ],
+  "in": 98.68,
+  "out": 100.08
+ },
+ {
+  "text": "hanya dengan terus membayangkannya.",
+  "words": [
+   {
+    "t": "hanya",
+    "s": 100.2,
+    "hl": false
+   },
+   {
+    "t": "dengan",
+    "s": 100.52,
+    "hl": false
+   },
+   {
+    "t": "terus",
+    "s": 100.8,
+    "hl": false
+   },
+   {
+    "t": "membayangkannya.",
+    "s": 101.18,
+    "hl": true
+   }
+  ],
+  "in": 100.08,
+  "out": 102.78
+ },
+ {
+  "text": "Suatu malam,",
+  "words": [
+   {
+    "t": "Suatu",
+    "s": 104.0,
+    "hl": false
+   },
+   {
+    "t": "malam,",
+    "s": 104.3,
+    "hl": false
+   }
+  ],
+  "in": 103.88,
+  "out": 104.7
+ },
+ {
+  "text": "ia berhenti menatap layar ponselnya.",
+  "words": [
+   {
+    "t": "ia",
+    "s": 104.82,
+    "hl": false
+   },
+   {
+    "t": "berhenti",
+    "s": 105.24,
+    "hl": true
+   },
+   {
+    "t": "menatap",
+    "s": 105.7,
+    "hl": false
+   },
+   {
+    "t": "layar",
+    "s": 106.18,
+    "hl": false
+   },
+   {
+    "t": "ponselnya.",
+    "s": 106.5,
+    "hl": false
+   }
+  ],
+  "in": 104.7,
+  "out": 107.58
+ },
+ {
+  "text": "Pandangannya beralih ke sekeliling ruangan:",
+  "words": [
+   {
+    "t": "Pandangannya",
+    "s": 107.7,
+    "hl": false
+   },
+   {
+    "t": "beralih",
+    "s": 108.14,
+    "hl": false
+   },
+   {
+    "t": "ke",
+    "s": 108.78,
+    "hl": false
+   },
+   {
+    "t": "sekeliling",
+    "s": 108.88,
+    "hl": false
+   },
+   {
+    "t": "ruangan:",
+    "s": 109.34,
+    "hl": false
+   }
+  ],
+  "in": 107.58,
+  "out": 110.38
+ },
+ {
+  "text": "ranjang,",
+  "words": [
+   {
+    "t": "ranjang,",
+    "s": 110.5,
+    "hl": true
+   }
+  ],
+  "in": 110.38,
+  "out": 111.38
+ },
+ {
+  "text": "dinding yang sunyi,",
+  "words": [
+   {
+    "t": "dinding",
+    "s": 111.5,
+    "hl": true
+   },
+   {
+    "t": "yang",
+    "s": 111.8,
+    "hl": false
+   },
+   {
+    "t": "sunyi,",
+    "s": 112.02,
+    "hl": false
+   }
+  ],
+  "in": 111.38,
+  "out": 112.88
+ },
+ {
+  "text": "ventilasi kecil,",
+  "words": [
+   {
+    "t": "ventilasi",
+    "s": 113.0,
+    "hl": true
+   },
+   {
+    "t": "kecil,",
+    "s": 113.42,
+    "hl": false
+   }
+  ],
+  "in": 112.88,
+  "out": 114.18
+ },
+ {
+  "text": "dan sebuah pintu.",
+  "words": [
+   {
+    "t": "dan",
+    "s": 114.3,
+    "hl": false
+   },
+   {
+    "t": "sebuah",
+    "s": 114.36,
+    "hl": false
+   },
+   {
+    "t": "pintu.",
+    "s": 114.86,
+    "hl": true
+   }
+  ],
+  "in": 114.18,
+  "out": 116.3
+ },
+ {
+  "text": "Untuk pertama kalinya,",
+  "words": [
+   {
+    "t": "Untuk",
+    "s": 116.42,
+    "hl": false
+   },
+   {
+    "t": "pertama",
+    "s": 116.86,
+    "hl": false
+   },
+   {
+    "t": "kalinya,",
+    "s": 117.1,
+    "hl": false
+   }
+  ],
+  "in": 116.3,
+  "out": 117.64
+ },
+ {
+  "text": "ia mempertanyakan sesuatu",
+  "words": [
+   {
+    "t": "ia",
+    "s": 117.76,
+    "hl": false
+   },
+   {
+    "t": "mempertanyakan",
+    "s": 118.16,
+    "hl": true
+   },
+   {
+    "t": "sesuatu",
+    "s": 118.84,
+    "hl": false
+   }
+  ],
+  "in": 117.64,
+  "out": 119.38
+ },
+ {
+  "text": "yang selama ini selalu dihindarinya.",
+  "words": [
+   {
+    "t": "yang",
+    "s": 119.5,
+    "hl": false
+   },
+   {
+    "t": "selama",
+    "s": 119.7,
+    "hl": false
+   },
+   {
+    "t": "ini",
+    "s": 120.1,
+    "hl": false
+   },
+   {
+    "t": "selalu",
+    "s": 120.3,
+    "hl": false
+   },
+   {
+    "t": "dihindarinya.",
+    "s": 120.9,
+    "hl": true
+   }
+  ],
+  "in": 119.38,
+  "out": 122.5
+ },
+ {
+  "text": "“Apakah aku benar-benar",
+  "words": [
+   {
+    "t": "“Apakah",
+    "s": 122.66,
+    "hl": false
+   },
+   {
+    "t": "aku",
+    "s": 123.1,
+    "hl": false
+   },
+   {
+    "t": "benar-benar",
+    "s": 123.32,
+    "hl": false
+   }
+  ],
+  "in": 122.54,
+  "out": 123.78
+ },
+ {
+  "text": "tidak mampu mengubah hidupku?",
+  "words": [
+   {
+    "t": "tidak",
+    "s": 123.9,
+    "hl": true
+   },
+   {
+    "t": "mampu",
+    "s": 124.08,
+    "hl": true
+   },
+   {
+    "t": "mengubah",
+    "s": 124.6,
+    "hl": false
+   },
+   {
+    "t": "hidupku?",
+    "s": 124.98,
+    "hl": false
+   }
+  ],
+  "in": 123.78,
+  "out": 126.58
+ },
+ {
+  "text": "Atau selama ini aku terus",
+  "words": [
+   {
+    "t": "Atau",
+    "s": 126.7,
+    "hl": false
+   },
+   {
+    "t": "selama",
+    "s": 126.86,
+    "hl": false
+   },
+   {
+    "t": "ini",
+    "s": 127.16,
+    "hl": false
+   },
+   {
+    "t": "aku",
+    "s": 127.36,
+    "hl": false
+   },
+   {
+    "t": "terus",
+    "s": 127.56,
+    "hl": false
+   }
+  ],
+  "in": 126.58,
+  "out": 127.7
+ },
+ {
+  "text": "mencari alasan untuk tidak mencobanya?”",
+  "words": [
+   {
+    "t": "mencari",
+    "s": 127.82,
+    "hl": true
+   },
+   {
+    "t": "alasan",
+    "s": 128.22,
+    "hl": true
+   },
+   {
+    "t": "untuk",
+    "s": 128.72,
+    "hl": false
+   },
+   {
+    "t": "tidak",
+    "s": 128.98,
+    "hl": false
+   },
+   {
+    "t": "mencobanya?”",
+    "s": 129.22,
+    "hl": false
+   }
+  ],
+  "in": 127.7,
+  "out": 130.82
+ },
+ {
+  "text": "Ia terdiam.",
+  "words": [
+   {
+    "t": "Ia",
+    "s": 131.6,
+    "hl": false
+   },
+   {
+    "t": "terdiam.",
+    "s": 131.72,
+    "hl": true
+   }
+  ],
+  "in": 131.48,
+  "out": 133.08
+ },
+ {
+  "text": "Tidak ada jawaban yang langsung",
+  "words": [
+   {
+    "t": "Tidak",
+    "s": 133.2,
+    "hl": false
+   },
+   {
+    "t": "ada",
+    "s": 133.64,
+    "hl": false
+   },
+   {
+    "t": "jawaban",
+    "s": 133.8,
+    "hl": false
+   },
+   {
+    "t": "yang",
+    "s": 134.32,
+    "hl": false
+   },
+   {
+    "t": "langsung",
+    "s": 134.52,
+    "hl": false
+   }
+  ],
+  "in": 133.08,
+  "out": 134.92
+ },
+ {
+  "text": "mengubah segalanya.",
+  "words": [
+   {
+    "t": "mengubah",
+    "s": 135.04,
+    "hl": false
+   },
+   {
+    "t": "segalanya.",
+    "s": 135.54,
+    "hl": true
+   }
+  ],
+  "in": 134.92,
+  "out": 136.48
+ },
+ {
+  "text": "Rasa takutnya masih ada,",
+  "words": [
+   {
+    "t": "Rasa",
+    "s": 136.6,
+    "hl": false
+   },
+   {
+    "t": "takutnya",
+    "s": 136.78,
+    "hl": true
+   },
+   {
+    "t": "masih",
+    "s": 137.3,
+    "hl": false
+   },
+   {
+    "t": "ada,",
+    "s": 137.54,
+    "hl": false
+   }
+  ],
+  "in": 136.48,
+  "out": 138.38
+ },
+ {
+  "text": "keraguannya belum menghilang.",
+  "words": [
+   {
+    "t": "keraguannya",
+    "s": 138.5,
+    "hl": true
+   },
+   {
+    "t": "belum",
+    "s": 139.02,
+    "hl": false
+   },
+   {
+    "t": "menghilang.",
+    "s": 139.36,
+    "hl": false
+   }
+  ],
+  "in": 138.38,
+  "out": 140.96
+ },
+ {
+  "text": "Namun, kali ini",
+  "words": [
+   {
+    "t": "Namun,",
+    "s": 142.0,
+    "hl": false
+   },
+   {
+    "t": "kali",
+    "s": 142.4,
+    "hl": true
+   },
+   {
+    "t": "ini",
+    "s": 142.86,
+    "hl": true
+   }
+  ],
+  "in": 141.88,
+  "out": 143.1
+ },
+ {
+  "text": "ia tidak membuat janji untuk esok hari.",
+  "words": [
+   {
+    "t": "ia",
+    "s": 143.22,
+    "hl": false
+   },
+   {
+    "t": "tidak",
+    "s": 143.44,
+    "hl": true
+   },
+   {
+    "t": "membuat",
+    "s": 143.64,
+    "hl": false
+   },
+   {
+    "t": "janji",
+    "s": 144.1,
+    "hl": false
+   },
+   {
+    "t": "untuk",
+    "s": 144.6,
+    "hl": false
+   },
+   {
+    "t": "esok",
+    "s": 144.82,
+    "hl": false
+   },
+   {
+    "t": "hari.",
+    "s": 145.16,
+    "hl": false
+   }
+  ],
+  "in": 143.1,
+  "out": 146.58
+ },
+ {
+  "text": "Ia meletakkan ponselnya,",
+  "words": [
+   {
+    "t": "Ia",
+    "s": 146.7,
+    "hl": false
+   },
+   {
+    "t": "meletakkan",
+    "s": 146.8,
+    "hl": false
+   },
+   {
+    "t": "ponselnya,",
+    "s": 147.44,
+    "hl": true
+   }
+  ],
+  "in": 146.58,
+  "out": 148.04
+ },
+ {
+  "text": "bangkit dari ranjang,",
+  "words": [
+   {
+    "t": "bangkit",
+    "s": 148.16,
+    "hl": true
+   },
+   {
+    "t": "dari",
+    "s": 148.84,
+    "hl": false
+   },
+   {
+    "t": "ranjang,",
+    "s": 149.06,
+    "hl": false
+   }
+  ],
+  "in": 148.04,
+  "out": 149.58
+ },
+ {
+  "text": "dan perlahan berjalan menuju pintu.",
+  "words": [
+   {
+    "t": "dan",
+    "s": 149.7,
+    "hl": false
+   },
+   {
+    "t": "perlahan",
+    "s": 150.1,
+    "hl": false
+   },
+   {
+    "t": "berjalan",
+    "s": 150.68,
+    "hl": false
+   },
+   {
+    "t": "menuju",
+    "s": 151.22,
+    "hl": false
+   },
+   {
+    "t": "pintu.",
+    "s": 151.68,
+    "hl": true
+   }
+  ],
+  "in": 149.58,
+  "out": 153.28
+ },
+ {
+  "text": "Ketika tangannya memutar",
+  "words": [
+   {
+    "t": "Ketika",
+    "s": 153.8,
+    "hl": false
+   },
+   {
+    "t": "tangannya",
+    "s": 154.12,
+    "hl": false
+   },
+   {
+    "t": "memutar",
+    "s": 154.52,
+    "hl": true
+   }
+  ],
+  "in": 153.68,
+  "out": 154.84
+ },
+ {
+  "text": "gagang pintu itu,",
+  "words": [
+   {
+    "t": "gagang",
+    "s": 154.96,
+    "hl": false
+   },
+   {
+    "t": "pintu",
+    "s": 155.38,
+    "hl": false
+   },
+   {
+    "t": "itu,",
+    "s": 155.72,
+    "hl": false
+   }
+  ],
+  "in": 154.84,
+  "out": 156.0
+ },
+ {
+  "text": "ia menemukan sesuatu",
+  "words": [
+   {
+    "t": "ia",
+    "s": 156.12,
+    "hl": false
+   },
+   {
+    "t": "menemukan",
+    "s": 156.52,
+    "hl": false
+   },
+   {
+    "t": "sesuatu",
+    "s": 157.06,
+    "hl": false
+   }
+  ],
+  "in": 156.0,
+  "out": 157.58
+ },
+ {
+  "text": "yang tak pernah benar-benar ia sadari.",
+  "words": [
+   {
+    "t": "yang",
+    "s": 157.7,
+    "hl": false
+   },
+   {
+    "t": "tak",
+    "s": 157.9,
+    "hl": false
+   },
+   {
+    "t": "pernah",
+    "s": 158.12,
+    "hl": false
+   },
+   {
+    "t": "benar-benar",
+    "s": 158.46,
+    "hl": false
+   },
+   {
+    "t": "ia",
+    "s": 159.18,
+    "hl": false
+   },
+   {
+    "t": "sadari.",
+    "s": 159.34,
+    "hl": true
+   }
+  ],
+  "in": 157.58,
+  "out": 159.74
+ },
+ {
+  "text": "Pintu tersebut",
+  "words": [
+   {
+    "t": "Pintu",
+    "s": 159.86,
+    "hl": false
+   },
+   {
+    "t": "tersebut",
+    "s": 160.62,
+    "hl": false
+   }
+  ],
+  "in": 159.74,
+  "out": 162.22
+ },
+ {
+  "text": "tidak terkunci.",
+  "words": [
+   {
+    "t": "tidak",
+    "s": 162.9,
+    "hl": true
+   },
+   {
+    "t": "terkunci.",
+    "s": 163.06,
+    "hl": true
+   }
+  ],
+  "in": 162.78,
+  "out": 164.28
+ },
+ {
+  "text": "Di hadapannya terbentang dunia yang luas,",
+  "words": [
+   {
+    "t": "Di",
+    "s": 164.4,
+    "hl": false
+   },
+   {
+    "t": "hadapannya",
+    "s": 164.45,
+    "hl": false
+   },
+   {
+    "t": "terbentang",
+    "s": 164.98,
+    "hl": false
+   },
+   {
+    "t": "dunia",
+    "s": 165.58,
+    "hl": false
+   },
+   {
+    "t": "yang",
+    "s": 166.08,
+    "hl": false
+   },
+   {
+    "t": "luas,",
+    "s": 166.24,
+    "hl": true
+   }
+  ],
+  "in": 164.28,
+  "out": 167.68
+ },
+ {
+  "text": "dengan segala kemungkinan",
+  "words": [
+   {
+    "t": "dengan",
+    "s": 167.8,
+    "hl": false
+   },
+   {
+    "t": "segala",
+    "s": 167.98,
+    "hl": false
+   },
+   {
+    "t": "kemungkinan",
+    "s": 168.54,
+    "hl": true
+   }
+  ],
+  "in": 167.68,
+  "out": 169.16
+ },
+ {
+  "text": "dan ketidakpastiannya.",
+  "words": [
+   {
+    "t": "dan",
+    "s": 169.28,
+    "hl": false
+   },
+   {
+    "t": "ketidakpastiannya.",
+    "s": 169.44,
+    "hl": true
+   }
+  ],
+  "in": 169.16,
+  "out": 171.04
+ },
+ {
+  "text": "Ia belum tahu apa yang akan terjadi selanjutnya,",
+  "words": [
+   {
+    "t": "Ia",
+    "s": 171.2,
+    "hl": false
+   },
+   {
+    "t": "belum",
+    "s": 171.28,
+    "hl": false
+   },
+   {
+    "t": "tahu",
+    "s": 171.44,
+    "hl": false
+   },
+   {
+    "t": "apa",
+    "s": 171.74,
+    "hl": false
+   },
+   {
+    "t": "yang",
+    "s": 172.1,
+    "hl": false
+   },
+   {
+    "t": "akan",
+    "s": 172.28,
+    "hl": false
+   },
+   {
+    "t": "terjadi",
+    "s": 172.52,
+    "hl": false
+   },
+   {
+    "t": "selanjutnya,",
+    "s": 173.0,
+    "hl": true
+   }
+  ],
+  "in": 171.08,
+  "out": 173.98
+ },
+ {
+  "text": "tetapi kini ia memahami satu hal:",
+  "words": [
+   {
+    "t": "tetapi",
+    "s": 174.1,
+    "hl": false
+   },
+   {
+    "t": "kini",
+    "s": 174.4,
+    "hl": false
+   },
+   {
+    "t": "ia",
+    "s": 174.82,
+    "hl": false
+   },
+   {
+    "t": "memahami",
+    "s": 175.32,
+    "hl": false
+   },
+   {
+    "t": "satu",
+    "s": 175.96,
+    "hl": true
+   },
+   {
+    "t": "hal:",
+    "s": 176.16,
+    "hl": true
+   }
+  ],
+  "in": 173.98,
+  "out": 177.7
+ },
+ {
+  "text": "kesadaran tidak akan mengubah kehidupan",
+  "words": [
+   {
+    "t": "kesadaran",
+    "s": 177.82,
+    "hl": true
+   },
+   {
+    "t": "tidak",
+    "s": 178.32,
+    "hl": false
+   },
+   {
+    "t": "akan",
+    "s": 178.56,
+    "hl": false
+   },
+   {
+    "t": "mengubah",
+    "s": 178.84,
+    "hl": false
+   },
+   {
+    "t": "kehidupan",
+    "s": 179.3,
+    "hl": false
+   }
+  ],
+  "in": 177.7,
+  "out": 180.28
+ },
+ {
+  "text": "selama tidak diikuti keberanian",
+  "words": [
+   {
+    "t": "selama",
+    "s": 180.4,
+    "hl": false
+   },
+   {
+    "t": "tidak",
+    "s": 180.84,
+    "hl": false
+   },
+   {
+    "t": "diikuti",
+    "s": 181.1,
+    "hl": false
+   },
+   {
+    "t": "keberanian",
+    "s": 181.6,
+    "hl": true
+   }
+  ],
+  "in": 180.28,
+  "out": 182.08
+ },
+ {
+  "text": "untuk mengambil tindakan.",
+  "words": [
+   {
+    "t": "untuk",
+    "s": 182.2,
+    "hl": false
+   },
+   {
+    "t": "mengambil",
+    "s": 182.58,
+    "hl": false
+   },
+   {
+    "t": "tindakan.",
+    "s": 183.16,
+    "hl": true
+   }
+  ],
+  "in": 182.08,
+  "out": 183.78
+ },
+ {
+  "text": "Dan perubahan itu",
+  "words": [
+   {
+    "t": "Dan",
+    "s": 183.9,
+    "hl": false
+   },
+   {
+    "t": "perubahan",
+    "s": 184.4,
+    "hl": true
+   },
+   {
+    "t": "itu",
+    "s": 184.8,
+    "hl": false
+   }
+  ],
+  "in": 183.78,
+  "out": 185.0
+ },
+ {
+  "text": "dimulai dari langkah pertamanya.",
+  "words": [
+   {
+    "t": "dimulai",
+    "s": 185.12,
+    "hl": false
+   },
+   {
+    "t": "dari",
+    "s": 186.36,
+    "hl": false
+   },
+   {
+    "t": "langkah",
+    "s": 186.52,
+    "hl": true
+   },
+   {
+    "t": "pertamanya.",
+    "s": 186.96,
+    "hl": true
+   }
+  ],
+  "in": 185.0,
+  "out": 188.3
+ }
+]

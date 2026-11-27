@@ -3,12 +3,15 @@
   1. cube shadow wedge spilling onto the background (city shots)            -> un-shadow (YUV, see wedge_yuv.py)
   2. calendar half-covered by the thought bubble (38.3s-42.5s)               -> calendar hidden while bubble is shown
   3. 'TIDAK ADA JANJI BESOK' rendered outside its card (144.2-144.4s)        -> text outside the card removed
+  4. cube floating in the city shots (oblique side face ends above the sidewalk) -> side face extended down
+     to the sidewalk + drop shadow extended (see ground_cube.py)
 
 Usage: repair_base.py <original.mp4> <calendar.json> <out.mp4> <log.json>
 """
 import sys, json, subprocess
 import numpy as np, cv2
 import wedge_yuv as wy
+import ground_cube as gcube
 
 src, cal_p, out_p, log_p = sys.argv[1:5]
 W, H = 1080, 1920
@@ -400,6 +403,87 @@ for run in runs_of(sorted(k for k, v in geo.items() if v)):
         geo[k]["tr_x"] = geo[k]["gr_x"] + (geo[k]["fbr_y"] - geo[k]["y_top"]) * wf.RIGHT_SLOPE
 print("pass1: measured", sum(1 for v in geo.values() if v), "filled", len(filled), flush=True)
 
+# ---- pass 1.5: ground-line measurements for the cube (sidewalk top, shadow band, side colour)
+FIGURE_SEGMENTS = [(4929, 5009), (5121, 5222), (5637, 5723)]   # main figure / notes pass in front of the cube
+CROSSFADE = (2323, 2335)                                        # void -> city cross-fade at 77.4s
+
+
+def to_roi(g, bx0, by0):
+    gl = dict(g)
+    for k in ("fbr_x", "bbr_x", "gr_x", "tr_x"):
+        gl[k] = g[k] - bx0
+    for k in ("fbr_y", "bbr_y", "y_top"):
+        gl[k] = g[k] - by0
+    return gl
+
+
+def ground_roi(g, yG, yS):
+    shift = g["bbr_x"] - g["fbr_x"]
+    xmax = max(g["bbr_x"], g["gr_x"] + shift - (yG - g["fbr_y"]) * gcube.K)
+    xmin = min(g["fbr_x"] - 125, g["gr_x"] - (yS - g["fbr_y"]) * gcube.K)
+    return even_box(int(np.floor(xmin)) - 8, int(np.floor(min(g["bbr_y"], g["fbr_y"]))) - 14,
+                    int(np.ceil(xmax)) + 9, int(np.ceil(yS)) + 10)
+
+
+gmeas = {}
+for n, fr in frames(src):
+    if n > WEDGE[-1][1]:
+        break
+    g = geo.get(n)
+    if not g:
+        continue
+    Y, U, V = planes(fr)
+    bx0, by0, bx1, by1 = ground_roi(g, g["fbr_y"] + 6, g["fbr_y"] + 100)
+    if bx1 - bx0 < 8 or by1 - by0 < 8:
+        continue
+    roi = roi_get_rgb(Y, U, V, bx0, by0, bx1, by1)
+    m = gcube.measure(roi, to_roi(g, bx0, by0))
+    if "y_ground" in m:
+        m["y_ground"] += by0
+    if "y_shadow" in m:
+        m["y_shadow"] += by0
+    gmeas[n] = m
+# per run: robust offsets relative to the cube corner (stable within a shot), side colour per frame
+ground = {}
+for run in runs_of(sorted(k for k, v in geo.items() if v)):
+    dG = {k: gmeas[k]["y_ground"] - geo[k]["fbr_y"] for k in run if k in gmeas and "y_ground" in gmeas[k]}
+    dS = {k: gmeas[k]["y_shadow"] - gmeas[k]["y_ground"] for k in run if k in gmeas and "y_shadow" in gmeas[k] and "y_ground" in gmeas[k]}
+    if not dG:
+        continue
+    last_side = None
+    for k in run:
+        near = [dG[j] for j in run if j in dG and abs(j - k) <= 6] or [dG[min(dG, key=lambda j: abs(j - k))]]
+        nearS = [dS[j] for j in run if j in dS and abs(j - k) <= 6] or ([dS[min(dS, key=lambda j: abs(j - k))]] if dS else [20.0])
+        side = gmeas.get(k, {}).get("side")
+        if side is None:
+            side = last_side
+        if side is None:
+            continue
+        last_side = side
+        yG = geo[k]["fbr_y"] + float(np.median(near))
+        ground[k] = (yG, yG + max(6.0, float(np.median(nearS))), side)
+print("ground: frames", len(ground), flush=True)
+
+
+def apply_ground(Y, U, V, n, g):
+    gd = ground.get(n)
+    if not gd:
+        return None
+    yG, yS, side = gd
+    bx0, by0, bx1, by1 = ground_roi(g, yG, yS)
+    if bx1 - bx0 < 8 or by1 - by0 < 8:
+        return None
+    roi = roi_get_rgb(Y, U, V, bx0, by0, bx1, by1)
+    gl = to_roi(g, bx0, by0)
+    a = 1.0
+    if CROSSFADE[0] <= n <= CROSSFADE[1]:
+        a = smooth((n - CROSSFADE[0] + 1) / (CROSSFADE[1] - CROSSFADE[0] + 1))
+    fg = any(s0 <= n <= s1 for s0, s1 in FIGURE_SEGMENTS)
+    out = gcube.apply(roi, gl, yG - by0, yS - by0, side, alpha=a, protect_fg=fg)
+    roi_put_rgb(Y, U, V, bx0, by0, bx1, by1, out)
+    return {"y_ground": round(yG, 1), "y_shadow": round(yS, 1), "alpha": round(a, 3)}
+
+
 # ---- pass 2: apply all repairs and encode
 enc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "yuv420p", "-s", f"{W}x{H}",
                         "-r", "30", "-i", "-", "-i", src, "-map", "0:v", "-map", "1:a", "-c:v", "libx264",
@@ -418,6 +502,7 @@ for n, fr in frames(src):
         Yo, Uo, Vo = wy.apply(Y, U, V, g)
         Y[:], U[:], V[:] = Yo, Uo, Vo
         entry["wedge"] = {k: round(g[k], 2) for k in KEYS} | {"interp": n in filled}
+        entry["ground"] = apply_ground(Y, U, V, n, g)
     if BUBBLE[0] <= n <= BUBBLE[1]:
         entry["calendar_hide"] = hide_calendar(Y, U, V, n)
     if GHOST[0] <= n <= GHOST[1]:
